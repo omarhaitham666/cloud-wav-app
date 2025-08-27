@@ -1,4 +1,5 @@
 // LoginScreen.tsx
+import CustomHeader from "@/src/components/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
@@ -7,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   Image,
+  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -76,44 +78,55 @@ export default function LoginScreen() {
   );
 
   return (
-    <View className="flex-1 justify-center px-6 bg-white">
-      <Image
-        source={require("../../assets/login.png")}
-        className="w-40 h-40 self-center mb-6"
-      />
-      <Text className="text-2xl font-bold text-red-600 text-center mb-6">
-        Welcome to Cloud Wav
-      </Text>
-
-      {renderInput({ name: "username", placeholder: "Username" })}
-      {renderInput({ name: "password", placeholder: "Password", secure: true })}
-
-      <TouchableOpacity
-        className="bg-red-600 py-3 rounded-md mb-4"
-        onPress={handleSubmit(onSubmit)}
-      >
-        <Text className="text-white text-center font-semibold text-base">
-          Sign In
+    <SafeAreaView>
+      <View className="mt-8">
+        <CustomHeader showLanguageSwitcher />
+      </View>
+      <View className="min-h-screen justify-center px-6 bg-white">
+        <Image
+          source={require("../../assets/login.png")}
+          className="w-40 h-40 self-center mb-6"
+        />
+        <Text className="text-2xl font-bold text-red-600 text-center mb-6">
+          Welcome to Cloud Wav
         </Text>
-      </TouchableOpacity>
 
-      <Text className="text-center text-gray-500 mb-4">Or sign in with</Text>
+        {renderInput({ name: "username", placeholder: "Username" })}
+        {renderInput({
+          name: "password",
+          placeholder: "Password",
+          secure: true,
+        })}
 
-      <View className="flex-row justify-center mb-6">
         <TouchableOpacity
-          className="flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-2 shadow-md"
-          onPress={() => Alert.alert("Social Login", "Sign in with Google")}
+          className="bg-red-600 py-3 rounded-md mb-4"
+          onPress={handleSubmit(onSubmit)}
         >
-          <Ionicons name="logo-google" size={20} color="#DB4437" />
-          <Text className="ml-2 text-base font-medium text-black">Google</Text>
+          <Text className="text-white text-center font-semibold text-base">
+            Sign In
+          </Text>
+        </TouchableOpacity>
+
+        <Text className="text-center text-gray-500 mb-4">Or sign in with</Text>
+
+        <View className="flex-row justify-center mb-6">
+          <TouchableOpacity
+            className="flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-2 shadow-md"
+            onPress={() => Alert.alert("Social Login", "Sign in with Google")}
+          >
+            <Ionicons name="logo-google" size={20} color="#DB4437" />
+            <Text className="ml-2 text-base font-medium text-black">
+              Google
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity onPress={() => router.push("/register")}>
+          <Text className="text-red-600 text-center text-sm">
+            Don&apos;t have an account? Sign Up
+          </Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text className="text-red-600 text-center text-sm">
-          Don&apos;t have an account? Sign Up
-        </Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }

@@ -1,4 +1,5 @@
 // RegisterScreen.tsx
+import CustomHeader from "@/src/components/CustomHeader";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -92,6 +93,9 @@ export default function RegisterScreen() {
 
   return (
     <ScrollView>
+      <View className="mt-8">
+        <CustomHeader showLanguageSwitcher />
+      </View>
       <View className="min-h-screen justify-center px-6 bg-white">
         <Image
           source={require("../../assets/register.png")}

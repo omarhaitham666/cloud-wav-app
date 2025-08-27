@@ -23,22 +23,24 @@ const Page = () => {
           className="h-96 w-full justify-between p-5"
         >
           <CustomHeader transparent colorIcon="white" />
-          <View className="absolute top-28 left-6">
-            <Text className="text-white text-xs mb-1">{t("Cloud Wav")}</Text>
-            <Text className="text-white text-2xl font-bold leading-7">
-              Find Your Flow..
-            </Text>
-            <Text className="text-white text-base mb-4">- Kamelia</Text>
 
-            <View className="flex-row space-x-3">
-              <TouchableOpacity className="bg-white px-4 py-2 rounded-full">
+          <View className="absolute top-28 left-6">
+            <Text className="text-white text-xs mb-1">{t("cloudWav")}</Text>
+
+            <Text className="text-white text-2xl font-bold leading-7">
+              {t("Find Your Flow..")}
+            </Text>
+
+            <Text className="text-white text-base mb-4">
+              - {t("Unleash your soundworld")}
+            </Text>
+
+            <View className="flex-row items-center space-x-3">
+              <TouchableOpacity className="bg-white flex-row items-center gap-3 px-4 py-2.5 rounded-full">
                 <Text className="text-red-500 font-bold text-sm">
                   {t("play")}
                 </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity className="bg-white p-2 rounded-full">
-                <Ionicons name="share-social-outline" size={18} color="red" />
+                <Ionicons name="play" size={18} color="red" />
               </TouchableOpacity>
             </View>
           </View>
