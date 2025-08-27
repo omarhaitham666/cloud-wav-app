@@ -1,3 +1,4 @@
+import CustomHeader from "@/src/components/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -21,15 +22,11 @@ const Page = () => {
           resizeMode="cover"
           className="h-96 w-full justify-between p-5"
         >
-          <View className="flex-row justify-between items-center">
-            <TouchableOpacity>
-              <Ionicons name="menu" size={24} color="#fff" />
-            </TouchableOpacity>
-          </View>
+          <CustomHeader transparent colorIcon="white" />
           <View className="absolute top-28 left-6">
-            <Text className="text-white text-xs mb-1">{t("trending")}</Text>
+            <Text className="text-white text-xs mb-1">{t("Cloud Wav")}</Text>
             <Text className="text-white text-2xl font-bold leading-7">
-              Akcent Feat Lidia Buble...
+              Find Your Flow..
             </Text>
             <Text className="text-white text-base mb-4">- Kamelia</Text>
 
