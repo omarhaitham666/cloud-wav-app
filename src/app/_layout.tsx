@@ -9,6 +9,8 @@ export default function RootLayout() {
     <StoreProvider>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
       </Stack>
     </StoreProvider>
   );

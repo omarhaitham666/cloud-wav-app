@@ -48,3 +48,24 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+1- welcome screen
+
+2- home screen
+--- hero
+--- flatlist services
+--- top song
+
+3- song screen
+3- song details screen
+2- profile screen
+2- login screen
+2- register screen
+2- otp screen
+2- register Video Creator screen
+2- contact us screen
+2- faq screen
+2- service screen
+2- price screen
+2- search screen
+2- video creator screen
