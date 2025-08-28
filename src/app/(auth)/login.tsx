@@ -1,9 +1,8 @@
-// LoginScreen.tsx
 import CustomHeader from "@/src/components/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
@@ -15,6 +14,7 @@ import {
   View,
 } from "react-native";
 import * as yup from "yup";
+
 interface LoginFormValues {
   username: string;
   password: string;
@@ -25,11 +25,13 @@ const schema = yup.object().shape({
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
-    .required(),
+    .required("Password is required"),
 });
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -40,6 +42,7 @@ export default function LoginScreen() {
 
   const onSubmit = (data: LoginFormValues) => {
     Alert.alert("Login", JSON.stringify(data, null, 2));
+    // TODO: call your login API here
   };
 
   const renderInput = ({
@@ -47,26 +50,43 @@ export default function LoginScreen() {
     placeholder,
     secure = false,
     keyboardType = "default",
+    showToggle = false,
   }: {
     name: keyof LoginFormValues;
     placeholder: string;
     secure?: boolean;
-    keyboardType?: "default" | "email-address" | "phone-pad";
+    keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
+    showToggle?: boolean;
   }) => (
     <Controller
       control={control}
       name={name}
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
-          <TextInput
-            placeholder={placeholder}
-            value={value}
-            onChangeText={onChange}
-            secureTextEntry={secure}
-            keyboardType={keyboardType}
-            className="border border-gray-300 rounded-md px-4 py-3 text-base text-black"
-            placeholderTextColor="#888"
-          />
+          <View className="flex-row items-center border border-gray-300 rounded-md px-3">
+            <TextInput
+              placeholder={placeholder}
+              value={value}
+              onChangeText={onChange}
+              secureTextEntry={
+                secure &&
+                !(showToggle && name === "password" ? showPassword : false)
+              }
+              keyboardType={keyboardType}
+              className="flex-1 py-3 text-base text-black"
+              placeholderTextColor="#888"
+              autoCapitalize="none"
+            />
+            {showToggle && (
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons
+                  name={showPassword ? "eye-off" : "eye"}
+                  size={20}
+                  color="#888"
+                />
+              </TouchableOpacity>
+            )}
+          </View>
           {errors[name] && (
             <Text className="text-red-600 text-sm mt-1">
               {errors[name]?.message}
@@ -78,11 +98,11 @@ export default function LoginScreen() {
   );
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1 bg-white">
       <View className="mt-8">
         <CustomHeader showLanguageSwitcher />
       </View>
-      <View className="min-h-screen justify-center px-6 bg-white">
+      <View className="flex-1 justify-center px-6">
         <Image
           source={require("../../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"
@@ -96,7 +116,17 @@ export default function LoginScreen() {
           name: "password",
           placeholder: "Password",
           secure: true,
+          showToggle: true,
         })}
+
+        <TouchableOpacity
+          onPress={() => router.push("/(auth)/ForgotPassword")}
+          className="mb-4 self-end"
+        >
+          <Text className="text-sm text-red-600 font-medium">
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           className="bg-red-600 py-3 rounded-md mb-4"
@@ -108,18 +138,15 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <Text className="text-center text-gray-500 mb-4">Or sign in with</Text>
-
-        <View className="flex-row justify-center mb-6">
-          <TouchableOpacity
-            className="flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-2 shadow-md"
-            onPress={() => Alert.alert("Social Login", "Sign in with Google")}
-          >
-            <Ionicons name="logo-google" size={20} color="#DB4437" />
-            <Text className="ml-2 text-base font-medium text-black">
-              Google
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          className="flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-3 shadow-sm justify-center mb-6"
+          onPress={() => Alert.alert("Social Login", "Sign in with Google")}
+        >
+          <Ionicons name="logo-google" size={20} color="#DB4437" />
+          <Text className="ml-3 text-base font-medium text-gray-800">
+            Continue with Google
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
           <Text className="text-red-600 text-center text-sm">

@@ -1,15 +1,21 @@
 import { TabBar } from "@/src/components/TabBar";
 import { Tabs } from "expo-router";
-import React from "react";
 
-const TabLayout = () => {
+export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarPosition: "bottom",
+        tabBarActiveTintColor: "#4f46e5",
+        tabBarInactiveTintColor: "#9ca3af",
+        tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "white",
-          height: 80,
+          backgroundColor: "#fff",
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
         },
       }}
       tabBar={(props) => <TabBar {...props} />}
@@ -18,39 +24,32 @@ const TabLayout = () => {
         name="index"
         options={{
           title: "Home",
-          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: "Search",
-          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="song"
         options={{
           title: "Song",
-          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="price"
         options={{
-          title: "Price",
-          headerShown: false,
+          title: "Contact",
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          headerShown: false,
         }}
       />
     </Tabs>
   );
-};
-
-export default TabLayout;
+}
