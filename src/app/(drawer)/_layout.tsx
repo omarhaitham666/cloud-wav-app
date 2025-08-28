@@ -1,51 +1,25 @@
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Drawer } from "expo-router/drawer";
-import { I18nManager } from "react-native";
+// app/(drawer)/_layout.tsx
+import DrawerContent from "@/src/components/DrawerContent";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import React from "react";
+import LoginScreen from "../../screens/login";
+import RegisterScreen from "../../screens/register";
+import HomePage from "./(tabs)";
+
+const Drawer = createDrawerNavigator();
 
 export default function DrawerLayout() {
   return (
-    <Drawer
-      screenOptions={{
-        headerShown: false,
-        drawerStyle: {
-          backgroundColor: "white",
-        },
-        drawerActiveTintColor: "#4f46e5",
-        drawerLabelStyle: {
-          fontSize: 14,
-          paddingHorizontal: 7,
-          textAlign: I18nManager.isRTL ? "right" : "left",
-        },
-        drawerPosition: I18nManager.isRTL ? "right" : "left",
-      }}
+    <Drawer.Navigator
+      drawerContent={(props) => <DrawerContent {...props} />}
+      screenOptions={{ headerShown: false }}
     >
-      <Drawer.Screen
-        name="(tabs)"
-        options={{
-          drawerLabel: "Home",
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="login"
-        options={{
-          drawerLabel: "Login",
-          drawerIcon: ({ color, size }) => (
-            <MaterialIcons name="login" size={size} color={color} />
-          ),
-        }}
-      />
-      <Drawer.Screen
-        name="register"
-        options={{
-          drawerLabel: "Register",
-          drawerIcon: ({ color, size }) => (
-            <MaterialIcons name="person-add" size={size} color={color} />
-          ),
-        }}
-      />
-    </Drawer>
+      <Drawer.Screen name="Home" component={HomePage} />
+      <Drawer.Screen name="Login" component={LoginScreen} />
+      <Drawer.Screen name="Register" component={RegisterScreen} />
+      {/* <Drawer.Screen name="Profile" component={ProfileScreen} />
+      <Drawer.Screen name="Settings" component={SettingsScreen} />
+      <Drawer.Screen name="Help" component={HelpScreen} /> */}
+    </Drawer.Navigator>
   );
 }

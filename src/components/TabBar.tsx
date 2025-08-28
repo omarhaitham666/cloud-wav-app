@@ -13,7 +13,11 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.2,
           shadowRadius: 4,
-          height: 90,
+          // position: "absolute",
+          // bottom: 30,
+          // left: 0,
+          // right: 0,
+          height: 50,
         },
       ]}
       className="items-center justify-around shadow-md"

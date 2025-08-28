@@ -84,7 +84,7 @@ export default function LoginScreen() {
       </View>
       <View className="min-h-screen justify-center px-6 bg-white">
         <Image
-          source={require("../../assets/login.png")}
+          source={require("../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"
         />
         <Text className="text-2xl font-bold text-red-600 text-center mb-6">
@@ -121,7 +121,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => router.push("/register")}>
+        <TouchableOpacity onPress={() => router.push("/login")}>
           <Text className="text-red-600 text-center text-sm">
             Don&apos;t have an account? Sign Up
           </Text>

@@ -98,13 +98,12 @@ export default function RegisterScreen() {
       </View>
       <View className="min-h-screen justify-center px-6 bg-white">
         <Image
-          source={require("../../assets/register.png")}
+          source={require("../assets/images/register.png")}
           className="w-40 h-40 self-center mb-6"
         />
         <Text className="text-2xl font-bold text-red-600 text-center mb-6">
           Register on Cloud Wav
         </Text>
-
         {renderInput({ name: "fullName", placeholder: "Enter Your Name" })}
         {renderInput({
           name: "email",

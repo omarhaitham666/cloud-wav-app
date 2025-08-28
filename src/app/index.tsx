@@ -27,7 +27,7 @@ export default function WelcomeScreen() {
     if (currentIndex < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      router.replace("/(tabs)");
+      router.replace("/(drawer)/(tabs)");
     }
   };
 

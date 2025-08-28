@@ -12,14 +12,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const Page = () => {
+const HomePage = () => {
   const { t } = useTranslation();
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView>
         <ImageBackground
-          source={require("../../../assets/Rectangle.png")}
+          source={require("../../../assets/images/Rectangle.png")}
           resizeMode="cover"
           className="h-96 w-full justify-between p-5"
         >
@@ -52,4 +52,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default HomePage;
