@@ -2,6 +2,7 @@ import { DrawerContentComponentProps } from "@react-navigation/drawer";
 
 import React from "react";
 import {
+  Image,
   SafeAreaView,
   ScrollView,
   Text,
@@ -77,22 +78,14 @@ export default function DrawerContent({
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Logo Section */}
-        <View className="items-center py-8 bg-gray-100">
-          <View className="w-16 h-16 rounded-full bg-[#4f46e5] items-center justify-center mb-3 shadow-lg">
-            <Text className="text-white text-2xl font-bold">YA</Text>
+        <View className="items-center py-8 ">
+          <View className="w-10 h-10 mt-10 rounded-full items-center justify-center mb-3 shadow-lg">
+            <Image source={require("../assets/images/logo.png")} />
           </View>
-          <Text className="text-lg font-semibold text-gray-800 mb-1">
-            Your App
-          </Text>
-          <Text className="text-xs text-gray-500 uppercase tracking-widest">
-            Professional Edition
-          </Text>
         </View>
 
         <View className="h-px bg-gray-200 my-2 mx-6" />
 
-        {/* Main Navigation */}
         <View className="py-2">
           <Text className="text-xs font-semibold text-gray-500 uppercase tracking-wider mx-6 mb-1">
             NAVIGATION
@@ -102,7 +95,6 @@ export default function DrawerContent({
 
         <View className="h-px bg-gray-200 my-2 mx-6" />
 
-        {/* Secondary Navigation */}
         <View className="py-2">
           <Text className="text-xs font-semibold text-gray-500 uppercase tracking-wider mx-6 mb-1">
             ACCOUNT
