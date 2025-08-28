@@ -29,7 +29,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <View className="flex-row  absolute -bottom-3 left-0 right-0 bg-white h-24 items-center justify-around  shadow-md">
+    <View className="flex-row  absolute bottom-2 left-0 right-0 bg-white h-24 items-center justify-around  shadow-md">
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
 
