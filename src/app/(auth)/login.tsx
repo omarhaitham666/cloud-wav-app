@@ -1,5 +1,5 @@
-// RegisterScreen.tsx
-import CustomHeader from "@/src/components/CustomHeader";
+// LoginScreen.tsx
+import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -7,53 +7,38 @@ import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
   Image,
-  ScrollView,
+  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import * as yup from "yup";
-
-interface FormValues {
-  fullName: string;
-  email: string;
-  birthDate: string;
-  phone: string;
+interface LoginFormValues {
+  username: string;
   password: string;
-  confirmPassword: string;
 }
 
 const schema = yup.object().shape({
-  fullName: yup.string().required("Full Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  birthDate: yup
-    .string()
-    .matches(/^\d{2}\/\d{2}\/\d{4}$/, "Birth Date must be mm/dd/yyyy")
-    .required("Birth Date is required"),
-  phone: yup.string().required("Phone Number is required"),
+  username: yup.string().required("Username is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
     .required(),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required"),
 });
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
   const router = useRouter();
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<LoginFormValues>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: FormValues) => {
-    Alert.alert("Register", JSON.stringify(data, null, 2));
+  const onSubmit = (data: LoginFormValues) => {
+    Alert.alert("Login", JSON.stringify(data, null, 2));
   };
 
   const renderInput = ({
@@ -62,10 +47,10 @@ export default function RegisterScreen() {
     secure = false,
     keyboardType = "default",
   }: {
-    name: keyof FormValues;
+    name: keyof LoginFormValues;
     placeholder: string;
     secure?: boolean;
-    keyboardType?: "default" | "numeric" | "email-address" | "phone-pad";
+    keyboardType?: "default" | "email-address" | "phone-pad";
   }) => (
     <Controller
       control={control}
@@ -92,42 +77,20 @@ export default function RegisterScreen() {
   );
 
   return (
-    <ScrollView>
-      <View className="mt-8">
-        <CustomHeader showLanguageSwitcher />
-      </View>
+    <SafeAreaView>
       <View className="min-h-screen justify-center px-6 bg-white">
         <Image
-          source={require("../assets/images/register.png")}
+          source={require("../../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"
         />
         <Text className="text-2xl font-bold text-red-600 text-center mb-6">
-          Register on Cloud Wav
+          Welcome to Cloud Wav
         </Text>
-        {renderInput({ name: "fullName", placeholder: "Enter Your Name" })}
-        {renderInput({
-          name: "email",
-          placeholder: "Email Address",
-          keyboardType: "email-address",
-        })}
-        {renderInput({
-          name: "birthDate",
-          placeholder: "Birth Date (mm/dd/yyyy)",
-          keyboardType: "numeric",
-        })}
-        {renderInput({
-          name: "phone",
-          placeholder: "Phone Number",
-          keyboardType: "phone-pad",
-        })}
+
+        {renderInput({ name: "username", placeholder: "Username" })}
         {renderInput({
           name: "password",
           placeholder: "Password",
-          secure: true,
-        })}
-        {renderInput({
-          name: "confirmPassword",
-          placeholder: "Confirm Password",
           secure: true,
         })}
 
@@ -136,16 +99,30 @@ export default function RegisterScreen() {
           onPress={handleSubmit(onSubmit)}
         >
           <Text className="text-white text-center font-semibold text-base">
-            Sign Up
+            Sign In
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text className="text-red-600 text-center mb-24 text-sm">
-            Already have an account? Login
+        <Text className="text-center text-gray-500 mb-4">Or sign in with</Text>
+
+        <View className="flex-row justify-center mb-6">
+          <TouchableOpacity
+            className="flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-2 shadow-md"
+            onPress={() => Alert.alert("Social Login", "Sign in with Google")}
+          >
+            <Ionicons name="logo-google" size={20} color="#DB4437" />
+            <Text className="ml-2 text-base font-medium text-black">
+              Google
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+          <Text className="text-red-600 text-center text-sm">
+            Don&apos;t have an account? Sign Up
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }

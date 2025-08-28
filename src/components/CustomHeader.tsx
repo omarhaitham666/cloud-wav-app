@@ -7,25 +7,30 @@ import { TouchableOpacity, View } from "react-native";
 const CustomHeader = ({
   transparent,
   showLanguageSwitcher,
-  colorIcon,
+  colorIcon = "#000",
 }: {
   transparent?: boolean;
   showLanguageSwitcher?: boolean;
   colorIcon?: string;
 }) => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
+  const toggleDrawer = () => {
+    if ("toggleDrawer" in navigation || navigation.getParent()?.toggleDrawer) {
+      navigation.dispatch(DrawerActions.toggleDrawer());
+    }
+  };
 
   return (
     <View
       className={`flex-row justify-between items-center px-4 py-3 ${
-        transparent ? "bg-transparent" : "bg-white  shadow-md"
+        transparent ? "bg-transparent" : "bg-white shadow-md"
       }`}
     >
-      <TouchableOpacity
-        onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-      >
+      <TouchableOpacity onPress={toggleDrawer}>
         <Ionicons name="menu" size={26} color={colorIcon} />
       </TouchableOpacity>
+
       {showLanguageSwitcher && <LanguageSwitcher />}
     </View>
   );
