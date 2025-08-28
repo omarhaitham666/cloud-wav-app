@@ -102,7 +102,7 @@ export default function LoginScreen() {
       <View className="mt-8">
         <CustomHeader showLanguageSwitcher />
       </View>
-      <View className="flex-1 justify-center px-6">
+      <View className="flex-1 mt-5 justify-center px-6">
         <Image
           source={require("../../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"

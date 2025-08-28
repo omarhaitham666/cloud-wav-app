@@ -1,12 +1,21 @@
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import React from "react";
+import { SafeAreaView, ScrollView } from "react-native";
 
 const Layout = () => {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="login" />
-      <Stack.Screen name="register" />
-    </Stack>
+    <SafeAreaView>
+      <ScrollView
+        className="bg-white h-full"
+        keyboardShouldPersistTaps="handled"
+      >
+        <Slot
+          screenOptions={({ route }) => ({
+            headerShown: false,
+          })}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

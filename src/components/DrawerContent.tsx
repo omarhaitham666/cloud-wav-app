@@ -1,4 +1,5 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { RelativePathString, router } from "expo-router";
 import React from "react";
 import {
   Alert,
@@ -10,7 +11,6 @@ import {
   View,
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
-
 const DrawerItem = ({
   icon,
   label,
@@ -80,22 +80,12 @@ export default function DrawerContent({
     },
     {
       label: "FAQ",
-      route: "faq",
+      route: "(pages)/faq",
       iconName: "help-circle",
       displayName: "FAQ",
     },
-    {
-      label: "Login",
-      route: "(auth)/login",
-      iconName: "log-in",
-      displayName: "Login",
-    },
-    {
-      label: "Register",
-      route: "(auth)/register",
-      iconName: "user-plus",
-      displayName: "Register",
-    },
+    { label: "Login", route: "(auth)/login", iconName: "log-in" },
+    { label: "Register", route: "(auth)/register", iconName: "user-plus" },
   ];
 
   const secondaryItems = [
@@ -118,7 +108,8 @@ export default function DrawerContent({
       action();
     } else if (route) {
       try {
-        navigation.navigate(route as never);
+        const path = `/${route}` as RelativePathString;
+        router.push(path);
       } catch (error) {
         console.error(`Navigation error for route: ${route}`, error);
         Alert.alert("Navigation Error", `Could not navigate to ${route}`);
