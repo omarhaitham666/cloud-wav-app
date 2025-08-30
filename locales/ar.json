@@ -1,5 +1,30 @@
 {
-  "welcome": "مرحبا",
-  "login": "تسجيل الدخول",
-  "register": "إنشاء حساب"
+  "contact": {
+    "phoneSupportTitle": "الدعم الهاتفي",
+    "phoneSupportSubtitle": "اتصل بنا للحصول على المساعدة الفورية",
+    "phoneSupportValue": "+201055030045",
+    "emailSupportTitle": "الدعم عبر البريد الإلكتروني",
+    "emailSupportSubtitle": "أرسل إلينا استفساراتك التفصيلية",
+    "emailSupportValue": "support@cloudwavproduction.com",
+    "locationSupportTitle": "زر مكتبنا",
+    "locationSupportSubtitle": "قابلنا شخصياً",
+    "locationSupportValue": "٢٢ شارع السواح، الزيتون، القاهرة، مصر",
+    "formTitle": "أرسل لنا رسالة",
+    "firstName": "الاسم الأول *",
+    "lastName": "اسم العائلة *",
+    "email": "البريد الإلكتروني *",
+    "phone": "رقم الهاتف",
+    "message": "أخبرنا عن مشروعك... *",
+    "sendButton": "إرسال الرسالة",
+    "sending": "جارٍ الإرسال...",
+    "alerts": {
+      "errorTitle": "خطأ",
+      "errorFields": "يرجى ملء جميع الحقول المطلوبة",
+      "invalidEmail": "يرجى إدخال بريد إلكتروني صالح",
+      "successTitle": "نجاح!",
+      "successMessage": "تم إرسال رسالتك بنجاح.",
+      "errorMessage": "فشل في إرسال الرسالة. حاول مرة أخرى."
+    }
+  },
+  "faq": {}
 }

@@ -1,4 +1,3 @@
-import CustomHeader from "@/components/CustomHeader";
 import OTPModal from "@/components/OTPModal";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as yup from "yup";
 
 interface FormValues {
@@ -133,114 +133,115 @@ export default function RegisterScreen() {
   );
 
   return (
-    <ScrollView>
-      <View className="mt-8">
-        <CustomHeader showLanguageSwitcher />
-      </View>
-      <View className="min-h-screen justify-center px-6 bg-white">
-        <Image
-          source={require("../../../assets/images/register.png")}
-          className="w-40 h-40 self-center mb-6"
-        />
-        <Text className="text-2xl font-bold text-red-600 text-center mb-6">
-          Register on Cloud Wav
-        </Text>
-        {renderInput({ name: "fullName", placeholder: "Enter Your Name" })}
-        {renderInput({
-          name: "email",
-          placeholder: "Email Address",
-          keyboardType: "email-address",
-        })}
+    <SafeAreaView className="flex-1 py-3 bg-gray-50">
+      <ScrollView className="flex-1 px-4">
+        <View className="min-h-screen justify-center px-6 ">
+          <Image
+            source={require("../../../assets/images/register.png")}
+            className="w-40 h-40 self-center mb-6"
+          />
+          <Text className="text-2xl font-bold text-red-600 text-center mb-6">
+            Register on Cloud Wav
+          </Text>
+          {renderInput({ name: "fullName", placeholder: "Enter Your Name" })}
+          {renderInput({
+            name: "email",
+            placeholder: "Email Address",
+            keyboardType: "email-address",
+          })}
 
-        <Controller
-          control={control}
-          name="birthDate"
-          render={({ field: { value } }) => (
-            <View className="mb-4">
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(true)}
-                className="border border-gray-300 rounded-md px-4 py-3"
-              >
-                <Text
-                  className={`text-base ${
-                    value ? "text-black" : "text-gray-400"
-                  }`}
+          <Controller
+            control={control}
+            name="birthDate"
+            render={({ field: { value } }) => (
+              <View className="mb-4">
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(true)}
+                  className="border border-gray-300 rounded-md px-4 py-3"
                 >
-                  {value || "Select Birth Date"}
-                </Text>
-              </TouchableOpacity>
-              {errors.birthDate && (
-                <Text className="text-red-600 text-sm mt-1">
-                  {errors.birthDate.message}
-                </Text>
-              )}
-              {showDatePicker && (
-                <DateTimePicker
-                  value={value ? new Date(value) : new Date()}
-                  mode="date"
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
-                  onChange={(
-                    event: DateTimePickerEvent,
-                    selectedDate: Date | undefined
-                  ) => {
-                    setShowDatePicker(false);
-                    if (selectedDate) {
-                      const formatted = `${String(
-                        selectedDate.getMonth() + 1
-                      ).padStart(2, "0")}/${String(
-                        selectedDate.getDate()
-                      ).padStart(2, "0")}/${selectedDate.getFullYear()}`;
-                      setValue("birthDate", formatted);
-                    }
-                  }}
-                />
-              )}
-            </View>
-          )}
-        />
+                  <Text
+                    className={`text-base ${
+                      value ? "text-black" : "text-gray-400"
+                    }`}
+                  >
+                    {value || "Select Birth Date"}
+                  </Text>
+                </TouchableOpacity>
+                {errors.birthDate && (
+                  <Text className="text-red-600 text-sm mt-1">
+                    {errors.birthDate.message}
+                  </Text>
+                )}
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={value ? new Date(value) : new Date()}
+                    mode="date"
+                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                    onChange={(
+                      event: DateTimePickerEvent,
+                      selectedDate: Date | undefined
+                    ) => {
+                      setShowDatePicker(false);
+                      if (selectedDate) {
+                        const formatted = `${String(
+                          selectedDate.getMonth() + 1
+                        ).padStart(2, "0")}/${String(
+                          selectedDate.getDate()
+                        ).padStart(2, "0")}/${selectedDate.getFullYear()}`;
+                        setValue("birthDate", formatted);
+                      }
+                    }}
+                  />
+                )}
+              </View>
+            )}
+          />
 
-        {renderInput({
-          name: "phone",
-          placeholder: "Phone Number",
-          keyboardType: "phone-pad",
-        })}
-        {renderInput({
-          name: "password",
-          placeholder: "Password",
-          secure: true,
-          showToggle: true,
-        })}
-        {renderInput({
-          name: "confirmPassword",
-          placeholder: "Confirm Password",
-          secure: true,
-          showToggle: true,
-        })}
+          {renderInput({
+            name: "phone",
+            placeholder: "Phone Number",
+            keyboardType: "phone-pad",
+          })}
+          {renderInput({
+            name: "password",
+            placeholder: "Password",
+            secure: true,
+            showToggle: true,
+          })}
+          {renderInput({
+            name: "confirmPassword",
+            placeholder: "Confirm Password",
+            secure: true,
+            showToggle: true,
+          })}
 
-        <TouchableOpacity
-          className="bg-red-600 py-3 rounded-md mb-4"
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text className="text-white text-center font-semibold text-base">
-            Sign Up
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            className="bg-red-600 py-3 rounded-md mb-4"
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text className="text-white text-center font-semibold text-base">
+              Sign Up
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/(drawer)/(auth)/login")}>
-          <Text className="text-red-600 text-center mb-24 text-sm">
-            Already have an account? Login
-          </Text>
-        </TouchableOpacity>
-        <OTPModal
-          visible={otpVisible}
-          email={watch("email")}
-          password={watch("password")}
-          onVerified={() => {
-            setOtpVisible(false);
-            router.push("/(drawer)/(tabs)/profile");
-          }}
-        />
-      </View>
-    </ScrollView>
+          <TouchableOpacity
+            onPress={() => router.push("/(drawer)/(auth)/login")}
+          >
+            <Text className="text-red-600 text-center mb-24 text-sm">
+              Already have an account? Login
+            </Text>
+          </TouchableOpacity>
+          <OTPModal
+            visible={otpVisible}
+            email={watch("email")}
+            password={watch("password")}
+            onVerified={() => {
+              setOtpVisible(false);
+              router.push("/(drawer)/(tabs)/profile");
+            }}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

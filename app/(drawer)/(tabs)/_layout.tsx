@@ -16,40 +16,20 @@ export default function TabLayout() {
           bottom: 0,
           left: 0,
           right: 0,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 5,
         },
       }}
       tabBar={(props) => <TabBar {...props} />}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-        }}
-      />
-      <Tabs.Screen
-        name="music"
-        options={{
-          title: "Music",
-        }}
-      />
-      <Tabs.Screen
-        name="price"
-        options={{
-          title: "Contact",
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: "Home" }} />
+      <Tabs.Screen name="search" options={{ title: "Search" }} />
+      <Tabs.Screen name="music" options={{ title: "Music" }} />
+      <Tabs.Screen name="price" options={{ title: "Contact" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
     </Tabs>
   );
 }

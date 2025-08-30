@@ -1,4 +1,3 @@
-import CustomHeader from "@/components/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
@@ -98,11 +97,8 @@ export default function LoginScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="mt-8">
-        <CustomHeader showLanguageSwitcher />
-      </View>
-      <View className="flex-1 mt-5 justify-center px-6">
+    <SafeAreaView className="flex-1 py-3 bg-white">
+      <View className="flex-1  justify-center px-6">
         <Image
           source={require("../../../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"

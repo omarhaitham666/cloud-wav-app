@@ -1,5 +1,30 @@
 {
-  "welcome": "Welcome",
-  "login": "Login",
-  "register": "Register"
+  "contact": {
+    "phoneSupportTitle": "Phone Support",
+    "phoneSupportSubtitle": "Call us for immediate assistance",
+    "phoneSupportValue": "+201055030045",
+    "emailSupportTitle": "Email Support",
+    "emailSupportSubtitle": "Send us your detailed queries",
+    "emailSupportValue": "support@cloudwavproduction.com",
+    "locationSupportTitle": "Visit Our Office",
+    "locationSupportSubtitle": "Meet us in person",
+    "locationSupportValue": "22 Al-Sawah Street, Zeitoun, Cairo, Egypt",
+    "formTitle": "Send us a Message",
+    "firstName": "First Name *",
+    "lastName": "Last Name *",
+    "email": "Email Address *",
+    "phone": "Phone Number",
+    "message": "Tell us about your project... *",
+    "sendButton": "Send Message",
+    "sending": "Sending...",
+    "alerts": {
+      "errorTitle": "Error",
+      "errorFields": "Please fill in all required fields",
+      "invalidEmail": "Please enter a valid email address",
+      "successTitle": "Success!",
+      "successMessage": "Your message has been sent successfully.",
+      "errorMessage": "Failed to send message. Please try again."
+    }
+  },
+  "faq": {}
 }

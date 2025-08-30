@@ -1,8 +1,8 @@
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CustomHeader = ({
   transparent,
@@ -22,17 +22,19 @@ const CustomHeader = ({
   };
 
   return (
-    <View
-      className={`flex-row justify-between items-center px-4 py-3 ${
-        transparent ? "bg-transparent" : "bg-white shadow-md"
-      }`}
-    >
-      <TouchableOpacity onPress={toggleDrawer}>
-        <Ionicons name="menu" size={26} color={colorIcon} />
-      </TouchableOpacity>
+    <SafeAreaView>
+      <View
+        className={`flex-row justify-between items-center  px-6 ${
+          transparent ? "bg-transparent" : ""
+        }`}
+      >
+        <TouchableOpacity onPress={toggleDrawer}>
+          <Ionicons name="menu" size={26} color={colorIcon} />
+        </TouchableOpacity>
 
-      {showLanguageSwitcher && <LanguageSwitcher />}
-    </View>
+        {/* {showLanguageSwitcher && <LanguageSwitcher />} */}
+      </View>
+    </SafeAreaView>
   );
 };
 

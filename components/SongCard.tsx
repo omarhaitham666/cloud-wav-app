@@ -13,7 +13,7 @@ export const SongCard = ({
   const router = useRouter();
   return (
     <TouchableOpacity
-      className="bg-white p-4 rounded-lg flex-row mb-6"
+      className="bg-white w-full p-4 rounded-lg flex-row mb-6"
       onPress={() => {
         router.push({ pathname: "/(drawer)/song/[id]", params: { id } });
       }}

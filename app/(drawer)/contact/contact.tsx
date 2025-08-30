@@ -1,7 +1,7 @@
-import CustomHeader from "@/components/CustomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -17,6 +17,7 @@ import {
 } from "react-native";
 
 const Contact = () => {
+  const { t } = useTranslation("contact");
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -41,18 +42,18 @@ const Contact = () => {
       !formData.email ||
       !formData.message
     ) {
-      return Alert.alert("Error", "Please fill in all required fields");
+      return Alert.alert(t("alerts.errorTitle"), t("alerts.errorFields"));
     }
 
     if (!validateEmail(formData.email)) {
-      return Alert.alert("Error", "Please enter a valid email address");
+      return Alert.alert(t("alerts.errorTitle"), t("alerts.invalidEmail"));
     }
 
     setIsLoading(true);
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert("Success!", "Your message has been sent successfully.", [
+      Alert.alert(t("alerts.successTitle"), t("alerts.successMessage"), [
         {
           text: "OK",
           onPress: () =>
@@ -66,7 +67,7 @@ const Contact = () => {
         },
       ]);
     } catch {
-      Alert.alert("Error", "Failed to send message. Please try again.");
+      Alert.alert(t("alerts.errorTitle"), t("alerts.errorMessage"));
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +77,7 @@ const Contact = () => {
   const handleEmail = () =>
     Linking.openURL("mailto:support@cloudwavproduction.com");
   const handleLocation = () => {
-    const address = "22 Al-Sawah Street, Zeitoun, Cairo, Egypt";
+    const address = t("locationSupportValue");
     Linking.openURL(
       `https://maps.google.com/?q=${encodeURIComponent(address)}`
     );
@@ -153,35 +154,30 @@ const Contact = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <View className=" ">
-        <CustomHeader showLanguageSwitcher />
-      </View>
-
+    <SafeAreaView className="flex-1 py-3 bg-gray-50">
       <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false}>
-        {/* 🔹 Contact Info Cards */}
         <View className="mt-8">
           <ContactCard
             icon="call"
-            title="Phone Support"
-            subtitle="Call us for immediate assistance"
-            value="+201055030045"
+            title={t("phoneSupportTitle")}
+            subtitle={t("phoneSupportSubtitle")}
+            value={t("phoneSupportValue")}
             onPress={handleCall}
             colors={["#3B82F6", "#1D4ED8"]}
           />
           <ContactCard
             icon="mail"
-            title="Email Support"
-            subtitle="Send us your detailed queries"
-            value="support@cloudwavproduction.com"
+            title={t("emailSupportTitle")}
+            subtitle={t("emailSupportSubtitle")}
+            value={t("emailSupportValue")}
             onPress={handleEmail}
             colors={["#8B5CF6", "#7C3AED"]}
           />
           <ContactCard
             icon="location"
-            title="Visit Our Office"
-            subtitle="Meet us in person"
-            value="22 Al-Sawah Street, Zeitoun, Cairo, Egypt"
+            title={t("locationSupportTitle")}
+            subtitle={t("locationSupportSubtitle")}
+            value={t("locationSupportValue")}
             onPress={handleLocation}
             colors={["#10B981", "#059669"]}
           />
@@ -190,38 +186,38 @@ const Contact = () => {
         {/* 🔹 Contact Form */}
         <View className="mt-10 mb-10">
           <Text className="text-xl font-bold text-gray-800 mb-4">
-            Send us a Message
+            {t("formTitle")}
           </Text>
 
           <View className="bg-white rounded-2xl p-5 shadow-md">
             <InputField
-              placeholder="First Name *"
+              placeholder={t("firstName")}
               value={formData.firstName}
               onChangeText={(text) => handleInputChange("firstName", text)}
               field="firstName"
             />
             <InputField
-              placeholder="Last Name *"
+              placeholder={t("lastName")}
               value={formData.lastName}
               onChangeText={(text) => handleInputChange("lastName", text)}
               field="lastName"
             />
             <InputField
-              placeholder="Email Address *"
+              placeholder={t("email")}
               value={formData.email}
               onChangeText={(text) => handleInputChange("email", text)}
               keyboardType="email-address"
               field="email"
             />
             <InputField
-              placeholder="Phone Number"
+              placeholder={t("phone")}
               value={formData.phone}
               onChangeText={(text) => handleInputChange("phone", text)}
               keyboardType="phone-pad"
               field="phone"
             />
             <InputField
-              placeholder="Tell us about your project... *"
+              placeholder={t("message")}
               value={formData.message}
               onChangeText={(text) => handleInputChange("message", text)}
               multiline
@@ -241,11 +237,13 @@ const Contact = () => {
                 {isLoading ? (
                   <View className="flex-row items-center space-x-2">
                     <ActivityIndicator size="small" color="#fff" />
-                    <Text className="text-white font-bold">Sending...</Text>
+                    <Text className="text-white font-bold">{t("sending")}</Text>
                   </View>
                 ) : (
                   <View className="flex-row items-center gap-2 space-x-2">
-                    <Text className="text-white font-bold">Send Message</Text>
+                    <Text className="text-white font-bold">
+                      {t("sendButton")}
+                    </Text>
                     <Ionicons name="send" size={20} color="#fff" />
                   </View>
                 )}

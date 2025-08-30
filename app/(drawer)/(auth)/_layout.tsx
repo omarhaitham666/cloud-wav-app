@@ -1,3 +1,4 @@
+import CustomHeader from "@/components/CustomHeader";
 import { Stack } from "expo-router";
 import React from "react";
 import { SafeAreaView, ScrollView } from "react-native";
@@ -10,7 +11,12 @@ const AuthLayout = () => {
         keyboardShouldPersistTaps="handled"
         className="bg-white"
       >
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            header: () => <CustomHeader showLanguageSwitcher />,
+          }}
+        >
           <Stack.Screen name="login" />
           <Stack.Screen name="register" />
         </Stack>

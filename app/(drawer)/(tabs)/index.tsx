@@ -29,7 +29,9 @@ const HomePage = () => {
           resizeMode="cover"
           className="h-96 w-full justify-between p-5"
         >
-          <CustomHeader transparent colorIcon="white" />
+          <View>
+            <CustomHeader transparent colorIcon="white" />
+          </View>
 
           <View className="absolute top-28 left-6">
             <Text className="text-white text-xs mb-1">{t("cloudWav")}</Text>

@@ -15,9 +15,11 @@ export interface Artists {
     cover_path: string;
     song_path: string;
   }[];
+  albums: [];
   user_id: string;
   whatsapp_number: string;
 }
+
 const songApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
     getArtists: builder.query<Artists[], void>({
@@ -26,7 +28,13 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getArtist: builder.query<Artists, string>({
+      query: (id) => ({
+        url: `/Artists/${id}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetArtistsQuery } = songApi;
+export const { useGetArtistsQuery, useGetArtistQuery } = songApi;

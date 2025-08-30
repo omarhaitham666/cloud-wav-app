@@ -84,6 +84,12 @@ export default function DrawerContent({
       iconName: "help-circle",
       displayName: "FAQ",
     },
+    {
+      label: "Services",
+      route: "services/services",
+      iconName: "grid",
+      displayName: "Services",
+    },
     { label: "Login", route: "(auth)/login", iconName: "log-in" },
     { label: "Register", route: "(auth)/register", iconName: "user-plus" },
   ];

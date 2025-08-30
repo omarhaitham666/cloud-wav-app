@@ -45,7 +45,9 @@ const SongDetail = () => {
 
   const soundRef = useRef<Audio.Sound | null>(null);
 
-  const { data, isLoading: isFetching } = useGetSongQuery(id!);
+  const { data, isLoading: isFetching } = useGetSongQuery(id, {
+    skip: !id,
+  });
 
   useEffect(() => {
     const configureAudio = async () => {
@@ -263,7 +265,7 @@ const SongDetail = () => {
   if (isFetching) {
     return (
       <View className="flex-1 justify-center items-center bg-black">
-        <ActivityIndicator size="large" color="#f9a826" />
+        <ActivityIndicator size="large" color="#2f00ac" />
       </View>
     );
   }
