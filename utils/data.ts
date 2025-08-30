@@ -78,3 +78,42 @@ export const pricingPlans: PricingPlan[] = [
     ],
   },
 ];
+
+export const services = [
+  {
+    title: "Professional Voice Recording",
+    description:
+      "Record your voice in a studio equipped with the latest technology, with a sound engineer to ensure clarity and high quality.",
+    icon: "mic-outline",
+  },
+  {
+    title: "Song Lyrics Writing",
+    description:
+      "We help you write lyrics that express you, match your style, and deliver your message.",
+    icon: "create-outline",
+  },
+  {
+    title: "Music Production & Arrangement",
+    description:
+      "Original music and professional arrangement by experienced producers and musicians, across various styles and genres.",
+    icon: "musical-notes-outline",
+  },
+  {
+    title: "Professional Music Video Shooting",
+    description:
+      "Shoot a high-quality music video with a specialized directing and filming team, including lighting, editing, and visual effects.",
+    icon: "videocam-outline",
+  },
+  {
+    title: "Complete Song Creation",
+    description:
+      "From lyrics and composition to recording, arrangement, and mastering—we deliver a fully finished, publish-ready song.",
+    icon: "headset-outline",
+  },
+  {
+    title: "Full Song & Music Video Package",
+    description:
+      "A complete package including song production and high-quality video clip, with full coordination between all project elements.",
+    icon: "albums-outline",
+  },
+];

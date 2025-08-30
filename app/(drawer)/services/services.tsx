@@ -1,19 +1,20 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import {
   ChevronRight,
-  Clock,
   Code,
+  Facebook,
+  Instagram,
   Monitor,
   Music,
   Share2,
   ShoppingBag,
-  Sparkles,
   Video,
 } from "lucide-react-native";
-import React from "react";
+import React, { useState } from "react";
 import {
   ColorValue,
+  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -74,17 +75,8 @@ const services: Service[] = [
     description: "Custom software development and technical solutions",
     icon: <Code size={28} color="#FFFFFF" />,
     gradientColors: ["#6366F1", "#4F46E5"],
-    route: "/services/programming-services",
-  },
-  {
-    id: "coming-soon-1",
-    title: "Coming Soon",
-    description:
-      "Exciting new services are on the way. Stay tuned for updates!",
-    icon: <Clock size={28} color="#FFFFFF" />,
-    gradientColors: ["#64748B", "#475569"],
     isComingSoon: true,
-    route: "/services/coming-soon",
+    route: "/services/programming-services",
   },
   {
     id: "tiktok-agency",
@@ -92,25 +84,19 @@ const services: Service[] = [
     description: "Professional TikTok marketing and viral content strategies",
     icon: <Video size={28} color="#FFFFFF" />,
     gradientColors: ["#EF4444", "#DC2626"],
-    route: "/services/tiktok-agency",
-  },
-  {
-    id: "coming-soon-2",
-    title: "Coming Soon",
-    description:
-      "More innovative services launching soon. Get ready for something amazing!",
-    icon: <Sparkles size={28} color="#FFFFFF" />,
-    gradientColors: ["#64748B", "#475569"],
     isComingSoon: true,
-    route: "/services/coming-soon",
+    route: "/services/tiktok-agency",
   },
 ];
 
 export default function ServicesScreen() {
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleServicePress = (service: Service) => {
-    if (!service.isComingSoon) {
+    if (service.id === "clothes-store") {
+      setModalVisible(true);
+    } else if (!service.isComingSoon) {
       router.push(service.route as any);
     }
   };
@@ -188,6 +174,52 @@ export default function ServicesScreen() {
           <View className="gap-4">{services.map(renderServiceCard)}</View>
         </ScrollView>
       </LinearGradient>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 bg-black/50 items-center justify-center px-6">
+          <View className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
+            <Text className="text-lg font-bold text-gray-900 mb-4 text-center">
+              Follow Our Clothes Store
+            </Text>
+            <View className="flex-row justify-around mb-6">
+              <Link
+                href={"https://www.facebook.com/profile.php?id=61573739062609#"}
+              >
+                <TouchableOpacity className="items-center">
+                  <Facebook size={36} color="#1877F2" />
+                  <Text className="text-xs text-gray-700 mt-2">Facebook</Text>
+                </TouchableOpacity>
+              </Link>
+              <Link href={"https://www.instagram.com/black_8_bear"}>
+                <TouchableOpacity className="items-center">
+                  <Instagram size={36} color="#E4405F" />
+                  <Text className="text-xs text-gray-700 mt-2">Instagram</Text>
+                </TouchableOpacity>
+              </Link>
+              <Link href={"https://www.tiktok.com/@___blackbear"}>
+                <TouchableOpacity className="items-center">
+                  <Video size={36} color="#000000" />
+                  <Text className="text-xs text-gray-700 mt-2">TikTok</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              className="bg-purple-600 py-3 rounded-xl"
+            >
+              <Text className="text-white text-center font-semibold">
+                Close
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
