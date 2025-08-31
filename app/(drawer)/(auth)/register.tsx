@@ -1,4 +1,5 @@
 import OTPModal from "@/components/OTPModal";
+import { useRegisterMutation } from "@/store/api/user/user";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DateTimePicker, {
@@ -8,7 +9,6 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  Alert,
   Image,
   Platform,
   ScrollView,
@@ -18,6 +18,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import * as yup from "yup";
 
 interface FormValues {
@@ -50,6 +51,7 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [register, { isLoading }] = useRegisterMutation();
 
   const {
     control,
@@ -61,9 +63,29 @@ export default function RegisterScreen() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: FormValues) => {
-    Alert.alert("Register", JSON.stringify(data, null, 2));
-    setOtpVisible(true);
+  const onSubmit = async (data: FormValues) => {
+    await register({
+      name: data.fullName,
+      email: data.email,
+      password: data.password,
+      password_confirmation: data.confirmPassword,
+    })
+      .unwrap()
+      .then((res) => {
+        Toast.show({
+          type: "success",
+          text1: "Account Created 🎉",
+          text2: "Please verify your email with the OTP code.",
+        });
+        setOtpVisible(true);
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Registration Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
   };
 
   const renderInput = ({
@@ -220,7 +242,7 @@ export default function RegisterScreen() {
             onPress={handleSubmit(onSubmit)}
           >
             <Text className="text-white text-center font-semibold text-base">
-              Sign Up
+              {isLoading ? "Signing Up..." : "Sign Up"}
             </Text>
           </TouchableOpacity>
 

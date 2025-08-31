@@ -1,3 +1,5 @@
+import { useLoginMutation } from "@/store/api/user/user";
+import { saveToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
@@ -12,15 +14,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import * as yup from "yup";
-
 interface LoginFormValues {
-  username: string;
+  email: string;
   password: string;
 }
 
 const schema = yup.object().shape({
-  username: yup.string().required("Username is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
   password: yup
     .string()
     .min(6, "Password must be at least 6 characters")
@@ -30,6 +32,7 @@ const schema = yup.object().shape({
 export default function LoginScreen() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [login, { isLoading }] = useLoginMutation();
 
   const {
     control,
@@ -39,9 +42,29 @@ export default function LoginScreen() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    Alert.alert("Login", JSON.stringify(data, null, 2));
-    // TODO: call your login API here
+  const onSubmit = async (data: LoginFormValues) => {
+    await login({
+      email: data.email,
+      password: data.password,
+    })
+      .unwrap()
+      .then(async (res) => {
+        await saveToken("access_token", res.access_token);
+
+        Toast.show({
+          type: "success",
+          text1: "Account Logged In 🎉",
+          text2: "Welcome to Cloud Wav",
+        });
+        router.replace("/(drawer)/(tabs)");
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
   };
 
   const renderInput = ({
@@ -107,7 +130,7 @@ export default function LoginScreen() {
           Welcome to Cloud Wav
         </Text>
 
-        {renderInput({ name: "username", placeholder: "Username" })}
+        {renderInput({ name: "email", placeholder: "Email" })}
         {renderInput({
           name: "password",
           placeholder: "Password",
@@ -129,7 +152,7 @@ export default function LoginScreen() {
           onPress={handleSubmit(onSubmit)}
         >
           <Text className="text-white text-center font-semibold text-base">
-            Sign In
+            {isLoading ? "Sign In..." : "Sign In"}
           </Text>
         </TouchableOpacity>
 

@@ -1,43 +1,56 @@
-import { useRouter } from "expo-router";
+import { useResetPasswordMutation } from "@/store/api/user/user";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-
-interface ResetPasswordProps {
-  route: { params: { email: string } };
-  navigation: any;
-}
+import Toast from "react-native-toast-message";
 
 export default function ResetPassword() {
   const router = useRouter();
   const [verificationCode, setVerificationCode] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const { email } = useLocalSearchParams<{ email?: string }>();
+
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const handleResetPassword = async () => {
     if (password !== passwordConfirmation) {
-      Alert.alert("Error", "Passwords do not match.");
+      Toast.show({
+        type: "error",
+        text1: "Passwords do not match",
+        text2: "Please try again",
+      });
       return;
     }
 
-    try {
-      // Example API request (replace URL with your backend)
-      // await fetch("API/reset-password", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ email, verification_code: verificationCode, password, password_confirmation: passwordConfirmation }),
-      // });
-      router.push("/(drawer)/(tabs)");
-      Alert.alert("Success", "Password has been reset!");
-    } catch (error) {
-      Alert.alert("Error", "Failed to reset password.");
-    }
+    await resetPassword({
+      email: email || "",
+      verification_code: verificationCode,
+      password: password,
+      password_confirmation: passwordConfirmation,
+    })
+      .unwrap()
+      .then((res) => {
+        Toast.show({
+          type: "success",
+          text1: "Password Reset Successfully",
+          text2: "Please check your email for the verification code.",
+        });
+        router.replace("/(drawer)/(auth)/login");
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Password Reset Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
   };
 
   return (
@@ -72,7 +85,7 @@ export default function ResetPassword() {
           onPress={handleResetPassword}
         >
           <Text className="text-white text-center font-semibold text-base">
-            Reset Password
+            {isLoading ? "Resetting..." : "Reset Password"}
           </Text>
         </TouchableOpacity>
       </View>

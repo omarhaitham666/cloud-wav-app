@@ -11,10 +11,11 @@ import {
 import { Artists, useGetArtistsQuery } from "@/store/api/global/artists";
 import {
   Songs,
+  useGetSongByDivisionQuery,
   useGetSongsQuery,
   useGetTrendSongQuery,
 } from "@/store/api/global/song";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -35,7 +36,7 @@ interface BrowseCategory {
 
 const Music = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("home");
-  const [activeGenre, setActiveGenre] = useState<number>(0);
+  const [activeGenre, setActiveGenre] = useState<string>("All Genres");
 
   const { data: songs, isLoading: isSongLoading } = useGetSongsQuery();
   const { data: artists, isLoading: isArtistLoading } = useGetArtistsQuery();
@@ -45,6 +46,12 @@ const Music = () => {
     useGetTrendSongQuery();
   const { data: trendAlbums, isLoading: isLoadingTrendAlbums } =
     useGetTrendalbumsQuery();
+
+  const { data: songsByDivision, isLoading: isLoadingSongsByDivision } =
+    useGetSongByDivisionQuery(activeGenre === "All Genres" ? "" : activeGenre, {
+      skip: activeGenre === "All Genres",
+    });
+  console.log(songsByDivision, "songsByDivision");
 
   const browseCategories: BrowseCategory[] = [
     { name: "Home", filter: "home", data: null },
@@ -65,12 +72,19 @@ const Music = () => {
     "Sonata",
     "Symphony",
     "Orchestra",
+    "Pop",
   ];
+
+  const filteredSongs = useMemo(() => {
+    if (activeGenre === "All Genres") {
+      return songs;
+    }
+    return songsByDivision;
+  }, [activeGenre, songs, songsByDivision]);
 
   const LoadingSpinner = ({ color = "#22c55e" }) => (
     <View className="flex-1 justify-center items-center py-12">
       <ActivityIndicator size="large" color={color} />
-      <Text className="text-gray-500 mt-2 text-sm">Loading...</Text>
     </View>
   );
 
@@ -78,41 +92,68 @@ const Music = () => {
     setActiveFilter(filter);
   };
 
-  const handleGenrePress = (index: number) => {
-    setActiveGenre(index);
+  const handleGenrePress = (genre: string) => {
+    setActiveGenre(genre);
   };
 
-  const renderSongList = (items: Songs[] | undefined) => {
-    if (!items || items.length === 0)
+  const renderSongList = (
+    items: Songs | Songs[] | undefined,
+    showGenreTitle = false
+  ) => {
+    const isLoading =
+      activeGenre === "All Genres" ? isSongLoading : isLoadingSongsByDivision;
+
+    if (isLoading) {
+      return <LoadingSpinner />;
+    }
+
+    if (!items) {
       return (
         <View className="flex items-center justify-center py-10 w-full">
-          <Text className="text-gray-500 text-base">No songs found</Text>
+          <Text className="text-gray-500 text-base">
+            {activeGenre === "All Genres"
+              ? "No songs found"
+              : `No ${activeGenre} songs found`}
+          </Text>
         </View>
       );
+    }
+
+    const songList = Array.isArray(items) ? items : [items];
 
     return (
-      <>
+      <View className="mb-8">
+        {showGenreTitle && (
+          <View className=" mb-4">
+            <SectionHeader
+              title={
+                activeGenre === "All Genres"
+                  ? "All Songs"
+                  : `${activeGenre} Songs`
+              }
+              showViewAll
+            />
+          </View>
+        )}
         <FlatList
-          data={items}
+          data={songList}
           keyExtractor={(item) => item.id.toString()}
           horizontal
+          pagingEnabled
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
-          ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
           renderItem={({ item }) => (
-            <View className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <SongCard
-                id={item.id}
-                title={item.title}
-                artist={item.artist}
-                audio_url={item.audio_url}
-                cover_url={item.cover_url}
-                debug_path={item.debug_path}
-              />
-            </View>
+            <SongCard
+              id={item.id}
+              key={item.id}
+              title={item.title}
+              artist={item.artist}
+              audio_url={item.audio_url}
+              cover_url={item.cover_url}
+              debug_path={item.debug_path}
+            />
           )}
         />
-      </>
+      </View>
     );
   };
 
@@ -218,37 +259,7 @@ const Music = () => {
             )}
           </View>
 
-          <View className="mb-4">
-            <SectionHeader title="Popular Songs" showViewAll />
-            {isSongLoading ? (
-              <LoadingSpinner />
-            ) : songs && songs.length > 0 ? (
-              <FlatList
-                data={songs}
-                keyExtractor={(item) => item.id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 20 }}
-                ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-                renderItem={({ item }) => (
-                  <View className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <SongCard
-                      id={item.id}
-                      title={item.title}
-                      artist={item.artist}
-                      audio_url={item.audio_url}
-                      cover_url={item.cover_url}
-                      debug_path={item.debug_path}
-                    />
-                  </View>
-                )}
-              />
-            ) : (
-              <View className="flex items-center justify-center py-10 w-full">
-                <Text className="text-gray-500 text-base">No songs found</Text>
-              </View>
-            )}
-          </View>
+          {renderSongList(filteredSongs, true)}
         </>
       );
     }
@@ -339,45 +350,44 @@ const Music = () => {
           </ScrollView>
         </View>
 
-        {activeFilter === "home" && (
-          <View className="mb-8">
-            <View className="px-5 mb-4">
-              <Text className="text-2xl font-bold text-gray-900">Genres</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 20 }}
-            >
-              {genres.map((genre, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  onPress={() => handleGenrePress(idx)}
-                  className={`${
-                    activeGenre === idx
-                      ? "bg-green-500"
-                      : "bg-gray-50 border-gray-200"
-                  } border rounded-full px-5 py-2.5 mr-3 shadow-sm`}
-                  style={{
-                    shadowColor: activeGenre === idx ? "#22c55e" : "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: activeGenre === idx ? 0.3 : 0.1,
-                    shadowRadius: 4,
-                    elevation: activeGenre === idx ? 6 : 2,
-                  }}
-                >
-                  <Text
-                    className={`text-sm font-medium ${
-                      activeGenre === idx ? "text-white" : "text-gray-600"
-                    }`}
-                  >
-                    {genre}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+        {/* Genres - Always visible */}
+        <View className="mb-8">
+          <View className="px-5 mb-4">
+            <Text className="text-2xl font-bold text-gray-900">Genres</Text>
           </View>
-        )}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
+          >
+            {genres.map((genre, idx) => (
+              <TouchableOpacity
+                key={idx}
+                onPress={() => handleGenrePress(genre)}
+                className={`${
+                  activeGenre === genre
+                    ? "bg-green-500"
+                    : "bg-gray-50 border-gray-200"
+                } border rounded-full px-5 py-2.5 mr-3 shadow-sm`}
+                style={{
+                  shadowColor: activeGenre === genre ? "#22c55e" : "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: activeGenre === genre ? 0.3 : 0.1,
+                  shadowRadius: 4,
+                  elevation: activeGenre === genre ? 6 : 2,
+                }}
+              >
+                <Text
+                  className={`text-sm font-medium ${
+                    activeGenre === genre ? "text-white" : "text-gray-600"
+                  }`}
+                >
+                  {genre}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         <View className="px-0">{getFilteredContent()}</View>
       </ScrollView>

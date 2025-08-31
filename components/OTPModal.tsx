@@ -1,5 +1,7 @@
+import { useVerifyCodeMutation } from "@/store/api/user/user";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Modal,
   Text,
@@ -7,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 interface OTPModalProps {
   visible: boolean;
@@ -22,14 +25,31 @@ export default function OTPModal({
   onVerified,
 }: OTPModalProps) {
   const [otp, setOtp] = useState("");
+  const [verifyCode, { isLoading }] = useVerifyCodeMutation();
 
-  const handleVerifyOTP = () => {
-    if (otp === "123456") {
-      Alert.alert("Success", "Account verified successfully!");
-      onVerified();
-    } else {
-      Alert.alert("Error", "Invalid OTP. Please try again.");
+  const handleVerifyOTP = async () => {
+    if (!otp || otp.length < 6) {
+      Alert.alert("Error", "Please enter a valid 6-digit OTP.");
+      return;
     }
+
+    await verifyCode({ email, password, code: otp })
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+        Toast.show({
+          type: "success",
+          text1: "Account Verified 🎉",
+        });
+        onVerified();
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Verification Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
   };
 
   return (
@@ -40,7 +60,7 @@ export default function OTPModal({
             Verify Your Account
           </Text>
           <Text className="text-gray-600 text-center mb-4">
-            Enter the 6-digit OTP sent to your phone/email.
+            Enter the 6-digit OTP sent to your email.
           </Text>
           <TextInput
             value={otp}
@@ -51,12 +71,19 @@ export default function OTPModal({
             className="border border-gray-300 rounded-md px-4 py-3 text-center text-lg tracking-widest text-black"
           />
           <TouchableOpacity
-            className="bg-red-600 py-3 rounded-md mt-4"
+            disabled={isLoading}
+            className={`py-3 rounded-md mt-4 ${
+              isLoading ? "bg-gray-400" : "bg-red-600"
+            }`}
             onPress={handleVerifyOTP}
           >
-            <Text className="text-white text-center font-semibold text-base">
-              Verify
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text className="text-white text-center font-semibold text-base">
+                Verify
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>

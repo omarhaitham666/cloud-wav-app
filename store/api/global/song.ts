@@ -35,8 +35,18 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getSongByDivision: builder.query<Songs, string>({
+      query: (name) => ({
+        url: `/songs/division/${name}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useGetTrendSongQuery, useGetSongsQuery, useGetSongQuery } =
-  songApi;
+export const {
+  useGetTrendSongQuery,
+  useGetSongsQuery,
+  useGetSongQuery,
+  useGetSongByDivisionQuery,
+} = songApi;

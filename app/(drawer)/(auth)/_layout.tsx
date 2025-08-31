@@ -2,6 +2,7 @@ import CustomHeader from "@/components/CustomHeader";
 import { Stack } from "expo-router";
 import React from "react";
 import { SafeAreaView, ScrollView } from "react-native";
+import Toast from "react-native-toast-message";
 
 const AuthLayout = () => {
   return (
@@ -20,6 +21,7 @@ const AuthLayout = () => {
           <Stack.Screen name="login" />
           <Stack.Screen name="register" />
         </Stack>
+        <Toast />
       </ScrollView>
     </SafeAreaView>
   );

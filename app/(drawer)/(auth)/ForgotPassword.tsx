@@ -1,24 +1,43 @@
+import { useForgotPasswordMutation } from "@/store/api/user/user";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+
   const handleSendOTP = async () => {
-    try {
-      Alert.alert("OTP Sent", `Verification code sent to ${email}`);
-      router.push({ pathname: "/ResetPassword", params: { email } });
-    } catch (error) {
-      Alert.alert("Error", "Failed to send OTP. Try again.");
-    }
+    await forgotPassword({
+      email: email,
+    })
+      .unwrap()
+      .then((res) => {
+        Toast.show({
+          type: "success",
+          text1: "OTP Sent Successfully",
+          text2: "Please check your email for the verification code.",
+        });
+        router.replace({
+          pathname: "/(drawer)/(auth)/ResetPassword",
+          params: { email: email },
+        });
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Failed to send OTP",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
   };
 
   return (
@@ -40,7 +59,7 @@ export default function ForgotPassword() {
           onPress={handleSendOTP}
         >
           <Text className="text-white text-center font-semibold text-base">
-            Send Verification Code
+            {isLoading ? "Sending..." : "Send OTP"}
           </Text>
         </TouchableOpacity>
       </View>

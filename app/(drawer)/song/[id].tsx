@@ -49,6 +49,7 @@ const SongDetail = () => {
     skip: !id,
   });
 
+  // configure audio
   useEffect(() => {
     const configureAudio = async () => {
       try {
@@ -63,9 +64,7 @@ const SongDetail = () => {
         console.log("Error configuring audio:", error);
       }
     };
-
     configureAudio();
-
     return () => {
       cleanupAudio();
     };
@@ -93,7 +92,6 @@ const SongDetail = () => {
 
   const loadAudio = async () => {
     if (!data?.song_url) {
-      console.log("No song URL available");
       setAudioError(true);
       return;
     }
@@ -105,81 +103,49 @@ const SongDetail = () => {
 
       await cleanupAudio();
 
-      console.log("Loading audio from:", data.song_url);
-
-      const { sound, status } = await Audio.Sound.createAsync(
+      const { sound } = await Audio.Sound.createAsync(
         { uri: data.song_url },
-        {
-          shouldPlay: false,
-          isLooping: false,
-          volume: 1.0,
-          progressUpdateIntervalMillis: 500,
-        }
+        { shouldPlay: false }
       );
 
       soundRef.current = sound;
 
-      if (status.isLoaded) {
+      sound.setOnPlaybackStatusUpdate((status: any) => {
+        if (!status.isLoaded) {
+          if (status.error) {
+            console.log("Playback error:", status.error);
+            setAudioError(true);
+          }
+          return;
+        }
+
+        // duration
         if (status.durationMillis) {
           setDuration(status.durationMillis / 1000);
         }
 
-        sound.setOnPlaybackStatusUpdate((playbackStatus) => {
-          if (playbackStatus.isLoaded) {
-            if (
-              playbackStatus.durationMillis &&
-              duration !== playbackStatus.durationMillis / 1000
-            ) {
-              setDuration(playbackStatus.durationMillis / 1000);
-            }
-
-            if (!isSliding) {
-              setCurrentTime((playbackStatus.positionMillis || 0) / 1000);
-            }
-
-            setIsPlaying(playbackStatus.isPlaying);
-
-            if (playbackStatus.didJustFinish) {
-              setIsPlaying(false);
-              setCurrentTime(0);
-              sound.setPositionAsync(0);
-            }
-          } else {
-            console.log("Playback error:", playbackStatus.error);
-            setAudioError(true);
-            Alert.alert(
-              "Playback Error",
-              "There was an issue playing the audio"
-            );
-          }
-        });
-
-        if (!status.durationMillis) {
-          (async () => {
-            try {
-              await sound.playAsync();
-              await new Promise((resolve) => setTimeout(resolve, 100));
-              const finalStatus = await sound.getStatusAsync();
-              await sound.pauseAsync();
-              await sound.setPositionAsync(0);
-
-              if (finalStatus.isLoaded && finalStatus.durationMillis) {
-                setDuration(finalStatus.durationMillis / 1000);
-              }
-            } catch (err) {
-              console.error("Failed to preload duration", err);
-            }
-          })();
+        // current time
+        if (!isSliding && status.positionMillis !== undefined) {
+          setCurrentTime(status.positionMillis / 1000);
         }
-      } else {
-        console.log("Audio failed to load:", status.error);
-        setAudioError(true);
-        Alert.alert("Error", "Failed to load audio file");
+
+        setIsPlaying(status.isPlaying);
+
+        if (status.didJustFinish) {
+          setIsPlaying(false);
+          setCurrentTime(0);
+          sound.setPositionAsync(0);
+        }
+      });
+
+      // force duration check once
+      const firstStatus = await sound.getStatusAsync();
+      if (firstStatus.isLoaded && firstStatus.durationMillis) {
+        setDuration(firstStatus.durationMillis / 1000);
       }
     } catch (error) {
       console.log("Error loading audio:", error);
       setAudioError(true);
-      Alert.alert("Error", "Could not load the audio file");
     } finally {
       setIsAudioLoading(false);
     }
@@ -200,9 +166,6 @@ const SongDetail = () => {
             setPlaysCount((prev) => prev + 1);
           }
         }
-      } else {
-        console.log("Audio not loaded, retrying...");
-        await loadAudio();
       }
     } catch (error) {
       console.log("Error toggling playback:", error);
@@ -210,23 +173,13 @@ const SongDetail = () => {
     }
   };
 
-  const handleSliderStart = () => {
-    setIsSliding(true);
-  };
-
-  const handleSliderChange = (value: number) => {
-    setCurrentTime(value);
-  };
-
   const handleSliderComplete = async (value: number) => {
     if (!soundRef.current) {
       setIsSliding(false);
       return;
     }
-
     try {
       await soundRef.current.setPositionAsync(value * 1000);
-      console.log("Seeked to:", value);
     } catch (error) {
       console.log("Error seeking:", error);
     } finally {
@@ -236,7 +189,6 @@ const SongDetail = () => {
 
   const handlePrevious = async () => {
     if (!soundRef.current) return;
-
     try {
       await soundRef.current.setPositionAsync(0);
       setCurrentTime(0);
@@ -253,13 +205,6 @@ const SongDetail = () => {
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
-    // TODO: API call to update like status
-  };
-
-  const retryLoadAudio = () => {
-    if (data) {
-      loadAudio();
-    }
   };
 
   if (isFetching) {
@@ -289,6 +234,7 @@ const SongDetail = () => {
     <View className="flex-1 bg-black">
       <StatusBar barStyle="light-content" backgroundColor="black" />
 
+      {/* cover background */}
       <View className="absolute top-0 left-0 right-0 h-1/2">
         <ImageBackground
           source={{ uri: data.cover_url }}
@@ -298,6 +244,7 @@ const SongDetail = () => {
         <View className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-70" />
       </View>
 
+      {/* header */}
       <View className="flex-row justify-between items-center pt-12 pb-4 px-6">
         <TouchableOpacity
           onPress={() => router.back()}
@@ -316,18 +263,14 @@ const SongDetail = () => {
         </View>
       </View>
 
+      {/* content */}
       <View className="flex-1 justify-end px-6 pb-8">
+        {/* song info */}
         <View className="items-center mb-8">
           <View className="relative">
             <Image
               source={{ uri: data.cover_url }}
               className="w-72 h-72 rounded-3xl shadow-2xl"
-              style={{
-                shadowColor: "#f9a826",
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.3,
-                shadowRadius: 16,
-              }}
             />
             {isAudioLoading && (
               <View className="absolute inset-0 bg-black/50 rounded-3xl justify-center items-center">
@@ -348,7 +291,7 @@ const SongDetail = () => {
             </Text>
           )}
 
-          <View className="flex-row gap-3 items-center mt-4 space-x-6">
+          <View className="flex-row gap-3 items-center mt-4">
             <View className="flex-row items-center">
               <Ionicons name="play-outline" size={16} color="#9CA3AF" />
               <Text className="text-gray-400 text-sm ml-1">
@@ -362,21 +305,9 @@ const SongDetail = () => {
               </Text>
             </View>
           </View>
-
-          {audioError && (
-            <View className="mt-4 bg-red-500/20 px-4 py-2 rounded-lg">
-              <Text className="text-red-400 text-sm text-center">
-                Audio failed to load
-              </Text>
-              <TouchableOpacity onPress={retryLoadAudio} className="mt-2">
-                <Text className="text-orange-400 text-xs text-center">
-                  Tap to retry
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
 
+        {/* slider */}
         <View className="mb-8">
           <View className="flex-row justify-between mb-2">
             <Text className="text-gray-300 text-sm">
@@ -391,8 +322,8 @@ const SongDetail = () => {
             minimumValue={0}
             maximumValue={duration || 1}
             value={currentTime}
-            onSlidingStart={handleSliderStart}
-            onValueChange={handleSliderChange}
+            onSlidingStart={() => setIsSliding(true)}
+            onValueChange={(val) => setCurrentTime(val)}
             onSlidingComplete={handleSliderComplete}
             thumbTintColor="#f9a826"
             minimumTrackTintColor="#f9a826"
@@ -401,7 +332,8 @@ const SongDetail = () => {
           />
         </View>
 
-        <View className="flex-row gap-3 justify-center items-center space-x-8">
+        {/* controls */}
+        <View className="flex-row gap-3 justify-center items-center">
           <TouchableOpacity
             onPress={handleLike}
             className="bg-white/10 rounded-full p-3"
@@ -429,13 +361,7 @@ const SongDetail = () => {
             onPress={togglePlayback}
             className="bg-orange-500 rounded-full p-4 shadow-lg"
             disabled={isAudioLoading || audioError}
-            style={{
-              shadowColor: "#f9a826",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              opacity: isAudioLoading || audioError ? 0.6 : 1,
-            }}
+            style={{ opacity: isAudioLoading || audioError ? 0.6 : 1 }}
           >
             {isAudioLoading ? (
               <ActivityIndicator size="small" color="white" />
