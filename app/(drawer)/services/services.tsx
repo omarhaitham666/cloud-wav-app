@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import {
   ChevronRight,
   Code,
@@ -14,6 +14,7 @@ import {
 import React, { useState } from "react";
 import {
   ColorValue,
+  Linking,
   Modal,
   ScrollView,
   Text,
@@ -98,6 +99,19 @@ export default function ServicesScreen() {
       setModalVisible(true);
     } else if (!service.isComingSoon) {
       router.push(service.route as any);
+    }
+  };
+
+  const openApp = async (url: string, fallbackUrl: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        await Linking.openURL(fallbackUrl);
+      }
+    } catch (err) {
+      console.error("Error opening app:", err);
     }
   };
 
@@ -187,26 +201,46 @@ export default function ServicesScreen() {
               Follow Our Clothes Store
             </Text>
             <View className="flex-row justify-around mb-6">
-              <Link
-                href={"https://www.facebook.com/profile.php?id=61573739062609#"}
+              <TouchableOpacity
+                className="items-center"
+                onPress={() =>
+                  openApp(
+                    "fb://profile/61573739062609",
+                    "https://www.facebook.com/profile.php?id=61573739062609"
+                  )
+                }
               >
-                <TouchableOpacity className="items-center">
-                  <Facebook size={36} color="#1877F2" />
-                  <Text className="text-xs text-gray-700 mt-2">Facebook</Text>
-                </TouchableOpacity>
-              </Link>
-              <Link href={"https://www.instagram.com/black_8_bear"}>
-                <TouchableOpacity className="items-center">
-                  <Instagram size={36} color="#E4405F" />
-                  <Text className="text-xs text-gray-700 mt-2">Instagram</Text>
-                </TouchableOpacity>
-              </Link>
-              <Link href={"https://www.tiktok.com/@___blackbear"}>
-                <TouchableOpacity className="items-center">
-                  <Video size={36} color="#000000" />
-                  <Text className="text-xs text-gray-700 mt-2">TikTok</Text>
-                </TouchableOpacity>
-              </Link>
+                <Facebook size={36} color="#1877F2" />
+                <Text className="text-xs text-gray-700 mt-2">Facebook</Text>
+              </TouchableOpacity>
+
+              {/* Instagram */}
+              <TouchableOpacity
+                className="items-center"
+                onPress={() =>
+                  openApp(
+                    "instagram://user?username=black_8_bear",
+                    "https://www.instagram.com/black_8_bear"
+                  )
+                }
+              >
+                <Instagram size={36} color="#E4405F" />
+                <Text className="text-xs text-gray-700 mt-2">Instagram</Text>
+              </TouchableOpacity>
+
+              {/* TikTok */}
+              <TouchableOpacity
+                className="items-center"
+                onPress={() =>
+                  openApp(
+                    "snssdk1128://user/profile/___blackbear",
+                    "https://www.tiktok.com/@___blackbear"
+                  )
+                }
+              >
+                <Video size={36} color="#000000" />
+                <Text className="text-xs text-gray-700 mt-2">TikTok</Text>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity

@@ -1,8 +1,9 @@
+import MusicServiceModal from "@/components/MusicServiceModal";
 import { services } from "@/utils/data";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -14,6 +15,7 @@ import {
 } from "react-native";
 
 const MusicDistribution = () => {
+  const [visible, setVisible] = useState(false);
   return (
     <LinearGradient
       colors={["#3B82F6", "#06B6D4", "#10B981"]}
@@ -50,7 +52,7 @@ const MusicDistribution = () => {
 
           <View className="flex-row justify-between mb-8">
             <TouchableOpacity
-              onPress={() => router.push("/(drawer)/(tabs)/price")}
+              onPress={() => setVisible(true)}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
               <Text className="text-white text-base font-semibold">
@@ -124,6 +126,10 @@ const MusicDistribution = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        <MusicServiceModal
+          visible={visible}
+          onClose={() => setVisible(false)}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

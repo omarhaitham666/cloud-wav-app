@@ -1,3 +1,7 @@
+import ServiceRequestModal, {
+  FormData,
+} from "@/components/ServiceRequestModal";
+import { useServicesMutation } from "@/store/api/global/services";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -8,7 +12,7 @@ import {
   TrendingUp,
   User,
 } from "lucide-react-native";
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -17,6 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 const features = [
   {
@@ -47,7 +52,42 @@ const features = [
   },
 ];
 
-const PlatformManagement = ({ navigation }: any) => {
+const PlatformManagement = () => {
+  const [visible, setVisible] = useState(false);
+  const [Services, { isLoading }] = useServicesMutation();
+  const handleFormSubmit = async (data: FormData) => {
+    await Services({
+      type: "platform management",
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        whatsapp_number: data.whatsapp || "",
+        platform: data.platform || "",
+        social_media_account: data.social || "",
+        details: data.details || "",
+      },
+    })
+      .unwrap()
+      .then(async (res) => {
+        console.log(res);
+
+        Toast.show({
+          type: "success",
+          text1: "Service Request Sent Successfully",
+        });
+        setVisible(false);
+      })
+
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Service Request Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
+  };
+
   return (
     <LinearGradient
       colors={["#3B82F6", "#06B6D4", "#10B981"]}
@@ -90,7 +130,7 @@ const PlatformManagement = ({ navigation }: any) => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => router.push("/(drawer)/(auth)/login")}
+              onPress={() => setVisible(true)}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
               <Text className="text-white text-base font-semibold">
@@ -138,6 +178,12 @@ const PlatformManagement = ({ navigation }: any) => {
             </View>
           </View>
         </ScrollView>
+        <ServiceRequestModal
+          visible={visible}
+          isLoading={isLoading}
+          onClose={() => setVisible(false)}
+          onSubmitForm={handleFormSubmit}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

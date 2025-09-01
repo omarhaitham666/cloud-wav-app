@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -11,7 +11,12 @@ import {
   View,
 } from "react-native";
 
+import ServiceRequestModal, {
+  FormData,
+} from "@/components/ServiceRequestModal";
+import { useServicesMutation } from "@/store/api/global/services";
 import { Lightbulb, Megaphone, ShieldCheck } from "lucide-react-native";
+import Toast from "react-native-toast-message";
 
 const services = [
   {
@@ -20,6 +25,7 @@ const services = [
       "We help you create and manage Facebook, Instagram, Twitter, LinkedIn, TikTok, YouTube, and more.",
     price: "$20",
     icon: <Lightbulb size={26} color="#6D28D9" />,
+    type: "verify social media accounts",
   },
   {
     title: "Recover Closed Accounts",
@@ -27,6 +33,7 @@ const services = [
       "We recover closed or deactivated accounts and restore deleted ones quickly.",
     price: "$30",
     icon: <ShieldCheck size={26} color="#6D28D9" />,
+    type: "recover social media account",
   },
   {
     title: "Create Sponsored Ads",
@@ -34,10 +41,48 @@ const services = [
       "We create ads on Google Ads, Facebook, TikTok, YouTube, Snapchat, and more.",
     price: "$15",
     icon: <Megaphone size={26} color="#6D28D9" />,
+    type: "Sponsored ads",
   },
 ];
 
-const SocialMedia = ({ navigation }: any) => {
+const SocialMedia = () => {
+  const [visible, setVisible] = useState(false);
+  const [selectedService, setSelectedService] = useState<string | null>(null);
+
+  const [Services, { isLoading }] = useServicesMutation();
+
+  const handleFormSubmit = async (data: FormData) => {
+    if (!selectedService) return;
+
+    await Services({
+      type: selectedService,
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        whatsapp_number: data.whatsapp || "",
+        platform: data.platform || "",
+        social_media_account: data.social || "",
+        details: data.details || "",
+      },
+    })
+      .unwrap()
+      .then(() => {
+        Toast.show({
+          type: "success",
+          text1: "Service Request Sent Successfully",
+        });
+        setVisible(false);
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Service Request Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
+  };
+
   return (
     <LinearGradient
       colors={["#3B82F6", "#06B6D4", "#10B981"]}
@@ -74,7 +119,10 @@ const SocialMedia = ({ navigation }: any) => {
 
           <View className="flex-row justify-between mb-8">
             <TouchableOpacity
-              onPress={() => router.push("/(drawer)/(tabs)/price")}
+              onPress={() => {
+                setSelectedService("account_creation");
+                setVisible(true);
+              }}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
               <Text className="text-white text-base font-semibold">
@@ -85,11 +133,10 @@ const SocialMedia = ({ navigation }: any) => {
               onPress={() => router.push("/(drawer)/faq/faq")}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base font-semibold">
-                How it Works
-              </Text>
+              <Text className="text-white text-base font-semibold">FAQ</Text>
             </TouchableOpacity>
           </View>
+
           <View className="mb-4 items-center">
             <Image
               source={require("../../../assets/images/Kit-Ba0DSf7D.png")}
@@ -97,6 +144,7 @@ const SocialMedia = ({ navigation }: any) => {
               resizeMode="cover"
             />
           </View>
+
           <View className="mb-8">
             <Text className="text-2xl font-bold text-gray-900 mt-10 mb-6">
               Why Choose Us?
@@ -122,7 +170,13 @@ const SocialMedia = ({ navigation }: any) => {
                   <Text className="text-sm text-gray-600 leading-relaxed mb-4">
                     {service.description}
                   </Text>
-                  <TouchableOpacity className="bg-purple-600 px-5 py-2 rounded-full self-start">
+                  <TouchableOpacity
+                    className="bg-purple-600 px-5 py-2 rounded-full self-start"
+                    onPress={() => {
+                      setSelectedService(service.type);
+                      setVisible(true);
+                    }}
+                  >
                     <Text className="text-white text-sm font-medium">
                       Get it now
                     </Text>
@@ -131,6 +185,13 @@ const SocialMedia = ({ navigation }: any) => {
               ))}
             </View>
           </View>
+
+          <ServiceRequestModal
+            visible={visible}
+            isLoading={isLoading}
+            onClose={() => setVisible(false)}
+            onSubmitForm={handleFormSubmit}
+          />
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
