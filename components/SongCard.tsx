@@ -1,31 +1,54 @@
 import { Songs } from "@/store/api/global/song";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity } from "react-native";
 
-export const SongCard = ({
-  id,
-  title,
-  artist,
-  cover_url,
-  audio_url,
-}: Songs) => {
+export const SongCard = ({ id, title, artist, cover_url }: Songs) => {
   const router = useRouter();
+
   return (
     <TouchableOpacity
-      className="bg-white w-full p-4 rounded-lg flex-row mb-6"
-      onPress={() => {
-        router.push({ pathname: "/(drawer)/song/[id]", params: { id } });
+      onPress={() =>
+        router.push({ pathname: "/(drawer)/song/[id]", params: { id } })
+      }
+      style={{
+        width: 140,
+        marginRight: 15,
+        alignItems: "center",
       }}
     >
       <Image
         source={{ uri: cover_url }}
-        className="w-20 h-20 rounded-md mr-4"
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: 10,
+          marginBottom: 6,
+        }}
+        resizeMode="cover"
       />
-      <View className="flex-1 mt-3">
-        <Text className="font-semibold text-lg">{title}</Text>
-        <Text className="text-sm text-gray-600">{artist}</Text>
-      </View>
+
+      <Text
+        numberOfLines={1}
+        style={{
+          fontSize: 14,
+          fontWeight: "600",
+          textAlign: "center",
+        }}
+      >
+        {title}
+      </Text>
+
+      <Text
+        numberOfLines={1}
+        style={{
+          fontSize: 12,
+          color: "#666",
+          textAlign: "center",
+        }}
+      >
+        {artist ?? "Unknown Artist"}
+      </Text>
     </TouchableOpacity>
   );
 };

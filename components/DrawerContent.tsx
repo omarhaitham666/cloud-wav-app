@@ -66,7 +66,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setToken(storedToken);
     };
     fetchToken();
-  }, []);
+  }, [state.index]);
 
   const handleLogout = async () => {
     await deleteToken("access_token");

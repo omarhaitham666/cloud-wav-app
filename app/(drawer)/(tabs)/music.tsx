@@ -18,6 +18,7 @@ import {
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
   ScrollView,
   StatusBar,
@@ -34,6 +35,7 @@ interface BrowseCategory {
   data: Songs[] | Albums[] | null | undefined;
 }
 
+const { width } = Dimensions.get("window");
 const Music = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("home");
   const [activeGenre, setActiveGenre] = useState<string>("All Genres");
@@ -67,7 +69,7 @@ const Music = () => {
     "Hip-Hop",
     "Blues",
     "Rock",
-    "Mahragnaat",
+    "Mahrgnat",
     "Jazz",
     "Sonata",
     "Symphony",
@@ -128,10 +130,9 @@ const Music = () => {
             <SectionHeader
               title={
                 activeGenre === "All Genres"
-                  ? "All Songs"
+                  ? "Popular Song"
                   : `${activeGenre} Songs`
               }
-              showViewAll
             />
           </View>
         )}
@@ -144,12 +145,10 @@ const Music = () => {
           renderItem={({ item }) => (
             <SongCard
               id={item.id}
-              key={item.id}
               title={item.title}
-              artist={item.artist}
-              audio_url={item.audio_url}
+              artist={item.artist_name ?? "Unknown Artist"}
+              audio_url={item.song_url ?? item.audio_url}
               cover_url={item.cover_url}
-              debug_path={item.debug_path}
             />
           )}
         />
@@ -177,9 +176,13 @@ const Music = () => {
           renderItem={({ item }) => (
             <View className="bg-white rounded-xl shadow-sm overflow-hidden">
               <AlbumCard
-                title={item.name}
-                imageUrl={item.profile_image}
                 id={item.id}
+                title={item.title}
+                imageUrl={
+                  "https://api.cloudwavproduction.com/storage/" +
+                  item.album_cover
+                }
+                artistName={item.artist?.name}
               />
             </View>
           )}
@@ -200,7 +203,7 @@ const Music = () => {
       return (
         <>
           <View className="mb-8">
-            <SectionHeader title="Popular Artists" showViewAll />
+            <SectionHeader title="Popular Artists" />
             {isArtistLoading ? (
               <LoadingSpinner />
             ) : artists && artists.length > 0 ? (
@@ -231,25 +234,29 @@ const Music = () => {
           </View>
 
           <View className="mb-8">
-            <SectionHeader title="Popular Albums" showViewAll />
+            <SectionHeader title="Popular Albums" />
             {isAlbumLoading ? (
               <LoadingSpinner />
             ) : albums && albums.length > 0 ? (
               <FlatList
-                data={albums}
+                data={(albums as Albums[]) || []}
                 keyExtractor={(item) => item.id.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 20 }}
-                ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+                contentContainerStyle={{
+                  paddingHorizontal: 16,
+                  paddingBottom: 10,
+                }}
                 renderItem={({ item }) => (
-                  <View className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <AlbumCard
-                      title={item.name}
-                      imageUrl={item.profile_image}
-                      id={item.id}
-                    />
-                  </View>
+                  <AlbumCard
+                    id={item.id}
+                    title={item.title}
+                    imageUrl={
+                      "https://api.cloudwavproduction.com/storage/" +
+                      item.album_cover
+                    }
+                    artistName={item.artist?.name}
+                  />
                 )}
               />
             ) : (
@@ -268,7 +275,7 @@ const Music = () => {
     if (activeFilter === "tsongs" || activeFilter === "tAdded") {
       return (
         <View className="mb-8">
-          <SectionHeader title={activeCategory.name} showViewAll />
+          <SectionHeader title={activeCategory.name} />
           {isLoadingTrendSongs ? (
             <LoadingSpinner />
           ) : (
@@ -282,7 +289,7 @@ const Music = () => {
     if (activeFilter === "tAlbums") {
       return (
         <View className="mb-8">
-          <SectionHeader title={activeCategory.name} showViewAll />
+          <SectionHeader title={activeCategory.name} />
           {isLoadingTrendAlbums ? (
             <LoadingSpinner />
           ) : (

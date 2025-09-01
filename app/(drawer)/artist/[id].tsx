@@ -1,4 +1,6 @@
+import AlbumCard from "@/components/AlbumCard";
 import { SongCard } from "@/components/SongCard";
+import { Albums } from "@/store/api/global/albums";
 import { useGetArtistQuery } from "@/store/api/global/artists";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,7 +11,6 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  Linking,
   ScrollView,
   StatusBar,
   Text,
@@ -21,15 +22,6 @@ const ArtistProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: artistData, isLoading: isFetching } = useGetArtistQuery(id);
-
-  const openEmail = () => Linking.openURL(`mailto:${artistData?.email}`);
-  const openCall = () => Linking.openURL(`tel:${artistData?.number}`);
-  const openWhatsApp = () =>
-    Linking.openURL(
-      `whatsapp://send?phone=${artistData?.whatsapp_number}`
-    ).catch(() =>
-      Linking.openURL(`https://wa.me/${artistData?.whatsapp_number}`)
-    );
 
   if (isFetching) {
     return (
@@ -82,121 +74,52 @@ const ArtistProfile = () => {
         </View>
       </LinearGradient>
 
-      <View className="px-5 -mt-10">
-        <View className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
-          <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">
-            Contact Information
-          </Text>
-
-          <View className="space-y-4">
-            <TouchableOpacity
-              onPress={openEmail}
-              className="flex-row items-center p-3 rounded-xl hover:bg-gray-50 active:bg-indigo-50"
-            >
-              <View className="w-10 h-10 rounded-full bg-blue-100 justify-center items-center">
-                <Ionicons name="mail" size={20} color="#4f46e5" />
-              </View>
-              <View className="flex-1 mx-3">
-                <Text className="text-base font-medium text-gray-800">
-                  Email
-                </Text>
-                <Text className="text-sm text-gray-500" numberOfLines={1}>
-                  {artistData?.email}
-                </Text>
-              </View>
-              <Ionicons name="open-outline" size={18} color="#9ca3af" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={openCall}
-              className="flex-row items-center p-3 rounded-xl hover:bg-gray-50 active:bg-indigo-50"
-            >
-              <View className="w-10 h-10 rounded-full bg-green-100 justify-center items-center">
-                <Ionicons name="call" size={20} color="#10B981" />
-              </View>
-              <View className="flex-1 mx-3">
-                <Text className="text-base font-medium text-gray-800">
-                  Call
-                </Text>
-                <Text className="text-sm text-gray-500">
-                  {artistData?.number}
-                </Text>
-              </View>
-              <Ionicons name="call-outline" size={18} color="#9ca3af" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={openWhatsApp}
-              className="flex-row items-center p-3 rounded-xl hover:bg-gray-50 active:bg-indigo-50"
-            >
-              <View className="w-10 h-10 rounded-full bg-emerald-100 justify-center items-center">
-                <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
-              </View>
-              <View className="flex-1 mx-3">
-                <Text className="text-base font-medium text-gray-800">
-                  WhatsApp
-                </Text>
-                <Text className="text-sm text-gray-500">
-                  {artistData?.whatsapp_number}
-                </Text>
-              </View>
-              <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
+      <View className="px-5 mt-6 ">
         <View className="mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-gray-800">All Songs</Text>
-            <TouchableOpacity>
-              <Text className="text-sm text-indigo-600 font-semibold">
-                See All
-              </Text>
-            </TouchableOpacity>
           </View>
+
           <FlatList
-            data={artistData?.songs}
+            data={artistData?.songs || []}
             keyExtractor={(item) => item.id.toString()}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
             renderItem={({ item }) => (
               <SongCard
                 id={item.id}
-                key={item.id}
                 title={item.title}
-                artist={item.title}
+                artist={(artistData?.name as string) || ""}
                 audio_url={item.song_path}
                 cover_url={item.cover_path}
               />
             )}
           />
         </View>
+
         <View className="mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-gray-800">All Albums</Text>
-            <TouchableOpacity>
-              <Text className="text-sm text-indigo-600 font-semibold">
-                See All
-              </Text>
-            </TouchableOpacity>
           </View>
+
           <FlatList
-            data={artistData?.albums}
-            // keyExtractor={(item) => item.id.toString()}
+            data={(artistData?.albums as Albums[]) || []}
+            keyExtractor={(item) => item.id.toString()}
             horizontal
-            pagingEnabled
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) =>
-              //   <SongCard
-              //     id={item.id}
-              //     key={item.id}
-              //     title={item.title}
-              //     artist={item.title}
-              //     audio_url={item.song_path}
-              //     cover_url={item.cover_path}
-              //   />
-              null
-            }
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10 }}
+            renderItem={({ item }) => (
+              <AlbumCard
+                id={item.id}
+                title={(artistData?.name as string) || ""}
+                imageUrl={item.album_cover}
+              />
+            )}
+            ListEmptyComponent={() => (
+              <View className="flex items-center mx-auto justify-center py-10 w-full">
+                <Text className="text-gray-500 text-base">No albums found</Text>
+              </View>
+            )}
           />
         </View>
         <View className="h-20" />

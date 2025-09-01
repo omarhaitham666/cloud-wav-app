@@ -5,7 +5,7 @@ const SectionHeader = ({
   showViewAll = false,
 }: {
   title: string;
-  showViewAll: boolean;
+  showViewAll?: boolean;
 }) => (
   <View className="flex-row justify-between items-center mb-4 px-5">
     <Text className="text-2xl font-bold text-gray-900">{title}</Text>
