@@ -1,4 +1,6 @@
+import AlbumCard from "@/components/AlbumCard";
 import { SongCard } from "@/components/SongCard";
+import { Albums } from "@/store/api/global/albums";
 import { useGetArtistQuery } from "@/store/api/global/artists";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,7 +11,6 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  Linking,
   ScrollView,
   StatusBar,
   Text,
@@ -21,15 +22,6 @@ const ArtistProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: artistData, isLoading: isFetching } = useGetArtistQuery(id);
-
-  const openEmail = () => Linking.openURL(`mailto:${artistData?.email}`);
-  const openCall = () => Linking.openURL(`tel:${artistData?.number}`);
-  const openWhatsApp = () =>
-    Linking.openURL(
-      `whatsapp://send?phone=${artistData?.whatsapp_number}`
-    ).catch(() =>
-      Linking.openURL(`https://wa.me/${artistData?.whatsapp_number}`)
-    );
 
   if (isFetching) {
     return (
@@ -82,60 +74,52 @@ const ArtistProfile = () => {
         </View>
       </LinearGradient>
 
-      <View className="px-5  ">
+      <View className="px-5 mt-6 ">
         <View className="mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-gray-800">All Songs</Text>
-            <TouchableOpacity>
-              <Text className="text-sm text-indigo-600 font-semibold">
-                See All
-              </Text>
-            </TouchableOpacity>
           </View>
+
           <FlatList
-            data={artistData?.songs}
+            data={artistData?.songs || []}
             keyExtractor={(item) => item.id.toString()}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
             renderItem={({ item }) => (
               <SongCard
                 id={item.id}
-                key={item.id}
                 title={item.title}
-                artist={item.title}
+                artist={(artistData?.name as string) || ""}
                 audio_url={item.song_path}
                 cover_url={item.cover_path}
               />
             )}
           />
         </View>
+
         <View className="mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-gray-800">All Albums</Text>
-            <TouchableOpacity>
-              <Text className="text-sm text-indigo-600 font-semibold">
-                See All
-              </Text>
-            </TouchableOpacity>
           </View>
+
           <FlatList
-            data={artistData?.albums}
-            // keyExtractor={(item) => item.id.toString()}
+            data={(artistData?.albums as Albums[]) || []}
+            keyExtractor={(item) => item.id.toString()}
             horizontal
-            pagingEnabled
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) =>
-              //   <SongCard
-              //     id={item.id}
-              //     key={item.id}
-              //     title={item.title}
-              //     artist={item.title}
-              //     audio_url={item.song_path}
-              //     cover_url={item.cover_path}
-              //   />
-              null
-            }
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10 }}
+            renderItem={({ item }) => (
+              <AlbumCard
+                id={item.id}
+                title={(artistData?.name as string) || ""}
+                imageUrl={item.album_cover}
+              />
+            )}
+            ListEmptyComponent={() => (
+              <View className="flex items-center mx-auto justify-center py-10 w-full">
+                <Text className="text-gray-500 text-base">No albums found</Text>
+              </View>
+            )}
           />
         </View>
         <View className="h-20" />

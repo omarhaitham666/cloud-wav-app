@@ -14,7 +14,7 @@ const Profile = () => {
 
   const checkAuthToken = async () => {
     try {
-      const token = await AsyncStorage.getItem("authToken");
+      const token = await AsyncStorage.getItem("access_token");
       setIsAuthenticated(!!token);
     } catch (error) {
       console.error("Error checking auth token:", error);

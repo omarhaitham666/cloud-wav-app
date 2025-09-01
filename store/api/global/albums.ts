@@ -1,22 +1,17 @@
 import { mainApi } from ".";
+import { Songs } from "./song";
 
 export interface Albums {
+  title: string;
+  artist: {
+    id: number;
+    name: string;
+    profile_image: string;
+    division: string;
+  };
   id: string;
-  details: string;
-  division: string;
-  email: string;
-  name: string;
-  number: string;
-  profile_image: string;
-  social_links: string;
-  songs: {
-    id: 82;
-    title: string;
-    cover_path: string;
-    song_path: string;
-  }[];
-  user_id: string;
-  whatsapp_number: string;
+  album_cover: string;
+  songs: Songs[];
 }
 const songApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
