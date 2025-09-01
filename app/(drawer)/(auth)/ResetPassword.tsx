@@ -2,12 +2,14 @@ import { useResetPasswordMutation } from "@/store/api/user/user";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
 import Toast from "react-native-toast-message";
 
 export default function ResetPassword() {
@@ -85,7 +87,7 @@ export default function ResetPassword() {
           onPress={handleResetPassword}
         >
           <Text className="text-white text-center font-semibold text-base">
-            {isLoading ? "Resetting..." : "Reset Password"}
+            {isLoading ? <ActivityIndicator color="#fff" /> : "Reset Password"}
           </Text>
         </TouchableOpacity>
       </View>

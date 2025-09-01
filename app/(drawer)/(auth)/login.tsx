@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   SafeAreaView,
@@ -40,6 +41,11 @@ export default function LoginScreen() {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: yupResolver(schema),
+    mode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -151,9 +157,13 @@ export default function LoginScreen() {
           className="bg-red-600 py-3 rounded-md mb-4"
           onPress={handleSubmit(onSubmit)}
         >
-          <Text className="text-white text-center font-semibold text-base">
-            {isLoading ? "Sign In..." : "Sign In"}
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className="text-white text-center font-semibold text-base">
+              Sign In
+            </Text>
+          )}
         </TouchableOpacity>
 
         <Text className="text-center text-gray-500 mb-4">Or sign in with</Text>

@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { getToken } from "./secureStore";
 
 export const mainApi = axios.create({
   baseURL: "https://api.cloudwavproduction.com/api",
@@ -7,7 +8,7 @@ export const mainApi = axios.create({
 });
 
 mainApi.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem("token");
+  const token = await getToken("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
     config.headers["Content-Type"] = "application/json";

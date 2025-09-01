@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   Image,
   Platform,
   ScrollView,
@@ -242,7 +243,7 @@ export default function RegisterScreen() {
             onPress={handleSubmit(onSubmit)}
           >
             <Text className="text-white text-center font-semibold text-base">
-              {isLoading ? "Signing Up..." : "Sign Up"}
+              {isLoading ? <ActivityIndicator color="#fff" /> : "Sign Up"}
             </Text>
           </TouchableOpacity>
 

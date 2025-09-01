@@ -2,6 +2,7 @@ import { useForgotPasswordMutation } from "@/store/api/user/user";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   SafeAreaView,
   Text,
   TextInput,
@@ -59,7 +60,7 @@ export default function ForgotPassword() {
           onPress={handleSendOTP}
         >
           <Text className="text-white text-center font-semibold text-base">
-            {isLoading ? "Sending..." : "Send OTP"}
+            {isLoading ? <ActivityIndicator color="#fff" /> : "Send OTP"}
           </Text>
         </TouchableOpacity>
       </View>

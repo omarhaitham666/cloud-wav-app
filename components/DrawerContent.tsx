@@ -1,6 +1,8 @@
+import { useLogoutMutation } from "@/store/api/user/user";
+import { deleteToken, getToken } from "@/utils/secureStore";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { RelativePathString, router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -10,7 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import Feather from "react-native-vector-icons/Feather";
+
 const DrawerItem = ({
   icon,
   label,
@@ -52,26 +56,42 @@ const DrawerItem = ({
   );
 };
 
-export default function DrawerContent({
-  navigation,
-  state,
-}: DrawerContentComponentProps) {
+export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const currentRoute = state.routes[state.index]?.name;
+  const [token, setToken] = useState<string | null>(null);
+  const [logout, { isLoading }] = useLogoutMutation();
+  useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = await getToken("access_token");
+      setToken(storedToken);
+    };
+    fetchToken();
+  }, []);
 
-  const routeMap = {
-    Home: "(tabs)",
-    Contact: "contact",
-    Login: "(auth)/login",
-    Register: "(auth)/register",
+  const handleLogout = async () => {
+    await deleteToken("access_token");
+    await logout()
+      .unwrap()
+      .then(() => {
+        setToken(null);
+        Toast.show({
+          type: "success",
+          text1: "Logout Successful",
+          text2: "You have been logged out.",
+        });
+        router.replace("/(drawer)/(auth)/login");
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: "Logout Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      });
   };
 
   const drawerItems = [
-    {
-      label: "Home",
-      route: "(tabs)",
-      iconName: "home",
-      displayName: "Home",
-    },
+    { label: "Home", route: "(tabs)", iconName: "home", displayName: "Home" },
     {
       label: "Contact Us",
       route: "contact/contact",
@@ -90,24 +110,27 @@ export default function DrawerContent({
       iconName: "grid",
       displayName: "Services",
     },
-    { label: "Login", route: "(auth)/login", iconName: "log-in" },
-    { label: "Register", route: "(auth)/register", iconName: "user-plus" },
   ];
 
-  const secondaryItems = [
-    {
-      label: "Profile",
-      route: null,
-      iconName: "user",
-      action: () => Alert.alert("Profile", "Profile screen coming soon!"),
-    },
-    {
-      label: "Settings",
-      route: null,
-      iconName: "settings",
-      action: () => Alert.alert("Settings", "Settings screen coming soon!"),
-    },
-  ];
+  const secondaryItems = token
+    ? [
+        {
+          label: "Profile",
+          route: null,
+          iconName: "user",
+          action: () => Alert.alert("Profile", "Profile screen coming soon!"),
+        },
+        {
+          label: isLoading ? "Logging Out" : "Logout",
+          route: null,
+          iconName: "log-out",
+          action: handleLogout,
+        },
+      ]
+    : [
+        { label: "Login", route: "(auth)/login", iconName: "log-in" },
+        { label: "Register", route: "(auth)/register", iconName: "user-plus" },
+      ];
 
   const navigateTo = (route: string | null, action?: () => void) => {
     if (action) {
@@ -158,7 +181,7 @@ export default function DrawerContent({
         showsVerticalScrollIndicator={false}
       >
         <View className="items-center py-3">
-          <View className="w-24 h-24 mt-10  items-center justify-center mb-3  bg-white">
+          <View className="w-24 h-24 mt-10 items-center justify-center mb-3 bg-white">
             <Image
               source={require("../assets/images/logo.png")}
               style={{ width: 180, height: 180 }}
@@ -196,12 +219,7 @@ export default function DrawerContent({
             </Text>
             <Text className="text-xs text-gray-400">Version 1.0.0</Text>
           </View>
-          <TouchableOpacity
-            onPress={() =>
-              Alert.alert("Logout", "Are you sure you want to logout?")
-            }
-            className="p-2"
-          >
+          <TouchableOpacity onPress={handleLogout} className="p-2">
             <Feather name="log-out" size={18} color="#64748b" />
           </TouchableOpacity>
         </View>

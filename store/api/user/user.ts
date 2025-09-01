@@ -94,11 +94,10 @@ const authApi = mainApi.injectEndpoints({
         }),
       }
     ),
-    logout: builder.mutation<{ success: boolean }, LogoutRequest>({
+    logout: builder.mutation<{ success: boolean }, void>({
       query: (body) => ({
         url: "/logout",
         method: "POST",
-        data: body,
       }),
     }),
   }),

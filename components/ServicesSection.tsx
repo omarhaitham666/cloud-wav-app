@@ -1,4 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import React from "react";
 import {
   ColorValue,
@@ -21,6 +22,7 @@ type Service = {
   comingSoon: boolean;
   gradientColors: [ColorValue, ColorValue, ...ColorValue[]];
   icon?: string;
+  route: string;
 };
 
 const services: Service[] = [
@@ -32,6 +34,7 @@ const services: Service[] = [
     comingSoon: false,
     gradientColors: ["#8B5CF6", "#A855F7", "#C084FC"],
     icon: "🎵",
+    route: "/services/music-distribution",
   },
   {
     id: "2",
@@ -41,6 +44,7 @@ const services: Service[] = [
     comingSoon: false,
     gradientColors: ["#10B981", "#34D399", "#6EE7B7"],
     icon: "🚀",
+    route: "/services/platform-management",
   },
   {
     id: "3",
@@ -50,15 +54,27 @@ const services: Service[] = [
     comingSoon: false,
     gradientColors: ["#3B82F6", "#60A5FA", "#93C5FD"],
     icon: "📱",
+    route: "/services/social-media",
   },
   {
     id: "4",
     title: "Clothes Store",
     desc: "Trendy fashion with fast delivery and easy returns.",
     image: require("../assets/images/ser-4.png"),
-    comingSoon: true,
+    comingSoon: false,
     gradientColors: ["#EF4444", "#F87171", "#FCA5A5"],
     icon: "👕",
+    route: "",
+  },
+  {
+    id: "5",
+    title: "tiktok-agency",
+    desc: "We help creators manage their TikTok accounts and reach a wider audience.",
+    image: require("../assets/images/Kit-Ba0DSf7D.png"),
+    comingSoon: true,
+    gradientColors: ["#6366F1", "#4F46E5"],
+    icon: "📱",
+    route: "#",
   },
 ];
 
@@ -139,6 +155,7 @@ export default function ServicesSection() {
                     className={`flex-row items-center self-start px-5 py-3 rounded-full ${
                       item.comingSoon ? "bg-white/30" : "bg-white"
                     }`}
+                    onPress={() => router.push(item.route as any)}
                     style={
                       !item.comingSoon && {
                         elevation: 4,
