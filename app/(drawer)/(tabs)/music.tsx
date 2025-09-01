@@ -67,7 +67,7 @@ const Music = () => {
     "Hip-Hop",
     "Blues",
     "Rock",
-    "Mahragnaat",
+    "Mahragnat",
     "Jazz",
     "Sonata",
     "Symphony",

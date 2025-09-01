@@ -82,68 +82,7 @@ const ArtistProfile = () => {
         </View>
       </LinearGradient>
 
-      <View className="px-5 -mt-10">
-        <View className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
-          <Text className="text-lg font-semibold text-gray-800 mb-4 text-center">
-            Contact Information
-          </Text>
-
-          <View className="space-y-4">
-            <TouchableOpacity
-              onPress={openEmail}
-              className="flex-row items-center p-3 rounded-xl hover:bg-gray-50 active:bg-indigo-50"
-            >
-              <View className="w-10 h-10 rounded-full bg-blue-100 justify-center items-center">
-                <Ionicons name="mail" size={20} color="#4f46e5" />
-              </View>
-              <View className="flex-1 mx-3">
-                <Text className="text-base font-medium text-gray-800">
-                  Email
-                </Text>
-                <Text className="text-sm text-gray-500" numberOfLines={1}>
-                  {artistData?.email}
-                </Text>
-              </View>
-              <Ionicons name="open-outline" size={18} color="#9ca3af" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={openCall}
-              className="flex-row items-center p-3 rounded-xl hover:bg-gray-50 active:bg-indigo-50"
-            >
-              <View className="w-10 h-10 rounded-full bg-green-100 justify-center items-center">
-                <Ionicons name="call" size={20} color="#10B981" />
-              </View>
-              <View className="flex-1 mx-3">
-                <Text className="text-base font-medium text-gray-800">
-                  Call
-                </Text>
-                <Text className="text-sm text-gray-500">
-                  {artistData?.number}
-                </Text>
-              </View>
-              <Ionicons name="call-outline" size={18} color="#9ca3af" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={openWhatsApp}
-              className="flex-row items-center p-3 rounded-xl hover:bg-gray-50 active:bg-indigo-50"
-            >
-              <View className="w-10 h-10 rounded-full bg-emerald-100 justify-center items-center">
-                <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
-              </View>
-              <View className="flex-1 mx-3">
-                <Text className="text-base font-medium text-gray-800">
-                  WhatsApp
-                </Text>
-                <Text className="text-sm text-gray-500">
-                  {artistData?.whatsapp_number}
-                </Text>
-              </View>
-              <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
+      <View className="px-5  ">
         <View className="mb-6">
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-gray-800">All Songs</Text>
