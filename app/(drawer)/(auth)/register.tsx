@@ -3,20 +3,21 @@ import { useRegisterMutation } from "@/store/api/user/user";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DateTimePicker, {
-  DateTimePickerEvent,
+    DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Image,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -31,28 +32,30 @@ interface FormValues {
   confirmPassword: string;
 }
 
-const schema = yup.object().shape({
-  fullName: yup.string().required("Full Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  birthDate: yup.string().required("Birth Date is required"),
-  phone: yup.string().required("Phone Number is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required(),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match")
-    .required("Confirm Password is required"),
-});
-
 export default function RegisterScreen() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [otpVisible, setOtpVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [register, { isLoading }] = useRegisterMutation();
+
+  const schema = yup.object().shape({
+    fullName: yup.string().required(t("auth.validation.fullNameRequired")),
+    email: yup.string().email(t("auth.validation.invalidEmail")).required(t("auth.validation.emailRequired")),
+    birthDate: yup.string().required(t("auth.validation.birthDateRequired")),
+    phone: yup.string().required(t("auth.validation.phoneRequired")),
+    password: yup
+      .string()
+      .min(6, t("auth.validation.passwordMinLength"))
+      .required(t("auth.validation.passwordRequired")),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("password")], t("auth.validation.passwordsMustMatch"))
+      .required(t("auth.validation.confirmPasswordRequired")),
+  });
 
   const {
     control,
@@ -75,16 +78,16 @@ export default function RegisterScreen() {
       .then((res) => {
         Toast.show({
           type: "success",
-          text1: "Account Created 🎉",
-          text2: "Please verify your email with the OTP code.",
+          text1: t("auth.register.alerts.registerSuccess"),
+          text2: t("auth.register.alerts.registerSuccessMessage"),
         });
         setOtpVisible(true);
       })
       .catch((e) => {
         Toast.show({
           type: "error",
-          text1: "Registration Failed",
-          text2: e?.data?.message || "Something went wrong",
+          text1: t("auth.register.alerts.registerFailed"),
+          text2: e?.data?.message || t("auth.register.alerts.registerFailedMessage"),
         });
       });
   };
@@ -107,7 +110,7 @@ export default function RegisterScreen() {
       name={name}
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
-          <View className="flex-row items-center border border-gray-300 rounded-md px-3">
+          <View className={`flex-row items-center border border-gray-300 rounded-md px-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <TextInput
               placeholder={placeholder}
               value={value}
@@ -123,6 +126,10 @@ export default function RegisterScreen() {
               keyboardType={keyboardType}
               className="flex-1 py-3 text-base text-black"
               placeholderTextColor="#888"
+              style={{ 
+                textAlign: isRTL ? 'right' : 'left',
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
             />
             {showToggle && (
               <TouchableOpacity
@@ -146,7 +153,10 @@ export default function RegisterScreen() {
             )}
           </View>
           {errors[name] && (
-            <Text className="text-red-600 text-sm mt-1">
+            <Text 
+              className="text-red-600 text-sm mt-1"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
               {errors[name]?.message}
             </Text>
           )}
@@ -163,13 +173,15 @@ export default function RegisterScreen() {
             source={require("../../../assets/images/register.png")}
             className="w-40 h-40 self-center mb-6"
           />
-          <Text className="text-2xl font-bold text-red-600 text-center mb-6">
-            Register on Cloud Wav
+          <Text 
+            className="text-2xl font-bold text-red-600 text-center mb-6"
+          >
+            {t("auth.register.title")}
           </Text>
-          {renderInput({ name: "fullName", placeholder: "Enter Your Name" })}
+          {renderInput({ name: "fullName", placeholder: t("auth.register.fullName") })}
           {renderInput({
             name: "email",
-            placeholder: "Email Address",
+            placeholder: t("auth.register.email"),
             keyboardType: "email-address",
           })}
 
@@ -186,12 +198,16 @@ export default function RegisterScreen() {
                     className={`text-base ${
                       value ? "text-black" : "text-gray-400"
                     }`}
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
                   >
-                    {value || "Select Birth Date"}
+                    {value || t("auth.register.birthDate")}
                   </Text>
                 </TouchableOpacity>
                 {errors.birthDate && (
-                  <Text className="text-red-600 text-sm mt-1">
+                  <Text 
+                    className="text-red-600 text-sm mt-1"
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                  >
                     {errors.birthDate.message}
                   </Text>
                 )}
@@ -222,18 +238,18 @@ export default function RegisterScreen() {
 
           {renderInput({
             name: "phone",
-            placeholder: "Phone Number",
+            placeholder: t("auth.register.phone"),
             keyboardType: "phone-pad",
           })}
           {renderInput({
             name: "password",
-            placeholder: "Password",
+            placeholder: t("auth.register.password"),
             secure: true,
             showToggle: true,
           })}
           {renderInput({
             name: "confirmPassword",
-            placeholder: "Confirm Password",
+            placeholder: t("auth.register.confirmPassword"),
             secure: true,
             showToggle: true,
           })}
@@ -242,16 +258,20 @@ export default function RegisterScreen() {
             className="bg-red-600 py-3 rounded-md mb-4"
             onPress={handleSubmit(onSubmit)}
           >
-            <Text className="text-white text-center font-semibold text-base">
-              {isLoading ? <ActivityIndicator color="#fff" /> : "Sign Up"}
+            <Text 
+              className="text-white text-center font-semibold text-base"
+            >
+              {isLoading ? <ActivityIndicator color="#fff" /> : t("auth.register.signUp")}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/(auth)/login")}
           >
-            <Text className="text-red-600 text-center mb-24 text-sm">
-              Already have an account? Login
+            <Text 
+              className="text-red-600 text-center mb-24 text-sm"
+            >
+              {t("auth.register.haveAccount")}
             </Text>
           </TouchableOpacity>
           <OTPModal

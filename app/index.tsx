@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions,
   FlatList,
@@ -18,6 +19,9 @@ export default function WelcomeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setCurrentIndex(index);
@@ -51,11 +55,15 @@ export default function WelcomeScreen() {
               className="w-72 h-72 mb-8"
               resizeMode="contain"
             />
-            <Text className="text-white text-2xl font-bold text-center mb-3">
-              {item.title}
+            <Text 
+              className="text-white text-2xl font-bold text-center mb-3"
+            >
+              {t(item.title)}
             </Text>
-            <Text className="text-gray-100 text-center text-sm leading-5">
-              {item.description}
+            <Text 
+              className="text-gray-50 text-center text-sm leading-5"
+            >
+              {t(item.description)}
             </Text>
           </View>
         )}
@@ -77,7 +85,10 @@ export default function WelcomeScreen() {
           onPress={handleNext}
         >
           <Text className="text-red-600 font-bold text-base">
-            {currentIndex === slides.length - 1 ? "GET STARTED" : "NEXT"}
+            {currentIndex === slides.length - 1 
+              ? t("welcome.buttons.getStarted") 
+              : t("welcome.buttons.next")
+            }
           </Text>
         </TouchableOpacity>
       </View>

@@ -5,15 +5,16 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    SafeAreaView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import * as yup from "yup";
@@ -22,18 +23,20 @@ interface LoginFormValues {
   password: string;
 }
 
-const schema = yup.object().shape({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup
-    .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
-});
-
 export default function LoginScreen() {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
+
+  const schema = yup.object().shape({
+    email: yup.string().email(t("auth.validation.invalidEmail")).required(t("auth.validation.emailRequired")),
+    password: yup
+      .string()
+      .min(6, t("auth.validation.passwordMinLength"))
+      .required(t("auth.validation.passwordRequired")),
+  });
 
   const {
     control,
@@ -59,16 +62,16 @@ export default function LoginScreen() {
 
         Toast.show({
           type: "success",
-          text1: "Account Logged In 🎉",
-          text2: "Welcome to Cloud Wav",
+          text1: t("auth.login.alerts.loginSuccess"),
+          text2: t("auth.login.alerts.loginSuccessMessage"),
         });
         router.replace("/(drawer)/(tabs)");
       })
       .catch((e) => {
         Toast.show({
           type: "error",
-          text1: "Login Failed",
-          text2: e?.data?.message || "Something went wrong",
+          text1: t("auth.login.alerts.loginFailed"),
+          text2: e?.data?.message || t("auth.login.alerts.loginFailedMessage"),
         });
       });
   };
@@ -91,7 +94,7 @@ export default function LoginScreen() {
       name={name}
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
-          <View className="flex-row items-center border border-gray-300 rounded-md px-3">
+          <View className={`flex-row items-center border border-gray-300 rounded-md px-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <TextInput
               placeholder={placeholder}
               value={value}
@@ -104,6 +107,10 @@ export default function LoginScreen() {
               className="flex-1 py-3 text-base text-black"
               placeholderTextColor="#888"
               autoCapitalize="none"
+              style={{ 
+                textAlign: isRTL ? 'right' : 'left',
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
             />
             {showToggle && (
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -116,7 +123,10 @@ export default function LoginScreen() {
             )}
           </View>
           {errors[name] && (
-            <Text className="text-red-600 text-sm mt-1">
+            <Text 
+              className="text-red-600 text-sm mt-1"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
               {errors[name]?.message}
             </Text>
           )}
@@ -132,14 +142,16 @@ export default function LoginScreen() {
           source={require("../../../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"
         />
-        <Text className="text-2xl font-bold text-red-600 text-center mb-6">
-          Welcome to Cloud Wav
+        <Text 
+          className="text-2xl font-bold text-red-600 text-center mb-6"
+        >
+          {t("auth.login.title")}
         </Text>
 
-        {renderInput({ name: "email", placeholder: "Email" })}
+        {renderInput({ name: "email", placeholder: t("auth.login.email") })}
         {renderInput({
           name: "password",
-          placeholder: "Password",
+          placeholder: t("auth.login.password"),
           secure: true,
           showToggle: true,
         })}
@@ -148,8 +160,11 @@ export default function LoginScreen() {
           onPress={() => router.push("/(drawer)/(auth)/ForgotPassword")}
           className="mb-4 self-end"
         >
-          <Text className="text-sm text-red-600 font-medium">
-            Forgot Password?
+          <Text 
+            className="text-sm text-red-600 font-medium"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("auth.login.forgotPassword")}
           </Text>
         </TouchableOpacity>
 
@@ -160,28 +175,40 @@ export default function LoginScreen() {
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text className="text-white text-center font-semibold text-base">
-              Sign In
+            <Text 
+              className="text-white text-center font-semibold text-base"
+            >
+              {t("auth.login.signIn")}
             </Text>
           )}
         </TouchableOpacity>
 
-        <Text className="text-center text-gray-500 mb-4">Or sign in with</Text>
+        <Text 
+          className="text-center text-gray-500 mb-4"
+          style={{ textAlign: isRTL ? 'right' : 'left' }}
+        >
+          {t("auth.login.orSignInWith")}
+        </Text>
         <TouchableOpacity
-          className="flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-3 shadow-sm justify-center mb-6"
+          className={`flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-3 shadow-sm justify-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}
           onPress={() => Alert.alert("Social Login", "Sign in with Google")}
         >
           <Ionicons name="logo-google" size={20} color="#DB4437" />
-          <Text className="ml-3 text-base font-medium text-gray-800">
-            Continue with Google
+          <Text 
+            className={`text-base font-medium text-gray-800 ${isRTL ? 'mr-3' : 'ml-3'}`}
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("auth.login.continueWithGoogle")}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => router.push("/(drawer)/(auth)/register")}
         >
-          <Text className="text-red-600 text-center text-sm">
-            Don&apos;t have an account? Sign Up
+          <Text 
+            className="text-red-600 text-center text-sm"
+          >
+            {t("auth.login.noAccount")}
           </Text>
         </TouchableOpacity>
       </View>

@@ -6,15 +6,16 @@ import { router } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
 
 type FormValues = {
@@ -28,15 +29,18 @@ type FormValues = {
 };
 
 const servicesOptions = [
-  "Voice Recording",
-  "Song Writing",
-  "Music Production",
-  "Video Filming",
-  "Creating Full Song",
-  "Creating Song With Clip",
+  "services.musicDistribution.modal.options.voiceRecording",
+  "services.musicDistribution.modal.options.songWriting",
+  "services.musicDistribution.modal.options.musicProduction",
+  "services.musicDistribution.modal.options.videoFilming",
+  "services.musicDistribution.modal.options.creatingFullSong",
+  "services.musicDistribution.modal.options.creatingSongWithClip",
 ];
 
-const singOptions = ["I Will Sing It Myself", "I Will Need A Specific"];
+const singOptions = [
+  "services.musicDistribution.modal.singOptions.singMyself",
+  "services.musicDistribution.modal.singOptions.needSpecific"
+];
 
 type Props = {
   visible: boolean;
@@ -44,6 +48,7 @@ type Props = {
 };
 
 export default function MusicServiceModal({ visible, onClose }: Props) {
+  const { t } = useTranslation();
   const { control, handleSubmit, watch, setValue } = useForm<FormValues>({
     defaultValues: {
       name: "",
@@ -108,10 +113,10 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
         <View className="bg-white rounded-2xl w-full h-full my-3">
           <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
             <Text className="text-lg font-bold text-indigo-600">
-              Service Request
+              {t("services.musicDistribution.modal.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-xl text-gray-600">✕</Text>
+                              <Text className="text-xl text-gray-600">{t("services.musicDistribution.modal.close")}</Text>
             </TouchableOpacity>
           </View>
 
@@ -129,7 +134,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="name"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder="Name"
+                  placeholder={t("services.musicDistribution.modal.form.name")}
                   className="border border-gray-300 rounded p-3 mb-4"
                   value={value}
                   onChangeText={onChange}
@@ -142,7 +147,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="email"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder="Email"
+                  placeholder={t("services.musicDistribution.modal.form.email")}
                   className="border border-gray-300 rounded p-3 mb-4"
                   keyboardType="email-address"
                   value={value}
@@ -156,7 +161,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="phone"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder="Phone"
+                  placeholder={t("services.musicDistribution.modal.form.phone")}
                   className="border border-gray-300 rounded p-3 mb-4"
                   keyboardType="phone-pad"
                   value={value}
@@ -170,7 +175,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="whatsapp_number"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder="WhatsApp Number"
+                  placeholder={t("services.musicDistribution.modal.form.whatsappNumber")}
                   className="border border-gray-300 rounded p-3 mb-4"
                   keyboardType="phone-pad"
                   value={value}
@@ -184,7 +189,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="details"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder="Details"
+                  placeholder={t("services.musicDistribution.modal.form.details")}
                   className="border border-gray-300 rounded p-3 mb-4 h-20"
                   multiline
                   value={value}
@@ -194,7 +199,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
             />
 
             <Text className="text-base font-semibold mb-2">
-              Select one or more options:
+              {t("services.musicDistribution.modal.form.selectOptions")}
             </Text>
             {servicesOptions.map((opt) => (
               <TouchableOpacity
@@ -209,12 +214,12 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
                       : "border-gray-400"
                   }`}
                 />
-                <Text>{opt}</Text>
+                <Text>{t(opt)}</Text>
               </TouchableOpacity>
             ))}
 
             <Text className="text-base font-semibold mt-4 mb-2">
-              Select an option:
+              {t("services.musicDistribution.modal.form.selectSingOption")}
             </Text>
             {singOptions.map((opt) => (
               <Controller
@@ -233,7 +238,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
                           : "border-gray-400"
                       }`}
                     />
-                    <Text>{opt}</Text>
+                    <Text>{t(opt)}</Text>
                   </TouchableOpacity>
                 )}
               />
@@ -244,7 +249,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               onPress={handleSubmit(onSubmit)}
             >
               <Text className="text-white text-center font-semibold">
-                {isLoading ? <ActivityIndicator color="#fff" /> : "Submit"}
+                {isLoading ? <ActivityIndicator color="#fff" /> : t("services.musicDistribution.modal.form.submit")}
               </Text>
             </TouchableOpacity>
           </ScrollView>

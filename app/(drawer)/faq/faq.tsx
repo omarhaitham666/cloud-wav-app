@@ -1,5 +1,7 @@
+import CreativeBanner from "@/components/CreativeBanner";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   LayoutAnimation,
   Platform,
@@ -7,7 +9,7 @@ import {
   Text,
   TouchableOpacity,
   UIManager,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -24,6 +26,8 @@ const FAQItem = ({
   answer: string;
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -31,12 +35,25 @@ const FAQItem = ({
   };
 
   return (
-    <View className="bg-purple-800 rounded-lg mb-4 p-4">
+    <View 
+    style={{
+      borderRadius: 18,
+      padding: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 6,
+    }}
+    className="bg-purple-800 mb-4 p-4">
       <TouchableOpacity
         onPress={toggleExpand}
-        className="flex-row justify-between items-center"
+        className={`flex-row justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}
       >
-        <Text className="text-white text-base font-semibold flex-1">
+        <Text 
+          className="text-white text-base font-semibold flex-1"
+          style={{ textAlign: isRTL ? 'right' : 'left' }}
+        >
           {question}
         </Text>
         <Ionicons
@@ -46,7 +63,10 @@ const FAQItem = ({
         />
       </TouchableOpacity>
       {expanded && (
-        <Text className="text-white mt-2 text-sm leading-relaxed">
+        <Text 
+          className="text-white mt-2 text-sm leading-relaxed"
+          style={{ textAlign: isRTL ? 'right' : 'left' }}
+        >
           {answer}
         </Text>
       )}
@@ -55,87 +75,114 @@ const FAQItem = ({
 };
 
 const FAQPage = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
   return (
     <SafeAreaView className="flex-1 py-3 bg-gray-50">
-      <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <View className="p-4">
+          <CreativeBanner
+            titleKey="title"
+            subtitleKey="subtitle"
+            iconKey="icon"
+            colors={["#8B5CF6", "#7C3AED", "#6D28D9"]}
+            namespace="faq"
+          />
+        </View>
+        
         <View className="px-4">
           <View className="mb-6">
-            <Text className="text-2xl font-bold text-center text-black">
-              Frequently Asked Questions (FAQ)
+            <Text 
+              className="text-2xl font-bold text-center text-black"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t('faq.title')}
             </Text>
-            <Text className="text-center text-sm text-gray-600 mt-1">
-              For advertising, music production, platform services, and more.
+            <Text 
+              className="text-center text-sm text-gray-600 mt-1"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t('faq.subtitle')}
             </Text>
           </View>
 
           <FAQItem
-            question="What is CloudWav Production?"
-            answer="CloudWav Production is a digital platform offering professional services like advertising, music production, platform management, and video production."
+            question={t('faq.questions.whatIsCloudWav.question')}
+            answer={t('faq.questions.whatIsCloudWav.answer')}
           />
           <FAQItem
-            question="How can I create an account on the website?"
-            answer="Click 'Sign Up', enter details, choose account type, agree to terms, verify your email, then manage your profile."
+            question={t('faq.questions.createAccount.question')}
+            answer={t('faq.questions.createAccount.answer')}
           />
           <FAQItem
-            question="How does the artist account work on the platform?"
-            answer="Upload/manage your songs, access streaming, request production support, receive events/gig offers."
+            question={t('faq.questions.artistAccount.question')}
+            answer={t('faq.questions.artistAccount.answer')}
           />
           <FAQItem
-            question="How can I request a dedication video or advertisement from an artist?"
-            answer="Select artist, choose video type, fill details (name/message), make payment, and receive within specified time."
+            question={t('faq.questions.requestDedication.question')}
+            answer={t('faq.questions.requestDedication.answer')}
           />
           <FAQItem
-            question="Can I book an artist for an event or occasion?"
-            answer="Choose event type, submit request with date/location/details. You'll be contacted to finalize pricing."
+            question={t('faq.questions.bookArtist.question')}
+            answer={t('faq.questions.bookArtist.answer')}
           />
           <FAQItem
-            question="How can I benefit from artistic and music production services?"
-            answer="Choose service, submit project (style/budget), and connect with top professionals."
+            question={t('faq.questions.productionServices.question')}
+            answer={t('faq.questions.productionServices.answer')}
           />
           <FAQItem
-            question="How do social media services and platform management work?"
-            answer="Includes account management, paid ads, growth strategy, copyright protection, and digital rights."
+            question={t('faq.questions.socialMediaServices.question')}
+            answer={t('faq.questions.socialMediaServices.answer')}
           />
           <FAQItem
-            question="How can I pay for services?"
-            answer="Payments via Visa/Mastercard, Vodafone Cash (select countries), and bank transfer. Encrypted for security."
+            question={t('faq.questions.paymentMethods.question')}
+            answer={t('faq.questions.paymentMethods.answer')}
           />
           <FAQItem
-            question="Can I get a refund after purchasing a service?"
-            answer="Payments are non-refundable unless a technical issue prevents service delivery."
+            question={t('faq.questions.refundPolicy.question')}
+            answer={t('faq.questions.refundPolicy.answer')}
           />
           <FAQItem
-            question="How can I sign a contract with CloudWav Production as an artist?"
-            answer="Submit application and previous work. Upon approval, a contract will be signed with benefits and rules."
+            question={t('faq.questions.artistContract.question')}
+            answer={t('faq.questions.artistContract.answer')}
           />
           <FAQItem
-            question="How can I contact customer support?"
-            answer="Email: support@cloudwavproduction.com, contact form, or live chat (if available)."
+            question={t('faq.questions.customerSupport.question')}
+            answer={t('faq.questions.customerSupport.answer')}
           />
           <FAQItem
-            question="What happens if my account gets suspended?"
-            answer="Accounts may be suspended for ToS violations or suspicious activity. Appeals can be submitted via support."
+            question={t('faq.questions.accountSuspension.question')}
+            answer={t('faq.questions.accountSuspension.answer')}
           />
 
           <View className="bg-gray-100 p-5 mt-6 rounded-lg">
-            <Text className="text-base font-semibold mb-2 text-black">
-              * Tips for using CloudWav Production professionally:
+            <Text 
+              className="text-base font-semibold mb-2 text-black"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t('faq.tips.title')}
             </Text>
-            <Text className="text-sm text-gray-700 leading-relaxed">
-              - Always check your email for updates.{"\n"}- Use production, paid
-              video, and media services to boost projects.{"\n"}- Contact
-              support for additional inquiries.
+            <Text 
+              className="text-sm text-gray-700 leading-relaxed"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t('faq.tips.content')}
             </Text>
           </View>
 
           <View className="bg-red-100 p-4 mt-4 rounded-lg">
-            <Text className="text-base font-bold mb-1 text-red-700">
-              Legal warning:
+            <Text 
+              className="text-base font-bold mb-1 text-red-700"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t('faq.legalWarning.title')}
             </Text>
-            <Text className="text-sm text-gray-800">
-              Violating platform rules may lead to suspension or closure.
-              Payments are non-refundable except in stated cases. CloudWav may
-              update terms without prior notice.
+            <Text 
+              className="text-sm text-gray-800"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t('faq.legalWarning.content')}
             </Text>
           </View>
 
@@ -143,8 +190,10 @@ const FAQPage = () => {
             onPress={() => router.push("/(drawer)/contact/contact")}
             className="mt-6 mb-16 bg-green-600 py-3 rounded-full"
           >
-            <Text className="text-center text-white text-base font-bold">
-              Contact Us
+            <Text 
+              className="text-center text-white text-base font-bold"
+            >
+              {t('faq.contactButton')}
             </Text>
           </TouchableOpacity>
         </View>

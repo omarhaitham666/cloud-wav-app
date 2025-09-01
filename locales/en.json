@@ -1,5 +1,10 @@
 {
   "contact": {
+    "banner": {
+      "title": "Get In Touch",
+      "subtitle": "We're here to help with your music production needs",
+      "icon": "chatbubbles"
+    },
     "phoneSupportTitle": "Phone Support",
     "phoneSupportSubtitle": "Call us for immediate assistance",
     "phoneSupportValue": "+201055030045",
@@ -26,5 +31,397 @@
       "errorMessage": "Failed to send message. Please try again."
     }
   },
-  "faq": {}
+  "faq": {
+    "banner": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know about CloudWav Production",
+      "icon": "help-circle"
+    },
+    "title": "Frequently Asked Questions (FAQ)",
+    "subtitle": "For advertising, music production, platform services, and more.",
+    "questions": {
+      "whatIsCloudWav": {
+        "question": "What is CloudWav Production?",
+        "answer": "CloudWav Production is a digital platform offering professional services like advertising, music production, platform management, and video production."
+      },
+      "createAccount": {
+        "question": "How can I create an account on the website?",
+        "answer": "Click 'Sign Up', enter details, choose account type, agree to terms, verify your email, then manage your profile."
+      },
+      "artistAccount": {
+        "question": "How does the artist account work on the platform?",
+        "answer": "Upload/manage your songs, access streaming, request production support, receive events/gig offers."
+      },
+      "requestDedication": {
+        "question": "How can I request a dedication video or advertisement from an artist?",
+        "answer": "Select artist, choose video type, fill details (name/message), make payment, and receive within specified time."
+      },
+      "bookArtist": {
+        "question": "Can I book an artist for an event or occasion?",
+        "answer": "Choose event type, submit request with date/location/details. You'll be contacted to finalize pricing."
+      },
+      "productionServices": {
+        "question": "How can I benefit from artistic and music production services?",
+        "answer": "Choose service, submit project (style/budget), and connect with top professionals."
+      },
+      "socialMediaServices": {
+        "question": "How do social media services and platform management work?",
+        "answer": "Includes account management, paid ads, growth strategy, copyright protection, and digital rights."
+      },
+      "paymentMethods": {
+        "question": "How can I pay for services?",
+        "answer": "Payments via Visa/Mastercard, Vodafone Cash (select countries), and bank transfer. Encrypted for security."
+      },
+      "refundPolicy": {
+        "question": "Can I get a refund after purchasing a service?",
+        "answer": "Payments are non-refundable unless a technical issue prevents service delivery."
+      },
+      "artistContract": {
+        "question": "How can I sign a contract with CloudWav Production as an artist?",
+        "answer": "Submit application and previous work. Upon approval, a contract will be signed with benefits and rules."
+      },
+      "customerSupport": {
+        "question": "How can I contact customer support?",
+        "answer": "Email: support@cloudwavproduction.com, contact form, or live chat (if available)."
+      },
+      "accountSuspension": {
+        "question": "What happens if my account gets suspended?",
+        "answer": "Accounts may be suspended for ToS violations or suspicious activity. Appeals can be submitted via support."
+      }
+    },
+    "tips": {
+      "title": "* Tips for using CloudWav Production professionally:",
+      "content": "- Always check your email for updates.\n- Use production, paid video, and media services to boost projects.\n- Contact support for additional inquiries."
+    },
+    "legalWarning": {
+      "title": "Legal warning:",
+      "content": "Violating platform rules may lead to suspension or closure. Payments are non-refundable except in stated cases. CloudWav may update terms without prior notice."
+    },
+    "contactButton": "Contact Us"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome to Cloud Wav",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot Password?",
+      "signIn": "Sign In",
+      "orSignInWith": "Or sign in with",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account? Sign Up",
+      "alerts": {
+        "loginSuccess": "Account Logged In 🎉",
+        "loginSuccessMessage": "Welcome to Cloud Wav",
+        "loginFailed": "Login Failed",
+        "loginFailedMessage": "Something went wrong"
+      }
+    },
+    "register": {
+      "title": "Register on Cloud Wav",
+      "fullName": "Enter Your Name",
+      "email": "Email Address",
+      "birthDate": "Select Birth Date",
+      "phone": "Phone Number",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "signUp": "Sign Up",
+      "haveAccount": "Already have an account? Login",
+      "alerts": {
+        "registerSuccess": "Account Created 🎉",
+        "registerSuccessMessage": "Please verify your email with the OTP code.",
+        "registerFailed": "Registration Failed",
+        "registerFailedMessage": "Something went wrong"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "email": "Enter your email",
+      "sendOTP": "Send OTP",
+      "alerts": {
+        "otpSent": "OTP Sent Successfully",
+        "otpSentMessage": "Please check your email for the verification code.",
+        "otpFailed": "Failed to send OTP",
+        "otpFailedMessage": "Something went wrong"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "verificationCode": "Verification Code",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "resetPassword": "Reset Password",
+      "alerts": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordMismatchMessage": "Please try again",
+        "resetSuccess": "Password Reset Successfully",
+        "resetSuccessMessage": "Please check your email for the verification code.",
+        "resetFailed": "Password Reset Failed",
+        "resetFailedMessage": "Something went wrong"
+      }
+    },
+    "validation": {
+      "fullNameRequired": "Full Name is required",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Invalid email",
+      "birthDateRequired": "Birth Date is required",
+      "phoneRequired": "Phone Number is required",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "confirmPasswordRequired": "Confirm Password is required",
+      "passwordsMustMatch": "Passwords must match"
+    }
+  },
+  "services": {
+    "main": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive solutions to elevate your creative career and business",
+      "comingSoon": "Soon"
+    },
+    "musicDistribution": {
+      "title": "Music Distribution",
+      "subtitle": "Distribute your music to all major streaming platforms worldwide",
+      "description": "We provide everything you need to create your song from start to finish. Whether you're an emerging artist or a professional, our services are designed to help you present your best self with the highest quality.",
+      "pricing": "pricing",
+      "contactUs": "Contact us",
+      "ourServicesInclude": "Our Services Include:",
+      "letsTalkTitle": "Let's Talk About Something Special",
+      "form": {
+        "name": "Your Name",
+        "email": "Your Email",
+        "projectDetails": "Project Details",
+        "sendMessage": "Send Message"
+      },
+      "modal": {
+        "title": "Service Request",
+        "close": "✕",
+        "form": {
+          "name": "Name",
+          "email": "Email",
+          "phone": "Phone",
+          "whatsappNumber": "WhatsApp Number",
+          "details": "Details",
+          "selectOptions": "Select one or more options:",
+          "selectSingOption": "Select an option:",
+          "submit": "Submit"
+        },
+        "options": {
+          "voiceRecording": "Voice Recording",
+          "songWriting": "Song Writing",
+          "musicProduction": "Music Production",
+          "videoFilming": "Video Filming",
+          "creatingFullSong": "Creating Full Song",
+          "creatingSongWithClip": "Creating Song With Clip"
+        },
+        "singOptions": {
+          "singMyself": "I Will Sing It Myself",
+          "needSpecific": "I Will Need A Specific"
+        }
+      }
+    },
+    "platformManagement": {
+      "title": "Platform Management",
+      "subtitle": "Professional management of your digital presence across platforms",
+      "description": "Create & manage platforms for independent artists, protecting ownership and securing their earnings with professional solutions.",
+      "pricing": "pricing",
+      "getStarted": "Get Started",
+      "whyChooseUs": "Why Choose Us?",
+      "modal": {
+        "title": "Service Request",
+        "close": "✕",
+        "fields": {
+          "name": {
+            "label": "Your Name",
+            "placeholder": "Enter your name"
+          },
+          "email": {
+            "label": "Your Email",
+            "placeholder": "Enter your email"
+          },
+          "phone": {
+            "label": "Phone Number",
+            "placeholder": "Enter your phone"
+          },
+          "whatsapp": {
+            "label": "WhatsApp Number",
+            "placeholder": "Enter WhatsApp"
+          },
+          "platform": {
+            "label": "Platform",
+            "placeholder": "Enter Platform"
+          },
+          "social": {
+            "label": "Social Media Links",
+            "placeholder": "Enter Social Links"
+          },
+          "details": {
+            "label": "Details",
+            "placeholder": "Enter additional details"
+          }
+        },
+        "submit": "Send Now",
+        "validation": {
+          "nameRequired": "Name is required",
+          "invalidEmail": "Invalid email",
+          "phoneRequired": "Phone number is required"
+        }
+      },
+      "features": {
+        "artistProfile": {
+          "title": "Artist Profile",
+          "description": "Customize and showcase your artist profile on our platform."
+        },
+        "providingRealJob": {
+          "title": "Providing Real Job",
+          "description": "Unlock real job opportunities through our platform."
+        },
+        "directDownload": {
+          "title": "Direct Download",
+          "description": "Enjoy secure and fast direct downloads anytime."
+        },
+        "dataSecurity": {
+          "title": "Data Security",
+          "description": "Protect content and intellectual property with enterprise-level security."
+        },
+        "ensuringSuccessful": {
+          "title": "Ensuring Successful",
+          "description": "Guarantee safe and timely receipt of profits worldwide."
+        }
+      }
+    },
+    "socialMedia": {
+      "title": "Social Media",
+      "subtitle": "Strategic social media marketing and content creation services",
+      "description": "Having a strong Social Media presence is essential—whether for a local startup or a global enterprise. Beyond posting, it's about building trust, boosting visibility, and connecting deeply with your audience.",
+      "specialist": "Social Media Specialist",
+      "getStarted": "Get Started",
+      "faq": "FAQ",
+      "whyChooseUs": "Why Choose Us?",
+      "services": {
+        "creatingPlatforms": {
+          "title": "Creating & Documenting Platforms",
+          "description": "We help you create and manage Facebook, Instagram, Twitter, LinkedIn, TikTok, YouTube, and more.",
+          "price": "$20",
+          "type": "verify social media accounts"
+        },
+        "recoverAccounts": {
+          "title": "Recover Closed Accounts",
+          "description": "We recover closed or deactivated accounts and restore deleted ones quickly.",
+          "price": "$30",
+          "type": "recover social media account"
+        },
+        "sponsoredAds": {
+          "title": "Create Sponsored Ads",
+          "description": "We create ads on Google Ads, Facebook, TikTok, YouTube, Snapchat, and more.",
+          "price": "$15",
+          "type": "Sponsored ads"
+        }
+      },
+      "getItNow": "Get it now"
+    },
+    "clothesStore": {
+      "title": "Clothes Store",
+      "subtitle": "Premium fashion and merchandise for artists and creators",
+      "modal": {
+        "title": "Follow Our Clothes Store",
+        "close": "Close"
+      }
+    },
+    "programmingServices": {
+      "title": "Programming Services",
+      "subtitle": "Custom software development and technical solutions"
+    },
+    "tiktokAgency": {
+      "title": "TikTok Agency",
+      "subtitle": "Professional TikTok marketing and viral content strategies"
+    },
+    "servicesData": {
+      "voiceRecording": {
+        "title": "Professional Voice Recording",
+        "description": "Record your voice in a studio equipped with the latest technology, with a sound engineer to ensure clarity and high quality."
+      },
+      "songWriting": {
+        "title": "Song Lyrics Writing",
+        "description": "We help you write lyrics that express you, match your style, and deliver your message."
+      },
+      "musicProduction": {
+        "title": "Music Production & Arrangement",
+        "description": "Original music and professional arrangement by experienced producers and musicians, across various styles and genres."
+      },
+      "videoShooting": {
+        "title": "Professional Music Video Shooting",
+        "description": "Shoot a high-quality music video with a specialized directing and filming team, including lighting, editing, and visual effects."
+      },
+      "completeSong": {
+        "title": "Complete Song Creation",
+        "description": "From lyrics and composition to recording, arrangement, and mastering—we deliver a fully finished, publish-ready song."
+      },
+      "fullPackage": {
+        "title": "Full Song & Music Video Package",
+        "description": "A complete package including song production and high-quality video clip, with full coordination between all project elements."
+      }
+    },
+    "servicesSection": {
+      "title": "Satisfy Solution",
+      "subtitle": "The Best Services we provide",
+      "services": {
+        "musicDistribution": {
+          "title": "Music Distribution",
+          "description": "We ensure your music reaches the right audience, wherever they are."
+        },
+        "platformManagement": {
+          "title": "Platform Management",
+          "description": "Upload tracks, albums, and visuals to all major platforms."
+        },
+        "socialMedia": {
+          "title": "Social Media",
+          "description": "Creative posts and stories to connect with fans."
+        },
+        "clothesStore": {
+          "title": "Clothes Store",
+          "description": "Trendy fashion with fast delivery and easy returns."
+        },
+        "tiktokAgency": {
+          "title": "TikTok Agency",
+          "description": "We help creators manage their TikTok accounts and reach a wider audience."
+        }
+      },
+      "buttons": {
+        "learnMore": "Learn More",
+        "comingSoon": "Coming Soon"
+      }
+    }
+  },
+  "welcome": {
+    "slides": {
+      "slide1": {
+        "title": "Listening Music Anytime",
+        "description": "The artists we represent are one of the most successful in Romania and also were a huge breakthrough."
+      },
+      "slide2": {
+        "title": "Discover New Artists",
+        "description": "Explore trending talents and experience fresh entertainment anytime."
+      },
+      "slide3": {
+        "title": "Stay Connected Everywhere",
+        "description": "Enjoy music and shows across all your devices with just one click."
+      }
+    },
+    "buttons": {
+      "next": "NEXT",
+      "getStarted": "GET STARTED"
+    }
+  },
+  "home": {
+    "brand": "CloudWav",
+    "hero": {
+      "title": "Find Your Flow..",
+      "subtitle": "Unleash your soundworld"
+    },
+    "buttons": {
+      "play": "play"
+    },
+    "sections": {
+      "trendingSongs": "Trending Songs"
+    }
+  }
 }

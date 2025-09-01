@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Modal,
@@ -24,6 +25,17 @@ const schema = z.object({
   details: z.string().optional(),
 });
 
+// Create a function to get translated schema
+const getTranslatedSchema = (t: any) => z.object({
+  name: z.string().min(1, t("services.platformManagement.modal.validation.nameRequired")),
+  email: z.string().email(t("services.platformManagement.modal.validation.invalidEmail")),
+  phone: z.string().min(1, t("services.platformManagement.modal.validation.phoneRequired")),
+  whatsapp: z.string().optional(),
+  platform: z.string().optional(),
+  social: z.string().optional(),
+  details: z.string().optional(),
+});
+
 export type FormData = z.infer<typeof schema>;
 
 type Props = {
@@ -39,6 +51,9 @@ export default function ServiceRequestModal({
   onClose,
   onSubmitForm,
 }: Props) {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  
   const {
     control,
     handleSubmit,
@@ -61,24 +76,24 @@ export default function ServiceRequestModal({
   };
 
   const fields = [
-    { name: "name", label: "Your Name", placeholder: "Enter your name" },
-    { name: "email", label: "Your Email", placeholder: "Enter your email" },
-    { name: "phone", label: "Phone Number", placeholder: "Enter your phone" },
+    { name: "name", label: t("services.platformManagement.modal.fields.name.label"), placeholder: t("services.platformManagement.modal.fields.name.placeholder") },
+    { name: "email", label: t("services.platformManagement.modal.fields.email.label"), placeholder: t("services.platformManagement.modal.fields.email.placeholder") },
+    { name: "phone", label: t("services.platformManagement.modal.fields.phone.label"), placeholder: t("services.platformManagement.modal.fields.phone.placeholder") },
     {
       name: "whatsapp",
-      label: "WhatsApp Number",
-      placeholder: "Enter WhatsApp",
+      label: t("services.platformManagement.modal.fields.whatsapp.label"),
+      placeholder: t("services.platformManagement.modal.fields.whatsapp.placeholder"),
     },
-    { name: "platform", label: "Platform", placeholder: "Enter Platform" },
+    { name: "platform", label: t("services.platformManagement.modal.fields.platform.label"), placeholder: t("services.platformManagement.modal.fields.platform.placeholder") },
     {
       name: "social",
-      label: "Social Media Links",
-      placeholder: "Enter Social Links",
+      label: t("services.platformManagement.modal.fields.social.label"),
+      placeholder: t("services.platformManagement.modal.fields.social.placeholder"),
     },
     {
       name: "details",
-      label: "Details",
-      placeholder: "Enter additional details",
+      label: t("services.platformManagement.modal.fields.details.label"),
+      placeholder: t("services.platformManagement.modal.fields.details.placeholder"),
       multiline: true,
     },
   ];
@@ -86,12 +101,18 @@ export default function ServiceRequestModal({
     <Modal visible={visible} animationType="fade" transparent>
       <View className="flex-1 bg-black/40 justify-center items-center px-4">
         <View className="bg-white rounded-2xl w-full max-h-[80%]">
-          <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-            <Text className="text-lg font-bold text-indigo-600">
-              Service Request
+          <View 
+            className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
+            style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+          >
+            <Text 
+              className="text-lg font-bold text-indigo-600"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("services.platformManagement.modal.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-xl text-gray-600">✕</Text>
+              <Text className="text-xl text-gray-600">{t("services.platformManagement.modal.close")}</Text>
             </TouchableOpacity>
           </View>
 
@@ -109,11 +130,18 @@ export default function ServiceRequestModal({
                       multiline={field.multiline || false}
                       className="border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800"
                       placeholderTextColor="#9CA3AF"
+                      style={{ 
+                        textAlign: isRTL ? 'right' : 'left',
+                        textAlignVertical: 'top'
+                      }}
                     />
                   )}
                 />
                 {errors[field.name as keyof FormData] && (
-                  <Text className="text-red-500 text-xs mt-1">
+                  <Text 
+                    className="text-red-500 text-xs mt-1"
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                  >
                     {errors[field.name as keyof FormData]?.message?.toString()}
                   </Text>
                 )}
@@ -125,7 +153,7 @@ export default function ServiceRequestModal({
               className="bg-indigo-600 py-4 rounded-full mt-4"
             >
               <Text className="text-white text-center font-bold text-base">
-                {isLoading ? <ActivityIndicator color="#fff" /> : "Send Now"}
+                {isLoading ? <ActivityIndicator color="#fff" /> : t("services.platformManagement.modal.submit")}
               </Text>
             </TouchableOpacity>
           </ScrollView>

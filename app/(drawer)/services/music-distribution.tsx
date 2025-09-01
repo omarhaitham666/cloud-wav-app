@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   SafeAreaView,
@@ -16,6 +17,9 @@ import {
 
 const MusicDistribution = () => {
   const [visible, setVisible] = useState(false);
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  
   return (
     <LinearGradient
       colors={["#3B82F6", "#06B6D4", "#10B981"]}
@@ -24,15 +28,17 @@ const MusicDistribution = () => {
       className="flex-1"
     >
       <SafeAreaView className="flex-1">
-        <View className="flex-row items-center px-5 pt-10">
+        <View className="flex-row items-center px-5 pt-10"
+        >
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/services/services")}
             className="p-2 bg-white/20 rounded-full"
           >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text className="text-white text-lg font-semibold ml-4">
-            Music Distribution
+          <Text className="text-white text-lg font-semibold ms-4"
+          >
+            {t("services.musicDistribution.title")}
           </Text>
         </View>
 
@@ -41,13 +47,10 @@ const MusicDistribution = () => {
           className="flex-1 px-5"
         >
           <Text className="text-white text-center my-4 text-lg font-semibold ml-4">
-            Music Distribution
+            {t("services.musicDistribution.title")}
           </Text>
           <Text className="text-white text-base leading-6 mb-6 mt-4">
-            We provide everything you need to create your song from start to
-            finish. Whether you’re an emerging artist or a professional, our
-            services are designed to help you present your best self with the
-            highest quality.
+            {t("services.musicDistribution.description")}
           </Text>
 
           <View className="flex-row justify-between mb-8">
@@ -56,7 +59,7 @@ const MusicDistribution = () => {
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
               <Text className="text-white text-base font-semibold">
-                pricing
+                {t("services.musicDistribution.pricing")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -64,28 +67,43 @@ const MusicDistribution = () => {
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
               <Text className="text-white text-base font-semibold">
-                Contact us
+                {t("services.musicDistribution.contactUs")}
               </Text>
             </TouchableOpacity>
           </View>
 
           <View className="mb-8">
-            <Text className="text-xl font-bold text-white mb-4">
-              Our Services Include:
+            <Text className="text-xl font-bold text-white mb-4"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("services.musicDistribution.ourServicesInclude")}
             </Text>
             {services.map((service, index) => (
               <View
                 key={index}
                 className="bg-white/10 p-4 rounded-xl mb-4 border border-white/20"
               >
-                <View className="flex-row items-center mb-2">
+                <View 
+                  className="flex-row items-center mb-2"
+                  style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+                >
                   <Ionicons name={service.icon as any} size={22} color="#fff" />
-                  <Text className="text-white font-semibold text-base ml-2">
-                    {service.title}
+                  <Text 
+                    className="text-white font-semibold text-base"
+                    style={{ 
+                      marginLeft: isRTL ? 0 : 8,
+                      marginRight: isRTL ? 8 : 0,
+                      textAlign: isRTL ? 'right' : 'left'
+                    }}
+                  >
+                    {t(service.title)}
                   </Text>
                 </View>
-                <Text className="text-gray-600 text-sm leading-5">
-                  {service.description}
+                <Text 
+                  className="text-gray-600 text-sm leading-5"
+                  style={{ textAlign: isRTL ? 'right' : 'left' }}
+                >
+                  {t(service.description)}
                 </Text>
               </View>
             ))}
@@ -100,28 +118,34 @@ const MusicDistribution = () => {
           </View>
 
           <View className="bg-white rounded-2xl shadow-md p-6 mb-8">
-            <Text className="text-lg font-bold text-gray-900 mb-4">
-              Let’s Talk About Something Special
+            <Text 
+              className="text-lg font-bold text-gray-900 mb-4"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("services.musicDistribution.letsTalkTitle")}
             </Text>
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
-              placeholder="Your Name"
+              placeholder={t("services.musicDistribution.form.name")}
               placeholderTextColor="#888"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
             />
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
-              placeholder="Your Email"
+              placeholder={t("services.musicDistribution.form.email")}
               placeholderTextColor="#888"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
             />
             <TextInput
               className="border border-gray-300 rounded-lg px-4 py-3 mb-4 h-24 text-base"
-              placeholder="Project Details"
+              placeholder={t("services.musicDistribution.form.projectDetails")}
               placeholderTextColor="#888"
               multiline
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
             />
             <TouchableOpacity className="bg-blue-600 py-3 rounded-xl items-center">
               <Text className="text-white text-base font-medium">
-                Send Message
+                {t("services.musicDistribution.form.sendMessage")}
               </Text>
             </TouchableOpacity>
           </View>

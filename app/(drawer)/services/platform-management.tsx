@@ -1,60 +1,63 @@
 import ServiceRequestModal, {
-  FormData,
+    FormData,
 } from "@/components/ServiceRequestModal";
 import { useServicesMutation } from "@/store/api/global/services";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-  Briefcase,
-  Download,
-  ShieldCheck,
-  TrendingUp,
-  User,
+    Briefcase,
+    Download,
+    ShieldCheck,
+    TrendingUp,
+    User,
 } from "lucide-react-native";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
-const features = [
-  {
-    title: "Artist Profile",
-    description: "Customize and showcase your artist profile on our platform.",
-    icon: <User size={20} color="#7C3AED" />,
-  },
-  {
-    title: "Providing Real Job",
-    description: "Unlock real job opportunities through our platform.",
-    icon: <Briefcase size={20} color="#7C3AED" />,
-  },
-  {
-    title: "Direct Download",
-    description: "Enjoy secure and fast direct downloads anytime.",
-    icon: <Download size={20} color="#7C3AED" />,
-  },
-  {
-    title: "Data Security",
-    description:
-      "Protect content and intellectual property with enterprise-level security.",
-    icon: <ShieldCheck size={20} color="#7C3AED" />,
-  },
-  {
-    title: "Ensuring Successful",
-    description: "Guarantee safe and timely receipt of profits worldwide.",
-    icon: <TrendingUp size={20} color="#7C3AED" />,
-  },
-];
-
 const PlatformManagement = () => {
   const [visible, setVisible] = useState(false);
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [Services, { isLoading }] = useServicesMutation();
+
+  const features = [
+    {
+      title: t("services.platformManagement.features.artistProfile.title"),
+      description: t("services.platformManagement.features.artistProfile.description"),
+      icon: <User size={20} color="#7C3AED" />,
+    },
+    {
+      title: t("services.platformManagement.features.providingRealJob.title"),
+      description: t("services.platformManagement.features.providingRealJob.description"),
+      icon: <Briefcase size={20} color="#7C3AED" />,
+    },
+    {
+      title: t("services.platformManagement.features.directDownload.title"),
+      description: t("services.platformManagement.features.directDownload.description"),
+      icon: <Download size={20} color="#7C3AED" />,
+    },
+    {
+      title: t("services.platformManagement.features.dataSecurity.title"),
+      description: t("services.platformManagement.features.dataSecurity.description"),
+      icon: <ShieldCheck size={20} color="#7C3AED" />,
+    },
+    {
+      title: t("services.platformManagement.features.ensuringSuccessful.title"),
+      description: t("services.platformManagement.features.ensuringSuccessful.description"),
+      icon: <TrendingUp size={20} color="#7C3AED" />,
+    },
+  ];
+
   const handleFormSubmit = async (data: FormData) => {
     await Services({
       type: "platform management",
@@ -96,15 +99,17 @@ const PlatformManagement = () => {
       className="flex-1"
     >
       <SafeAreaView className="flex-1">
-        <View className="flex-row items-center px-5 pt-10">
+        <View className={`flex-row items-center px-5 pt-10`}>
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/services/services")}
             className="p-2 bg-white/20 rounded-full"
           >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text className="text-white text-lg font-semibold ml-4">
-            Platform Management
+          <Text 
+            className={`text-white text-lg font-semibold ms-4`}
+          >
+            {t("services.platformManagement.title")}
           </Text>
         </View>
 
@@ -112,29 +117,40 @@ const PlatformManagement = () => {
           showsVerticalScrollIndicator={false}
           className="flex-1 px-5"
         >
-          <Text className="text-white text-center my-4 text-lg font-semibold ml-4">
-            Platform Management
+          <Text 
+            className="text-white text-center my-4 text-lg font-semibold"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("services.platformManagement.title")}
           </Text>
-          <Text className="text-white text-base leading-6 mb-6 mt-4">
-            Create & manage platforms for independent artists, protecting
-            ownership and securing their earnings with professional solutions.
+          <Text 
+            className="text-white text-base leading-6 mb-6 mt-4"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("services.platformManagement.description")}
           </Text>
 
-          <View className="flex-row justify-between mb-8">
+          <View className={`flex-row justify-between mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <TouchableOpacity
               onPress={() => router.push("/(drawer)/(tabs)/price")}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base font-semibold">
-                pricing
+              <Text 
+                className="text-white text-base font-semibold"
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("services.platformManagement.pricing")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setVisible(true)}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base font-semibold">
-                Get Started
+              <Text 
+                className="text-white text-base font-semibold"
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("services.platformManagement.getStarted")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -146,15 +162,18 @@ const PlatformManagement = () => {
             />
           </View>
           <View className="mb-8">
-            <Text className="text-2xl font-bold text-gray-900 mt-10 mb-6">
-              Why Choose Us?
+            <Text 
+              className="text-2xl font-bold text-gray-900 mt-10 mb-6"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("services.platformManagement.whyChooseUs")}
             </Text>
 
             <View className="space-y-5">
               {features.map((item, idx) => (
                 <View
                   key={idx}
-                  className="bg-white/80 rounded-2xl my-1.5 p-5 shadow-md flex-row items-center space-x-5 border border-gray-100"
+                  className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${isRTL ? 'flex-row-reverse' : 'flex-row'} items-center space-x-5`}
                   style={{
                     shadowColor: "#7C3AED",
                     shadowOpacity: 0.1,
@@ -162,14 +181,20 @@ const PlatformManagement = () => {
                     elevation: 3,
                   }}
                 >
-                  <View className="bg-purple-100 p-4 mx-2 rounded-2xl shadow-sm">
+                  <View className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${isRTL ? 'ml-2' : 'mr-2'}`}>
                     {item.icon}
                   </View>
                   <View className="flex-1">
-                    <Text className="text-lg font-semibold text-gray-900">
+                    <Text 
+                      className="text-lg font-semibold text-gray-900"
+                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    >
                       {item.title}
                     </Text>
-                    <Text className="text-sm text-gray-600 mt-1 leading-snug">
+                    <Text 
+                      className="text-sm text-gray-600 mt-1 leading-snug"
+                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    >
                       {item.description}
                     </Text>
                   </View>

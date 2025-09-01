@@ -18,7 +18,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const { data, isLoading } = useGetTrendSongQuery();
 
   return (
@@ -34,14 +35,25 @@ const HomePage = () => {
           </View>
 
           <View className="absolute top-28 left-6">
-            <Text className="text-white text-xs mb-1">{t("cloudWav")}</Text>
-
-            <Text className="text-white text-2xl font-bold leading-7">
-              {t("Find Your Flow..")}
+            <Text 
+              className="text-white text-xs mb-1"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("home.brand")}
             </Text>
 
-            <Text className="text-white text-base mb-4">
-              - {t("Unleash your soundworld")}
+            <Text 
+              className="text-white text-2xl font-bold leading-7"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("home.hero.title")}
+            </Text>
+
+            <Text 
+              className="text-white text-base mb-4"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+               {t("home.hero.subtitle")}
             </Text>
 
             <View className="flex-row items-center space-x-3">
@@ -50,7 +62,7 @@ const HomePage = () => {
                 className="bg-white flex-row items-center gap-3 px-4 py-2.5 rounded-full"
               >
                 <Text className="text-red-500 font-bold text-sm">
-                  {t("play")}
+                  {t("home.buttons.play")}
                 </Text>
                 <Ionicons name="play" size={18} color="red" />
               </TouchableOpacity>
@@ -59,7 +71,12 @@ const HomePage = () => {
         </ImageBackground>
         <ServicesSection />
         <View className=" mb-16 mx-3">
-          <Text className="text-2xl font-bold mx-3 mb-4">Trending Songs</Text>
+          <Text 
+            className="text-2xl font-bold mx-3 mb-4"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("home.sections.trendingSongs")}
+          </Text>
           {isLoading ? (
             <View className="flex-1 justify-center items-center my-8">
               <ActivityIndicator size="large" color="#0000ff" />

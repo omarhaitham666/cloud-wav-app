@@ -2,23 +2,20 @@ export const slides = [
   {
     id: "1",
     image: require("../assets/images/listen.png"),
-    title: "Listening Music Anytime",
-    description:
-      "The artists we represent are one of the most successful in Romania and also were a huge breakthrough.",
+    title: "welcome.slides.slide1.title",
+    description: "welcome.slides.slide1.description",
   },
   {
     id: "2",
     image: require("../assets/images/artist.png"),
-    title: "Discover New Artists",
-    description:
-      "Explore trending talents and experience fresh entertainment anytime.",
+    title: "welcome.slides.slide2.title",
+    description: "welcome.slides.slide2.description",
   },
   {
     id: "3",
     image: require("../assets/images/creator.png"),
-    title: "Stay Connected Everywhere",
-    description:
-      "Enjoy music and shows across all your devices with just one click.",
+    title: "welcome.slides.slide3.title",
+    description: "welcome.slides.slide3.description",
   },
 ];
 
@@ -81,39 +78,33 @@ export const pricingPlans: PricingPlan[] = [
 
 export const services = [
   {
-    title: "Professional Voice Recording",
-    description:
-      "Record your voice in a studio equipped with the latest technology, with a sound engineer to ensure clarity and high quality.",
+    title: "services.servicesData.voiceRecording.title",
+    description: "services.servicesData.voiceRecording.description",
     icon: "mic-outline",
   },
   {
-    title: "Song Lyrics Writing",
-    description:
-      "We help you write lyrics that express you, match your style, and deliver your message.",
+    title: "services.servicesData.songWriting.title",
+    description: "services.servicesData.songWriting.description",
     icon: "create-outline",
   },
   {
-    title: "Music Production & Arrangement",
-    description:
-      "Original music and professional arrangement by experienced producers and musicians, across various styles and genres.",
+    title: "services.servicesData.musicProduction.title",
+    description: "services.servicesData.musicProduction.description",
     icon: "musical-notes-outline",
   },
   {
-    title: "Professional Music Video Shooting",
-    description:
-      "Shoot a high-quality music video with a specialized directing and filming team, including lighting, editing, and visual effects.",
+    title: "services.servicesData.videoShooting.title",
+    description: "services.servicesData.videoShooting.description",
     icon: "videocam-outline",
   },
   {
-    title: "Complete Song Creation",
-    description:
-      "From lyrics and composition to recording, arrangement, and mastering—we deliver a fully finished, publish-ready song.",
+    title: "services.servicesData.completeSong.title",
+    description: "services.servicesData.completeSong.description",
     icon: "headset-outline",
   },
   {
-    title: "Full Song & Music Video Package",
-    description:
-      "A complete package including song production and high-quality video clip, with full coordination between all project elements.",
+    title: "services.servicesData.fullPackage.title",
+    description: "services.servicesData.fullPackage.description",
     icon: "albums-outline",
   },
 ];

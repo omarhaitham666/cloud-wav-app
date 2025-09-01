@@ -16,40 +16,40 @@ import ServiceRequestModal, {
 } from "@/components/ServiceRequestModal";
 import { useServicesMutation } from "@/store/api/global/services";
 import { Lightbulb, Megaphone, ShieldCheck } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
-
-const services = [
-  {
-    title: "Creating & Documenting Platforms",
-    description:
-      "We help you create and manage Facebook, Instagram, Twitter, LinkedIn, TikTok, YouTube, and more.",
-    price: "$20",
-    icon: <Lightbulb size={26} color="#6D28D9" />,
-    type: "verify social media accounts",
-  },
-  {
-    title: "Recover Closed Accounts",
-    description:
-      "We recover closed or deactivated accounts and restore deleted ones quickly.",
-    price: "$30",
-    icon: <ShieldCheck size={26} color="#6D28D9" />,
-    type: "recover social media account",
-  },
-  {
-    title: "Create Sponsored Ads",
-    description:
-      "We create ads on Google Ads, Facebook, TikTok, YouTube, Snapchat, and more.",
-    price: "$15",
-    icon: <Megaphone size={26} color="#6D28D9" />,
-    type: "Sponsored ads",
-  },
-];
 
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
 
   const [Services, { isLoading }] = useServicesMutation();
+
+  const services = [
+    {
+      title: t("services.socialMedia.services.creatingPlatforms.title"),
+      description: t("services.socialMedia.services.creatingPlatforms.description"),
+      price: t("services.socialMedia.services.creatingPlatforms.price"),
+      icon: <Lightbulb size={26} color="#6D28D9" />,
+      type: t("services.socialMedia.services.creatingPlatforms.type"),
+    },
+    {
+      title: t("services.socialMedia.services.recoverAccounts.title"),
+      description: t("services.socialMedia.services.recoverAccounts.description"),
+      price: t("services.socialMedia.services.recoverAccounts.price"),
+      icon: <ShieldCheck size={26} color="#6D28D9" />,
+      type: t("services.socialMedia.services.recoverAccounts.type"),
+    },
+    {
+      title: t("services.socialMedia.services.sponsoredAds.title"),
+      description: t("services.socialMedia.services.sponsoredAds.description"),
+      price: t("services.socialMedia.services.sponsoredAds.price"),
+      icon: <Megaphone size={26} color="#6D28D9" />,
+      type: t("services.socialMedia.services.sponsoredAds.type"),
+    },
+  ];
 
   const handleFormSubmit = async (data: FormData) => {
     if (!selectedService) return;
@@ -91,15 +91,17 @@ const SocialMedia = () => {
       className="flex-1"
     >
       <SafeAreaView className="flex-1">
-        <View className="flex-row items-center px-5 pt-10">
+        <View className={`flex-row items-center px-5 pt-10`}>
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/services/services")}
             className="p-2 bg-white/20 rounded-full"
           >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text className="text-white text-lg font-semibold ml-4">
-            Social Media
+          <Text 
+            className={`text-white text-lg font-semibold ms-4`}
+          >
+            {t("services.socialMedia.title")}
           </Text>
         </View>
 
@@ -107,17 +109,20 @@ const SocialMedia = () => {
           showsVerticalScrollIndicator={false}
           className="flex-1 px-5"
         >
-          <Text className="text-white text-center my-4 text-lg font-semibold ml-4">
-            Social Media Specialist
+          <Text 
+            className="text-white text-center my-4 text-lg font-semibold"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("services.socialMedia.specialist")}
           </Text>
-          <Text className="text-white text-base leading-6 mb-6 mt-4">
-            Having a strong Social Media presence is essential—whether for a
-            local startup or a global enterprise. Beyond posting, it’s about
-            building trust, boosting visibility, and connecting deeply with your
-            audience.
+          <Text 
+            className="text-white text-base leading-6 mb-6 mt-4"
+            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("services.socialMedia.description")}
           </Text>
 
-          <View className="flex-row justify-between mb-8">
+          <View className={`flex-row justify-between mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <TouchableOpacity
               onPress={() => {
                 setSelectedService("account_creation");
@@ -125,15 +130,23 @@ const SocialMedia = () => {
               }}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base font-semibold">
-                Get Started
+              <Text 
+                className="text-white text-base font-semibold"
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("services.socialMedia.getStarted")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => router.push("/(drawer)/faq/faq")}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base font-semibold">FAQ</Text>
+              <Text 
+                className="text-white text-base font-semibold"
+                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              >
+                {t("services.socialMedia.faq")}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -146,8 +159,11 @@ const SocialMedia = () => {
           </View>
 
           <View className="mb-8">
-            <Text className="text-2xl font-bold text-gray-900 mt-10 mb-6">
-              Why Choose Us?
+            <Text 
+              className="text-2xl font-bold text-gray-900 mt-10 mb-6"
+              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            >
+              {t("services.socialMedia.whyChooseUs")}
             </Text>
 
             <View className="space-y-5">
@@ -156,29 +172,41 @@ const SocialMedia = () => {
                   key={idx}
                   className="bg-white rounded-2xl p-5 my-2 shadow-md border border-gray-100"
                 >
-                  <View className="flex-row items-center space-x-4 mb-3">
-                    <View className="bg-purple-100 p-3 mx-2 rounded-xl">
+                  <View className={`flex-row items-center space-x-4 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <View className={`bg-purple-100 p-3 rounded-xl ${isRTL ? 'ml-2' : 'mr-2'}`}>
                       {service.icon}
                     </View>
-                    <Text className="text-lg font-semibold text-gray-900 flex-1">
+                    <Text 
+                      className="text-lg font-semibold text-gray-900 flex-1"
+                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    >
                       {service.title}
                     </Text>
-                    <Text className="text-purple-700 font-bold">
+                    <Text 
+                      className="text-purple-700 font-bold"
+                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    >
                       {service.price}
                     </Text>
                   </View>
-                  <Text className="text-sm text-gray-600 leading-relaxed mb-4">
+                  <Text 
+                    className="text-sm text-gray-600 leading-relaxed mb-4"
+                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                  >
                     {service.description}
                   </Text>
                   <TouchableOpacity
-                    className="bg-purple-600 px-5 py-2 rounded-full self-start"
+                    className={`bg-purple-600 px-5 py-2 rounded-full ${isRTL ? 'self-end' : 'self-start'}`}
                     onPress={() => {
                       setSelectedService(service.type);
                       setVisible(true);
                     }}
                   >
-                    <Text className="text-white text-sm font-medium">
-                      Get it now
+                    <Text 
+                      className="text-white text-sm font-medium"
+                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    >
+                      {t("services.socialMedia.getItNow")}
                     </Text>
                   </TouchableOpacity>
                 </View>
