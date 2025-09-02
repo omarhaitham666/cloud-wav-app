@@ -31,8 +31,11 @@ const DrawerItem = ({
     return (
       <TouchableOpacity
         onPress={onPress}
-        className={`${isRtl ? "flex-row-reverse" : "flex-row"} items-center py-3 px-6 mx-3 rounded-lg ${isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
-          }`}
+        className={`${
+          isRtl ? "flex-row-reverse" : "flex-row"
+        } items-center py-3 px-6 mx-3 rounded-lg ${
+          isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
+        }`}
         activeOpacity={0.7}
       >
         {component}
@@ -43,14 +46,20 @@ const DrawerItem = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`${isRtl ? "flex-row-reverse" : "flex-row"} items-center py-3 px-6 mx-3 rounded-lg ${isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
-        }`}
+      className={`${
+        isRtl ? "flex-row-reverse" : "flex-row"
+      } items-center py-3 px-6 mx-3 rounded-lg ${
+        isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
+      }`}
       activeOpacity={0.7}
     >
-      <View className={`${isRtl ? "ml-3" : "mr-3"} w-6 items-center`}>{icon}</View>
+      <View className={`${isRtl ? "ml-3" : "mr-3"} w-6 items-center`}>
+        {icon}
+      </View>
       <Text
-        className={`text-base font-medium ${isActive ? "text-[#4f46e5]" : "text-[#475569]"
-          }`}
+        className={`text-base font-medium ${
+          isActive ? "text-[#4f46e5]" : "text-[#475569]"
+        }`}
         style={{ fontFamily: AppFonts.medium }}
       >
         {label}
@@ -65,7 +74,14 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const [token, setToken] = useState<string | null>(null);
   const [logout, { isLoading }] = useLogoutMutation();
   const isArabic = i18n.language === "ar";
-  const rowDirection: ViewStyle = useMemo(() => ({ flexDirection: (isArabic ? "row-reverse" : "row") as "row" | "row-reverse" }), [isArabic]);
+  const rowDirection: ViewStyle = useMemo(
+    () => ({
+      flexDirection: (isArabic ? "row-reverse" : "row") as
+        | "row"
+        | "row-reverse",
+    }),
+    [isArabic]
+  );
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -98,7 +114,12 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   };
 
   const drawerItems = [
-    { label: t("drawer.items.home"), route: "(tabs)", iconName: "home", displayName: "Home" },
+    {
+      label: t("drawer.items.home"),
+      route: "(tabs)",
+      iconName: "home",
+      displayName: "Home",
+    },
     {
       label: t("drawer.items.contact"),
       route: "contact/contact",
@@ -117,39 +138,61 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       iconName: "grid",
       displayName: "Services",
     },
+    {
+      label: t("drawer.items.creators"),
+      route: "creators/creators",
+      iconName: "users",
+      displayName: "Creators",
+    },
   ];
 
   const secondaryItems = token
     ? [
-      {
-        label: t("drawer.items.profile"),
-        route: null,
-        iconName: "user",
-        action: () => Alert.alert("Profile", "Profile screen coming soon!"),
-      },
-      {
-        label: isLoading ? t("drawer.items.loggingOut") : t("drawer.items.logout"),
-        route: null,
-        iconName: "log-out",
-        action: handleLogout,
-      },
-    ]
+        {
+          label: t("drawer.items.profile"),
+          route: null,
+          iconName: "user",
+          action: () => Alert.alert("Profile", "Profile screen coming soon!"),
+        },
+        {
+          label: isLoading
+            ? t("drawer.items.loggingOut")
+            : t("drawer.items.logout"),
+          route: null,
+          iconName: "log-out",
+          action: handleLogout,
+        },
+      ]
     : [
-      { label: t("drawer.items.login"), route: "(auth)/login", iconName: "log-in" },
-      { label: t("drawer.items.register"), route: "(auth)/register", iconName: "user-plus" },
-      {
-        label: t("drawer.items.language"),
-        route: null,
-        iconName: "globe",
-        component: (
-          <View className="flex-1" style={[rowDirection, { alignItems: "center", justifyContent: "space-between" }]}>
-            <View style={{ flex: 1 }}>
-              <LanguageSwitcher />
+        {
+          label: t("drawer.items.login"),
+          route: "(auth)/login",
+          iconName: "log-in",
+        },
+        {
+          label: t("drawer.items.register"),
+          route: "(auth)/register",
+          iconName: "user-plus",
+        },
+        {
+          label: t("drawer.items.language"),
+          route: null,
+          iconName: "globe",
+          component: (
+            <View
+              className="flex-1"
+              style={[
+                rowDirection,
+                { alignItems: "center", justifyContent: "space-between" },
+              ]}
+            >
+              <View style={{ flex: 1 }}>
+                <LanguageSwitcher />
+              </View>
             </View>
-          </View>
-        ),
-      },
-    ];
+          ),
+        },
+      ];
 
   const navigateTo = (route: string | null, action?: () => void) => {
     if (action) {
@@ -234,7 +277,6 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
               fontFamily: AppFonts.semibold,
               textAlign: isArabic ? "right" : "left",
             }}
-
           >
             {t("drawer.sections.account")}
           </Text>

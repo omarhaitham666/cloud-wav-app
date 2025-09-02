@@ -2,13 +2,17 @@ import CustomHeader from "@/components/CustomHeader";
 import DrawerContent from "@/components/DrawerContent";
 import { Drawer } from "expo-router/drawer";
 import { useTranslation } from "react-i18next";
+import Toast from "react-native-toast-message";
 
 export default function DrawerLayout() {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   return (
     <Drawer
-      screenOptions={{ headerShown: false, drawerPosition: isArabic ? "right" : "left" }}
+      screenOptions={{
+        headerShown: false,
+        drawerPosition: isArabic ? "right" : "left",
+      }}
       drawerContent={(props) => <DrawerContent {...props} />}
     >
       <Drawer.Screen
@@ -31,7 +35,20 @@ export default function DrawerLayout() {
           header: () => <CustomHeader showLanguageSwitcher />,
         }}
       />
-
+      <Drawer.Screen
+        name="services/services"
+        options={{
+          drawerLabel: "Services",
+          header: () => <CustomHeader showLanguageSwitcher />,
+        }}
+      />
+      <Drawer.Screen
+        name="creators/creators"
+        options={{
+          drawerLabel: "Faq",
+          header: () => <CustomHeader showLanguageSwitcher />,
+        }}
+      />
       <Drawer.Screen
         name="(auth)"
         options={{
@@ -39,6 +56,7 @@ export default function DrawerLayout() {
           header: () => <CustomHeader showLanguageSwitcher />,
         }}
       />
+      <Toast />
     </Drawer>
   );
 }

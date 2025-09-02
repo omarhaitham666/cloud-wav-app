@@ -16,7 +16,6 @@ import {
 import { z } from "zod";
 import { AppFonts } from "@/utils/fonts";
 
-
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email"),
@@ -27,16 +26,22 @@ const schema = z.object({
   details: z.string().optional(),
 });
 
-// Create a function to get translated schema
-const getTranslatedSchema = (t: any) => z.object({
-  name: z.string().min(1, t("services.platformManagement.modal.validation.nameRequired")),
-  email: z.string().email(t("services.platformManagement.modal.validation.invalidEmail")),
-  phone: z.string().min(1, t("services.platformManagement.modal.validation.phoneRequired")),
-  whatsapp: z.string().optional(),
-  platform: z.string().optional(),
-  social: z.string().optional(),
-  details: z.string().optional(),
-});
+const getTranslatedSchema = (t: any) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("services.platformManagement.modal.validation.nameRequired")),
+    email: z
+      .string()
+      .email(t("services.platformManagement.modal.validation.invalidEmail")),
+    phone: z
+      .string()
+      .min(1, t("services.platformManagement.modal.validation.phoneRequired")),
+    whatsapp: z.string().optional(),
+    platform: z.string().optional(),
+    social: z.string().optional(),
+    details: z.string().optional(),
+  });
 
 export type FormData = z.infer<typeof schema>;
 
@@ -54,7 +59,7 @@ export default function ServiceRequestModal({
   onSubmitForm,
 }: Props) {
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
 
   const {
     control,
@@ -78,24 +83,54 @@ export default function ServiceRequestModal({
   };
 
   const fields = [
-    { name: "name", label: t("services.platformManagement.modal.fields.name.label"), placeholder: t("services.platformManagement.modal.fields.name.placeholder") },
-    { name: "email", label: t("services.platformManagement.modal.fields.email.label"), placeholder: t("services.platformManagement.modal.fields.email.placeholder") },
-    { name: "phone", label: t("services.platformManagement.modal.fields.phone.label"), placeholder: t("services.platformManagement.modal.fields.phone.placeholder") },
+    {
+      name: "name",
+      label: t("services.platformManagement.modal.fields.name.label"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.name.placeholder"
+      ),
+    },
+    {
+      name: "email",
+      label: t("services.platformManagement.modal.fields.email.label"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.email.placeholder"
+      ),
+    },
+    {
+      name: "phone",
+      label: t("services.platformManagement.modal.fields.phone.label"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.phone.placeholder"
+      ),
+    },
     {
       name: "whatsapp",
       label: t("services.platformManagement.modal.fields.whatsapp.label"),
-      placeholder: t("services.platformManagement.modal.fields.whatsapp.placeholder"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.whatsapp.placeholder"
+      ),
     },
-    { name: "platform", label: t("services.platformManagement.modal.fields.platform.label"), placeholder: t("services.platformManagement.modal.fields.platform.placeholder") },
+    {
+      name: "platform",
+      label: t("services.platformManagement.modal.fields.platform.label"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.platform.placeholder"
+      ),
+    },
     {
       name: "social",
       label: t("services.platformManagement.modal.fields.social.label"),
-      placeholder: t("services.platformManagement.modal.fields.social.placeholder"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.social.placeholder"
+      ),
     },
     {
       name: "details",
       label: t("services.platformManagement.modal.fields.details.label"),
-      placeholder: t("services.platformManagement.modal.fields.details.placeholder"),
+      placeholder: t(
+        "services.platformManagement.modal.fields.details.placeholder"
+      ),
       multiline: true,
     },
   ];
@@ -105,23 +140,26 @@ export default function ServiceRequestModal({
         <View className="bg-white rounded-2xl w-full max-h-[80%]">
           <View
             className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
-            style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+            style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
           >
             <Text
               className="text-lg text-indigo-600"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             >
               {t("services.platformManagement.modal.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-xl text-gray-600"
+              <Text
+                className="text-xl text-gray-600"
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}
-              >{t("services.platformManagement.modal.close")}</Text>
+              >
+                {t("services.platformManagement.modal.close")}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -140,8 +178,8 @@ export default function ServiceRequestModal({
                       className="border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800"
                       placeholderTextColor="#9CA3AF"
                       style={{
-                        textAlign: isRTL ? 'right' : 'left',
-                        textAlignVertical: 'top',
+                        textAlign: isRTL ? "right" : "left",
+                        textAlignVertical: "top",
                         fontFamily: AppFonts.semibold,
                       }}
                     />
@@ -151,7 +189,7 @@ export default function ServiceRequestModal({
                   <Text
                     className="text-red-500 text-xs mt-1"
                     style={{
-                      textAlign: isRTL ? 'right' : 'left',
+                      textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.semibold,
                     }}
                   >
@@ -165,12 +203,17 @@ export default function ServiceRequestModal({
               onPress={handleSubmit(onSubmit)}
               className="bg-indigo-600 py-4 rounded-full mt-4"
             >
-              <Text className="text-white text-center text-base"
+              <Text
+                className="text-white text-center text-base"
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}
               >
-                {isLoading ? <ActivityIndicator color="#fff" /> : t("services.platformManagement.modal.submit")}
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  t("services.platformManagement.modal.submit")
+                )}
               </Text>
             </TouchableOpacity>
           </ScrollView>
