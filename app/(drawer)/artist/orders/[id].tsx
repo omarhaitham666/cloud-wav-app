@@ -1,27 +1,31 @@
-import AlbumCard from "@/components/AlbumCard";
-import { SongCard } from "@/components/SongCard";
-import { Albums } from "@/store/api/global/albums";
-import { useGetArtistQuery } from "@/store/api/global/artists";
 import { Ionicons } from "@expo/vector-icons";
+import { ResizeMode, Video } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
-
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
+import CreatorOrderModal from "@/components/CreatorOrderModal";
+import {
+  useGetVedioCreatersQuery,
+  useGetVediosQuery,
+} from "@/store/api/global/videoCreator";
+
 const ArtistProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: artistData, isLoading: isFetching } = useGetArtistQuery(id);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const { data, isLoading: isFetching } = useGetVedioCreatersQuery(id);
+  const { data: vedios, isLoading } = useGetVediosQuery(id);
 
   if (isFetching) {
     return (
@@ -32,17 +36,12 @@ const ArtistProfile = () => {
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-gray-50"
-      contentContainerStyle={{ flexGrow: 1 }}
-      showsVerticalScrollIndicator={false}
-    >
+    <View className="flex-1 bg-gray-50">
       <LinearGradient
         colors={["#4f46e5", "#6d28d9"]}
         className="pt-12 pb-10 px-5"
       >
         <StatusBar barStyle="light-content" />
-
         <View className="flex-row justify-between items-center mb-8">
           <TouchableOpacity
             onPress={() => router.back()}
@@ -56,75 +55,70 @@ const ArtistProfile = () => {
         </View>
 
         <View className="items-center mb-6">
-          <View className="relative mb-4">
-            <Image
-              source={{ uri: artistData?.profile_image }}
-              className="w-36 h-36 rounded-full border-4 border-white"
-              style={{ resizeMode: "cover" }}
-            />
-            <View className="absolute bottom-2 right-1 w-8 h-8 rounded-full bg-green-500 justify-center items-center border-2 border-white shadow-lg">
-              <Ionicons name="checkmark" size={18} color="#fff" />
-            </View>
-          </View>
-
-          <Text className="text-2xl font-bold text-white mb-1 text-center">
-            {artistData?.name}
+          <Image
+            source={{
+              uri:
+                "https://api.cloudwavproduction.com/storage/" +
+                data?.profile_image,
+            }}
+            className="w-36 h-36 rounded-full border-4 border-white"
+          />
+          <Text className="text-2xl font-bold text-white mt-2">
+            {data?.name}
           </Text>
-          <Text className="text-sm text-white/90">{artistData?.division}</Text>
+          <Text className="text-sm text-white/90">{data?.division}</Text>
+
+          <TouchableOpacity
+            onPress={() => setModalVisible(true)}
+            className="bg-green-500 rounded-full px-5 py-3 mt-3 shadow-md"
+          >
+            <Text className="text-white font-semibold">Order Now →</Text>
+          </TouchableOpacity>
         </View>
       </LinearGradient>
 
-      <View className="px-5 mt-6 ">
-        <View className="mb-6">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-xl font-bold text-gray-800">All Songs</Text>
+      <FlatList
+        data={vedios?.videos ?? []}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ padding: 20 }}
+        ListHeaderComponent={() => (
+          <Text className="text-xl font-bold text-gray-800 mb-4">Videos</Text>
+        )}
+        renderItem={({ item }) => (
+          <View className="bg-white rounded-2xl shadow-md mb-5 overflow-hidden">
+            <Video
+              source={{ uri: item.url }}
+              useNativeControls
+              shouldPlay={false}
+              resizeMode={ResizeMode.CONTAIN}
+              style={{ width: "100%", height: 220, backgroundColor: "black" }}
+            />
+            <View className="p-4">
+              <Text className="text-lg font-semibold text-gray-900">
+                {item.title}
+              </Text>
+              <Text className="text-sm text-gray-500 mt-1">
+                {new Date(item.created_at).toDateString()}
+              </Text>
+            </View>
           </View>
+        )}
+        ListEmptyComponent={() =>
+          !isLoading && (
+            <Text className="text-center text-gray-500">No videos found</Text>
+          )
+        }
+      />
 
-          <FlatList
-            data={artistData?.songs || []}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            renderItem={({ item }) => (
-              <SongCard
-                id={item.id}
-                title={item.title}
-                artist={(artistData?.name as string) || ""}
-                audio_url={item.song_path}
-                cover_url={item.cover_path}
-              />
-            )}
-          />
-        </View>
-
-        <View className="mb-6">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-xl font-bold text-gray-800">All Albums</Text>
-          </View>
-
-          <FlatList
-            data={(artistData?.albums as Albums[]) || []}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10 }}
-            renderItem={({ item }) => (
-              <AlbumCard
-                id={item.id}
-                title={(artistData?.name as string) || ""}
-                imageUrl={item.album_cover}
-              />
-            )}
-            ListEmptyComponent={() => (
-              <View className="flex items-center mx-auto justify-center py-10 w-full">
-                <Text className="text-gray-500 text-base">No albums found</Text>
-              </View>
-            )}
-          />
-        </View>
-        <View className="h-20" />
-      </View>
-    </ScrollView>
+      <CreatorOrderModal
+        visible={modalVisible}
+        id={id}
+        name={data?.name ?? ""}
+        private_price={String(data?.private_price) ?? "0"}
+        bussiness_price={String(data?.bussiness_price) ?? "0"}
+        onClose={() => setModalVisible(false)}
+      />
+    </View>
   );
 };
 

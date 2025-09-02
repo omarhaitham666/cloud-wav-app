@@ -49,6 +49,13 @@ interface Order {
   bussiness_price?: number;
   order_artistName?: string;
 }
+
+interface videos {
+  id: number;
+  title: string;
+  url: string;
+  created_at: string;
+}
 const songApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
     videoCreator: builder.mutation<videoCreator[], videoCreator>({
@@ -78,6 +85,18 @@ const songApi = mainApi.injectEndpoints({
         data: body,
       }),
     }),
+    GetVedioCreaters: builder.query<videoCreator, string>({
+      query: (id) => ({
+        url: `/video-creators/${id}`,
+        method: "GET",
+      }),
+    }),
+    GetVedios: builder.query<{ videos: videos[] }, string>({
+      query: (id) => ({
+        url: `/video-creators/${id}/videos`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
@@ -86,4 +105,6 @@ export const {
   useTopVideoCreatorsQuery,
   useTopVideoCreatorsAllQuery,
   useOrderVideoCreatorsMutation,
+  useGetVedioCreatersQuery,
+  useGetVediosQuery,
 } = songApi;
