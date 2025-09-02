@@ -11,6 +11,8 @@ import {
   UIManager,
   View
 } from "react-native";
+import { AppFonts } from "@/utils/fonts";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 if (Platform.OS === "android") {
@@ -35,24 +37,27 @@ const FAQItem = ({
   };
 
   return (
-    <View 
-    style={{
-      borderRadius: 18,
-      padding: 20,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 6,
-    }}
-    className="bg-purple-800 mb-4 p-4">
+    <View
+      style={{
+        borderRadius: 18,
+        padding: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+        elevation: 6,
+      }}
+      className="bg-purple-800 mb-4 p-4">
       <TouchableOpacity
         onPress={toggleExpand}
         className={`flex-row justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}
       >
-        <Text 
-          className="text-white text-base font-semibold flex-1"
-          style={{ textAlign: isRTL ? 'right' : 'left' }}
+        <Text
+          className="text-white text-lg flex-1"
+          style={{
+            textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
+          }}
         >
           {question}
         </Text>
@@ -63,9 +68,12 @@ const FAQItem = ({
         />
       </TouchableOpacity>
       {expanded && (
-        <Text 
+        <Text
           className="text-white mt-2 text-sm leading-relaxed"
-          style={{ textAlign: isRTL ? 'right' : 'left' }}
+          style={{
+            textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.regular,
+          }}
         >
           {answer}
         </Text>
@@ -90,22 +98,8 @@ const FAQPage = () => {
             namespace="faq"
           />
         </View>
-        
+
         <View className="px-4">
-          <View className="mb-6">
-            <Text 
-              className="text-2xl font-bold text-center text-black"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
-            >
-              {t('faq.title')}
-            </Text>
-            <Text 
-              className="text-center text-sm text-gray-600 mt-1"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
-            >
-              {t('faq.subtitle')}
-            </Text>
-          </View>
 
           <FAQItem
             question={t('faq.questions.whatIsCloudWav.question')}
@@ -156,31 +150,47 @@ const FAQPage = () => {
             answer={t('faq.questions.accountSuspension.answer')}
           />
 
-          <View className="bg-gray-100 p-5 mt-6 rounded-lg">
-            <Text 
+          <View className="border border-1 p-5 mt-6"
+          style={{
+        borderRadius: 18,
+          }}
+          >
+            <Text
               className="text-base font-semibold mb-2 text-black"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t('faq.tips.title')}
             </Text>
-            <Text 
+            <Text
               className="text-sm text-gray-700 leading-relaxed"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t('faq.tips.content')}
             </Text>
           </View>
 
           <View className="bg-red-100 p-4 mt-4 rounded-lg">
-            <Text 
+            <Text
               className="text-base font-bold mb-1 text-red-700"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t('faq.legalWarning.title')}
             </Text>
-            <Text 
+            <Text
               className="text-sm text-gray-800"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t('faq.legalWarning.content')}
             </Text>
@@ -190,8 +200,11 @@ const FAQPage = () => {
             onPress={() => router.push("/(drawer)/contact/contact")}
             className="mt-6 mb-16 bg-green-600 py-3 rounded-full"
           >
-            <Text 
-              className="text-center text-white text-base font-bold"
+            <Text
+              className="text-center text-white text-base"
+              style={{
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t('faq.contactButton')}
             </Text>

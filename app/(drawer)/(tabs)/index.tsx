@@ -2,6 +2,7 @@ import CustomHeader from "@/components/CustomHeader";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/SongCard";
 import { useGetTrendSongQuery } from "@/store/api/global/song";
+import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -35,25 +36,34 @@ const HomePage = () => {
           </View>
 
           <View className="absolute top-28 left-6">
-            <Text 
+            <Text
               className="text-white text-xs mb-1"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                fontFamily: AppFonts.semibold,
+                textAlign: isRTL ? 'right' : 'left'
+              }}
             >
               {t("home.brand")}
             </Text>
 
-            <Text 
-              className="text-white text-2xl font-bold leading-7"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            <Text
+              className="text-white text-2xl leading-7"
+              style={{
+                fontFamily: AppFonts.semibold,
+                textAlign: isRTL ? 'right' : 'left'
+              }}
             >
               {t("home.hero.title")}
             </Text>
 
-            <Text 
+            <Text
               className="text-white text-base mb-4"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                fontFamily: AppFonts.semibold,
+                textAlign: isRTL ? 'right' : 'left'
+              }}
             >
-               {t("home.hero.subtitle")}
+              {t("home.hero.subtitle")}
             </Text>
 
             <View className="flex-row items-center space-x-3">
@@ -61,7 +71,11 @@ const HomePage = () => {
                 onPress={() => router.push("/music")}
                 className="bg-white flex-row items-center gap-3 px-4 py-2.5 rounded-full"
               >
-                <Text className="text-red-500 font-bold text-sm">
+                <Text className="text-red-500 text-sm"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
                   {t("home.buttons.play")}
                 </Text>
                 <Ionicons name="play" size={18} color="red" />
@@ -71,9 +85,12 @@ const HomePage = () => {
         </ImageBackground>
         <ServicesSection />
         <View className=" mb-16 mx-3">
-          <Text 
-            className="text-2xl font-bold mx-3 mb-4"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-2xl mx-3 mb-4"
+            style={{
+              fontFamily: AppFonts.semibold,
+              textAlign: isRTL ? 'right' : 'left'
+            }}
           >
             {t("home.sections.trendingSongs")}
           </Text>

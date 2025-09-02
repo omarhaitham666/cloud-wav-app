@@ -1,28 +1,30 @@
 import ServiceRequestModal, {
-    FormData,
+  FormData,
 } from "@/components/ServiceRequestModal";
 import { useServicesMutation } from "@/store/api/global/services";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-    Briefcase,
-    Download,
-    ShieldCheck,
-    TrendingUp,
-    User,
+  Briefcase,
+  Download,
+  ShieldCheck,
+  TrendingUp,
+  User,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
+import { AppFonts } from "@/utils/fonts";
+
 
 const PlatformManagement = () => {
   const [visible, setVisible] = useState(false);
@@ -98,7 +100,7 @@ const PlatformManagement = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <SafeAreaView className="flex-1">
+      <SafeAreaView className="flex-1 py-3">
         <View className={`flex-row items-center px-5 pt-10`}>
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/services/services")}
@@ -106,8 +108,11 @@ const PlatformManagement = () => {
           >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text 
-            className={`text-white text-lg font-semibold ms-4`}
+          <Text
+            className={`text-white text-lg ms-4`}
+            style={{
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.platformManagement.title")}
           </Text>
@@ -117,15 +122,21 @@ const PlatformManagement = () => {
           showsVerticalScrollIndicator={false}
           className="flex-1 px-5"
         >
-          <Text 
-            className="text-white text-center my-4 text-lg font-semibold"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-white text-center my-4 text-lg"
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.platformManagement.title")}
           </Text>
-          <Text 
+          <Text
             className="text-white text-base leading-6 mb-6 mt-4"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.platformManagement.description")}
           </Text>
@@ -135,9 +146,12 @@ const PlatformManagement = () => {
               onPress={() => router.push("/(drawer)/(tabs)/price")}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text 
-                className="text-white text-base font-semibold"
-                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              <Text
+                className="text-white text-base"
+                style={{
+                  textAlign: isRTL ? 'right' : 'left',
+                  fontFamily: AppFonts.semibold,
+                }}
               >
                 {t("services.platformManagement.pricing")}
               </Text>
@@ -146,9 +160,12 @@ const PlatformManagement = () => {
               onPress={() => setVisible(true)}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text 
-                className="text-white text-base font-semibold"
-                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              <Text
+                className="text-white text-base"
+                style={{
+                  textAlign: isRTL ? 'right' : 'left',
+                  fontFamily: AppFonts.semibold,
+                }}
               >
                 {t("services.platformManagement.getStarted")}
               </Text>
@@ -162,9 +179,12 @@ const PlatformManagement = () => {
             />
           </View>
           <View className="mb-8">
-            <Text 
+            <Text
               className="text-2xl font-bold text-gray-900 mt-10 mb-6"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("services.platformManagement.whyChooseUs")}
             </Text>
@@ -185,15 +205,21 @@ const PlatformManagement = () => {
                     {item.icon}
                   </View>
                   <View className="flex-1">
-                    <Text 
-                      className="text-lg font-semibold text-gray-900"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    <Text
+                      className="text-lg text-gray-900"
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {item.title}
                     </Text>
-                    <Text 
+                    <Text
                       className="text-sm text-gray-600 mt-1 leading-snug"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {item.description}
                     </Text>

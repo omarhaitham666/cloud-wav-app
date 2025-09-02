@@ -1,11 +1,14 @@
 import CustomHeader from "@/components/CustomHeader";
 import DrawerContent from "@/components/DrawerContent";
 import { Drawer } from "expo-router/drawer";
+import { useTranslation } from "react-i18next";
 
 export default function DrawerLayout() {
+  const { i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   return (
     <Drawer
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, drawerPosition: isArabic ? "right" : "left" }}
       drawerContent={(props) => <DrawerContent {...props} />}
     >
       <Drawer.Screen

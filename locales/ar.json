@@ -423,5 +423,27 @@
     "sections": {
       "trendingSongs": "الأغاني الرائجة"
     }
+  },
+  "drawer": {
+    "sections": {
+      "navigation": "التنقل",
+      "account": "الحساب"
+    },
+    "items": {
+      "home": "الرئيسية",
+      "contact": "اتصل",
+      "faq": "الأسئلة الشائعة",
+      "services": "الخدمات",
+      "profile": "الملف الشخصي",
+      "login": "تسجيل الدخول",
+      "register": "إنشاء حساب",
+      "logout": "تسجيل الخروج",
+      "loggingOut": "جارٍ تسجيل الخروج",
+      "language": "اللغة"
+    },
+    "footer": {
+      "brand": "كلاود ويف برودكشن",
+      "version": "الإصدار {{version}}"
+    }
   }
 }

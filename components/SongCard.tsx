@@ -1,4 +1,5 @@
 import { Songs } from "@/store/api/global/song";
+import { AppFonts } from "@/utils/fonts";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity } from "react-native";
@@ -34,6 +35,7 @@ export const SongCard = ({ id, title, artist, cover_url }: Songs) => {
           fontSize: 14,
           fontWeight: "600",
           textAlign: "center",
+          fontFamily: AppFonts.semibold,
         }}
       >
         {title}
@@ -45,6 +47,7 @@ export const SongCard = ({ id, title, artist, cover_url }: Songs) => {
           fontSize: 12,
           color: "#666",
           textAlign: "center",
+          fontFamily: AppFonts.semibold,
         }}
       >
         {artist ?? "Unknown Artist"}

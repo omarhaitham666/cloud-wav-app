@@ -18,6 +18,8 @@ import { useServicesMutation } from "@/store/api/global/services";
 import { Lightbulb, Megaphone, ShieldCheck } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
+import { AppFonts } from "@/utils/fonts";
+
 
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
@@ -90,7 +92,7 @@ const SocialMedia = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <SafeAreaView className="flex-1">
+      <SafeAreaView className="flex-1 py-3">
         <View className={`flex-row items-center px-5 pt-10`}>
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/services/services")}
@@ -98,8 +100,11 @@ const SocialMedia = () => {
           >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text 
-            className={`text-white text-lg font-semibold ms-4`}
+          <Text
+            className={`text-white text-lg ms-4`}
+            style={{
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.socialMedia.title")}
           </Text>
@@ -109,15 +114,21 @@ const SocialMedia = () => {
           showsVerticalScrollIndicator={false}
           className="flex-1 px-5"
         >
-          <Text 
-            className="text-white text-center my-4 text-lg font-semibold"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-white text-center my-4 text-lg"
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.socialMedia.specialist")}
           </Text>
-          <Text 
+          <Text
             className="text-white text-base leading-6 mb-6 mt-4"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.socialMedia.description")}
           </Text>
@@ -130,9 +141,12 @@ const SocialMedia = () => {
               }}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text 
-                className="text-white text-base font-semibold"
-                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              <Text
+                className="text-white text-base"
+                style={{
+                  textAlign: isRTL ? 'right' : 'left',
+                  fontFamily: AppFonts.semibold,
+                }}
               >
                 {t("services.socialMedia.getStarted")}
               </Text>
@@ -141,9 +155,12 @@ const SocialMedia = () => {
               onPress={() => router.push("/(drawer)/faq/faq")}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text 
-                className="text-white text-base font-semibold"
-                style={{ textAlign: isRTL ? 'right' : 'left' }}
+              <Text
+                className="text-white text-base"
+                style={{
+                  textAlign: isRTL ? 'right' : 'left',
+                  fontFamily: AppFonts.semibold,
+                }}
               >
                 {t("services.socialMedia.faq")}
               </Text>
@@ -159,9 +176,12 @@ const SocialMedia = () => {
           </View>
 
           <View className="mb-8">
-            <Text 
-              className="text-2xl font-bold text-gray-900 mt-10 mb-6"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            <Text
+              className="text-2xl text-gray-900 mt-10 mb-6"
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("services.socialMedia.whyChooseUs")}
             </Text>
@@ -176,22 +196,31 @@ const SocialMedia = () => {
                     <View className={`bg-purple-100 p-3 rounded-xl ${isRTL ? 'ml-2' : 'mr-2'}`}>
                       {service.icon}
                     </View>
-                    <Text 
-                      className="text-lg font-semibold text-gray-900 flex-1"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    <Text
+                      className="text-lg text-gray-900 flex-1"
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {service.title}
                     </Text>
-                    <Text 
-                      className="text-purple-700 font-bold"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    <Text
+                      className="text-purple-700"
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {service.price}
                     </Text>
                   </View>
-                  <Text 
+                  <Text
                     className="text-sm text-gray-600 leading-relaxed mb-4"
-                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    style={{
+                      textAlign: isRTL ? 'right' : 'left',
+                      fontFamily: AppFonts.semibold,
+                    }}
                   >
                     {service.description}
                   </Text>
@@ -202,9 +231,12 @@ const SocialMedia = () => {
                       setVisible(true);
                     }}
                   >
-                    <Text 
+                    <Text
                       className="text-white text-sm font-medium"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {t("services.socialMedia.getItNow")}
                     </Text>

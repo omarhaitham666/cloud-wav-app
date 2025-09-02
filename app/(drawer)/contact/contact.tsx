@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AppFonts } from "@/utils/fonts";
 
 const Contact = () => {
   const { t, i18n } = useTranslation();
@@ -118,29 +119,38 @@ const Contact = () => {
           <Ionicons name={icon as any} size={24} color="#fff" />
         </View>
         <View className={`flex-1 ${isRTL ? 'mr-4' : 'ml-4'}`}>
-          <Text 
-            className="text-white font-bold text-base"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-white text-base"
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {title}
           </Text>
-          <Text 
+          <Text
             className="text-white/80 text-xs"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {subtitle}
           </Text>
-          <Text 
+          <Text
             className="text-white font-medium text-sm mt-1"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {value}
           </Text>
         </View>
-        <Ionicons 
-          name={isRTL ? "chevron-back" : "chevron-forward"} 
-          size={20} 
-          color="#fff" 
+        <Ionicons
+          name={isRTL ? "chevron-back" : "chevron-forward"}
+          size={20}
+          color="#fff"
         />
       </LinearGradient>
     </TouchableOpacity>
@@ -162,11 +172,10 @@ const Contact = () => {
     field: string;
   }) => (
     <View
-      className={`mb-4 rounded-xl border px-3 ${
-        focusedField === field
+      className={`mb-4 rounded-xl border px-3 ${focusedField === field
           ? "border-indigo-500 bg-indigo-50"
           : "border-gray-200 bg-white"
-      }`}
+        }`}
     >
       <TextInput
         className={`py-3 text-base text-gray-900 ${multiline ? "h-24" : ""}`}
@@ -179,9 +188,10 @@ const Contact = () => {
         multiline={multiline}
         numberOfLines={multiline ? 4 : 1}
         keyboardType={keyboardType}
-        style={{ 
+        style={{
           textAlign: isRTL ? 'right' : 'left',
-          writingDirection: isRTL ? 'rtl' : 'ltr'
+          writingDirection: isRTL ? 'rtl' : 'ltr',
+          fontFamily: AppFonts.semibold,
         }}
       />
     </View>
@@ -199,7 +209,7 @@ const Contact = () => {
             namespace="contact"
           />
         </View>
-        
+
         <View className="px-4 mt-8">
           <ContactCard
             icon="call"
@@ -229,9 +239,11 @@ const Contact = () => {
 
         {/* 🔹 Contact Form */}
         <View className="px-4 mt-10 mb-10">
-          <Text 
-            className="text-xl font-bold text-gray-800 mb-4"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-xl text-gray-800 mb-4 pe-4"
+            style={{ textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+             }}
           >
             {t("contact.formTitle")}
           </Text>
@@ -276,14 +288,14 @@ const Contact = () => {
               className="mt-3"
             >
               <LinearGradient
-               style={{
-                borderRadius: 33,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-                elevation: 6,
-            }}
+                style={{
+                  borderRadius: 33,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.15,
+                  shadowRadius: 8,
+                  elevation: 6,
+                }}
                 colors={
                   isLoading ? ["#9CA3AF", "#6B7280"] : ["#6366F1", "#8B5CF6"]
                 }
@@ -292,12 +304,19 @@ const Contact = () => {
                 {isLoading ? (
                   <View className={`flex-row items-center space-x-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                     <ActivityIndicator size="small" color="#fff" />
-                    <Text className="text-white font-bold">{t("contact.sending")}</Text>
+                    <Text className="text-white"
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                    }}
+                    >{t("contact.sending")}</Text>
                   </View>
                 ) : (
                   <View
-                  className={`flex-row items-center gap-2 space-x-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <Text className="text-white font-bold">
+                    className={`flex-row items-center gap-2 space-x-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <Text className="text-white"
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                    }}>
                       {t("contact.sendButton")}
                     </Text>
                     <Ionicons name="send" size={20} color="#fff" />

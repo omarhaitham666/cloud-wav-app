@@ -1,8 +1,10 @@
 import { useLogoutMutation } from "@/store/api/user/user";
+import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { RelativePathString, router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Image,
@@ -11,9 +13,11 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import Feather from "react-native-vector-icons/Feather";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const DrawerItem = ({
   icon,
@@ -21,14 +25,14 @@ const DrawerItem = ({
   isActive,
   onPress,
   component = null,
+  isRtl = false,
 }: any) => {
   if (component) {
     return (
       <TouchableOpacity
         onPress={onPress}
-        className={`flex-row items-center py-3 px-6 mx-3 rounded-lg ${
-          isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
-        }`}
+        className={`${isRtl ? "flex-row-reverse" : "flex-row"} items-center py-3 px-6 mx-3 rounded-lg ${isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
+          }`}
         activeOpacity={0.7}
       >
         {component}
@@ -39,16 +43,15 @@ const DrawerItem = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`flex-row items-center py-3 px-6 mx-3 rounded-lg ${
-        isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
-      }`}
+      className={`${isRtl ? "flex-row-reverse" : "flex-row"} items-center py-3 px-6 mx-3 rounded-lg ${isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
+        }`}
       activeOpacity={0.7}
     >
-      <View className="mr-3 w-6 items-center">{icon}</View>
+      <View className={`${isRtl ? "ml-3" : "mr-3"} w-6 items-center`}>{icon}</View>
       <Text
-        className={`text-base font-medium ${
-          isActive ? "text-[#4f46e5]" : "text-[#475569]"
-        }`}
+        className={`text-base font-medium ${isActive ? "text-[#4f46e5]" : "text-[#475569]"
+          }`}
+        style={{ fontFamily: AppFonts.medium }}
       >
         {label}
       </Text>
@@ -57,9 +60,13 @@ const DrawerItem = ({
 };
 
 export default function DrawerContent({ state }: DrawerContentComponentProps) {
+  const { t, i18n } = useTranslation();
   const currentRoute = state.routes[state.index]?.name;
   const [token, setToken] = useState<string | null>(null);
   const [logout, { isLoading }] = useLogoutMutation();
+  const isArabic = i18n.language === "ar";
+  const rowDirection: ViewStyle = useMemo(() => ({ flexDirection: (isArabic ? "row-reverse" : "row") as "row" | "row-reverse" }), [isArabic]);
+
   useEffect(() => {
     const fetchToken = async () => {
       const storedToken = await getToken("access_token");
@@ -91,21 +98,21 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   };
 
   const drawerItems = [
-    { label: "Home", route: "(tabs)", iconName: "home", displayName: "Home" },
+    { label: t("drawer.items.home"), route: "(tabs)", iconName: "home", displayName: "Home" },
     {
-      label: "Contact Us",
+      label: t("drawer.items.contact"),
       route: "contact/contact",
       iconName: "phone",
       displayName: "Contact",
     },
     {
-      label: "FAQ",
+      label: t("drawer.items.faq"),
       route: "faq/faq",
       iconName: "help-circle",
       displayName: "FAQ",
     },
     {
-      label: "Services",
+      label: t("drawer.items.services"),
       route: "services/services",
       iconName: "grid",
       displayName: "Services",
@@ -114,23 +121,35 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
 
   const secondaryItems = token
     ? [
-        {
-          label: "Profile",
-          route: null,
-          iconName: "user",
-          action: () => Alert.alert("Profile", "Profile screen coming soon!"),
-        },
-        {
-          label: isLoading ? "Logging Out" : "Logout",
-          route: null,
-          iconName: "log-out",
-          action: handleLogout,
-        },
-      ]
+      {
+        label: t("drawer.items.profile"),
+        route: null,
+        iconName: "user",
+        action: () => Alert.alert("Profile", "Profile screen coming soon!"),
+      },
+      {
+        label: isLoading ? t("drawer.items.loggingOut") : t("drawer.items.logout"),
+        route: null,
+        iconName: "log-out",
+        action: handleLogout,
+      },
+    ]
     : [
-        { label: "Login", route: "(auth)/login", iconName: "log-in" },
-        { label: "Register", route: "(auth)/register", iconName: "user-plus" },
-      ];
+      { label: t("drawer.items.login"), route: "(auth)/login", iconName: "log-in" },
+      { label: t("drawer.items.register"), route: "(auth)/register", iconName: "user-plus" },
+      {
+        label: t("drawer.items.language"),
+        route: null,
+        iconName: "globe",
+        component: (
+          <View className="flex-1" style={[rowDirection, { alignItems: "center", justifyContent: "space-between" }]}>
+            <View style={{ flex: 1 }}>
+              <LanguageSwitcher />
+            </View>
+          </View>
+        ),
+      },
+    ];
 
   const navigateTo = (route: string | null, action?: () => void) => {
     if (action) {
@@ -169,6 +188,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         label={item.label}
         isActive={isActive}
         onPress={() => navigateTo(item.route, item.action)}
+        isRtl={isArabic}
         component={item.component}
       />
     );
@@ -193,8 +213,14 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         <View className="h-px bg-gray-200 my-2 mx-6" />
 
         <View className="py-2">
-          <Text className="text-xs font-semibold text-gray-500 uppercase tracking-wider mx-6 mb-3">
-            NAVIGATION
+          <Text
+            className="text-xs font-semibold text-gray-500 uppercase tracking-wider mx-6 mb-3"
+            style={{
+              fontFamily: AppFonts.semibold,
+              textAlign: isArabic ? "right" : "left",
+            }}
+          >
+            {t("drawer.sections.navigation")}
           </Text>
           {drawerItems.map(renderDrawerItem)}
         </View>
@@ -202,8 +228,15 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         <View className="h-px bg-gray-200 my-2 mx-6" />
 
         <View className="py-2">
-          <Text className="text-xs font-semibold text-gray-500 uppercase tracking-wider mx-6 mb-3">
-            ACCOUNT
+          <Text
+            className="text-xs font-semibold text-gray-500 uppercase tracking-wider mx-6 mb-3"
+            style={{
+              fontFamily: AppFonts.semibold,
+              textAlign: isArabic ? "right" : "left",
+            }}
+
+          >
+            {t("drawer.sections.account")}
           </Text>
           {secondaryItems.map(renderDrawerItem)}
         </View>
@@ -214,10 +247,18 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       <View className="py-4 px-6 border-t border-gray-200">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-sm font-medium text-gray-700">
-              CloudWav Production
+            <Text
+              className="text-sm font-medium text-gray-700"
+              style={{ fontFamily: AppFonts.medium }}
+            >
+              {t("drawer.footer.brand")}
             </Text>
-            <Text className="text-xs text-gray-400">Version 1.0.0</Text>
+            <Text
+              className="text-xs text-gray-400"
+              style={{ fontFamily: AppFonts.regular }}
+            >
+              {t("drawer.footer.version", { version: "1.0.0" })}
+            </Text>
           </View>
           <TouchableOpacity onPress={handleLogout} className="p-2">
             <Feather name="log-out" size={18} color="#64748b" />

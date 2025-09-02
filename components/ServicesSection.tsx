@@ -1,3 +1,4 @@
+import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
@@ -39,7 +40,7 @@ export default function ServicesSection() {
       image: require("../assets/images/ser-1.png"),
       comingSoon: false,
       gradientColors: ["#8B5CF6", "#A855F7", "#C084FC"],
-      icon: "🎵",
+      icon: "",
       route: "/services/music-distribution",
     },
     {
@@ -49,7 +50,7 @@ export default function ServicesSection() {
       image: require("../assets/images/ser-2.png"),
       comingSoon: false,
       gradientColors: ["#10B981", "#34D399", "#6EE7B7"],
-      icon: "🚀",
+      icon: "",
       route: "/services/platform-management",
     },
     {
@@ -59,7 +60,7 @@ export default function ServicesSection() {
       image: require("../assets/images/ser-3.png"),
       comingSoon: false,
       gradientColors: ["#3B82F6", "#60A5FA", "#93C5FD"],
-      icon: "📱",
+      icon: "",
       route: "/services/social-media",
     },
     {
@@ -69,7 +70,7 @@ export default function ServicesSection() {
       image: require("../assets/images/ser-4.png"),
       comingSoon: false,
       gradientColors: ["#EF4444", "#F87171", "#FCA5A5"],
-      icon: "👕",
+      icon: "",
       route: "",
     },
     {
@@ -79,8 +80,8 @@ export default function ServicesSection() {
       image: require("../assets/images/Kit-Ba0DSf7D.png"),
       comingSoon: true,
       gradientColors: ["#6366F1", "#4F46E5"],
-      icon: "📱",
-      route: "#",
+      icon: "",
+      route: "",
     },
   ];
 
@@ -88,16 +89,22 @@ export default function ServicesSection() {
     <SafeAreaView className="flex-1 ">
       <View className="px-5 pt-5 items-center">
         <View className="items-center">
-          <Text 
-            className="text-3xl mb-3 font-extrabold text-slate-800 text-center tracking-tight"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-3xl mb-3 text-slate-800 text-center tracking-tight"
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.servicesSection.title")}
           </Text>
 
-          <Text 
-            className="text-base text-slate-500 text-center font-medium"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-base text-slate-500 text-center"
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("services.servicesSection.subtitle")}
           </Text>
@@ -135,36 +142,36 @@ export default function ServicesSection() {
               >
                 {/* Background decorative circles - adjusted for RTL */}
                 <View className="absolute inset-0 opacity-10">
-                  <View 
-                    className={`absolute w-30 h-30 rounded-full bg-white ${
-                      isRTL ? '-top-7 -left-7' : '-top-7 -right-7'
-                    }`} 
+                  <View
+                    className={`absolute w-30 h-30 rounded-full bg-white ${isRTL ? '-top-7 -left-7' : '-top-7 -right-7'
+                      }`}
                   />
-                  <View 
-                    className={`absolute w-20 h-20 rounded-full bg-white ${
-                      isRTL ? 'bottom-5 -right-5' : 'bottom-5 -left-5'
-                    }`} 
+                  <View
+                    className={`absolute w-20 h-20 rounded-full bg-white ${isRTL ? 'bottom-5 -right-5' : 'bottom-5 -left-5'
+                      }`}
                   />
-                  <View 
-                    className={`absolute w-15 h-15 rounded-full bg-white ${
-                      isRTL ? 'top-1/2 left-5' : 'top-1/2 right-5'
-                    }`} 
+                  <View
+                    className={`absolute w-15 h-15 rounded-full bg-white ${isRTL ? 'top-1/2 left-5' : 'top-1/2 right-5'
+                      }`}
                   />
                 </View>
 
                 <View className="flex-1 z-10">
                   {/* Header section with icon and coming soon badge */}
-                  <View 
-                    className={`flex-row justify-between items-center mb-10 ${
-                      isRTL ? 'flex-row-reverse' : ''
-                    }`}
+                  <View
+                    className={`flex-row justify-between items-center mb-10 ${isRTL ? 'flex-row-reverse' : ''
+                      }`}
                   >
                     <View className="w-12 h-12 rounded-full bg-white/20 justify-center items-center">
                       <Text className="text-2xl">{item.icon}</Text>
                     </View>
                     {item.comingSoon && (
                       <View className="bg-white/20 px-3 py-1.5 rounded-2xl">
-                        <Text className="text-white text-xs font-semibold">
+                        <Text className="text-white text-xs font-semibold"
+                        style={{
+                          fontFamily: AppFonts.semibold,
+                        }}
+                        >
                           {t("services.servicesSection.buttons.comingSoon")}
                         </Text>
                       </View>
@@ -173,15 +180,21 @@ export default function ServicesSection() {
 
                   {/* Content section */}
                   <View className="mb-5 mt-6">
-                    <Text 
-                      className="text-white text-2xl font-bold mb-2 tracking-tight"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    <Text
+                      className="text-white text-2xl mb-2 tracking-tight"
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {item.title}
                     </Text>
-                    <Text 
+                    <Text
                       className="text-white/90 text-sm leading-5 font-medium"
-                      style={{ textAlign: isRTL ? 'right' : 'left' }}
+                      style={{
+                        textAlign: isRTL ? 'right' : 'left',
+                        fontFamily: AppFonts.semibold,
+                      }}
                     >
                       {item.desc}
                     </Text>
@@ -189,30 +202,33 @@ export default function ServicesSection() {
 
                   {/* Button section */}
                   <TouchableOpacity
-                    className={`flex-row items-center px-5 py-3 rounded-full ${
-                      item.comingSoon ? "bg-transparent" : "bg-white"
-                    }`}
+                    className={`flex-row items-center px-5 py-3 rounded-full ${item.comingSoon ? "bg-transparent" : "bg-white"
+                      }`}
                     onPress={() => router.push(item.route as any)}
                     style={
                       !item.comingSoon
                         ? {
-                            elevation: 4,
-                            shadowColor: "#000",
-                            shadowOffset: { width: 0, height: 2 },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 4,
-                            alignSelf: isRTL ? "flex-end" : "flex-start",
-                          }
+                          elevation: 4,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.25,
+                          shadowRadius: 4,
+                          alignSelf: isRTL ? "flex-end" : "flex-start",
+                        }
                         : undefined
                     }
                     disabled={item.comingSoon}
                   >
                     {!item.comingSoon && !isRTL && (
-                      <Text className="text-slate-800 text-sm font-bold mr-2">
+                      <Text className="text-slate-800 text-sm mr-2"
+                        style={{
+                          fontFamily: AppFonts.semibold,
+                        }}
+                      >
                         {t("services.servicesSection.buttons.learnMore")}
                       </Text>
                     )}
-                    
+
                     {!item.comingSoon && (
                       <View className="text-slate-800">
                         {isRTL ? (
@@ -222,9 +238,13 @@ export default function ServicesSection() {
                         )}
                       </View>
                     )}
-                    
+
                     {!item.comingSoon && isRTL && (
-                      <Text className="text-slate-800 text-sm font-bold ml-2">
+                      <Text className="text-slate-800 text-sm ml-2"
+                        style={{
+                          fontFamily: AppFonts.semibold,
+                        }}
+                      >
                         {t("services.servicesSection.buttons.learnMore")}
                       </Text>
                     )}
@@ -233,18 +253,16 @@ export default function ServicesSection() {
 
                 {/* Image section - positioned based on RTL */}
                 <View
-                  className={`absolute -bottom-5 z-0 ${
-                    isRTL ? '-left-5' : '-right-5'
-                  }`}
+                  className={`absolute -bottom-5 z-0 ${isRTL ? '-left-5' : '-right-5'
+                    }`}
                   style={{
                     width: width * 0.4,
                     height: 160,
                   }}
                 >
-                  <View 
-                    className={`absolute bottom-0 h-10 bg-black/10 rounded-2xl scale-x-75 ${
-                      isRTL ? 'right-0 left-0' : 'left-0 right-0'
-                    }`} 
+                  <View
+                    className={`absolute bottom-0 h-10 bg-black/10 rounded-2xl scale-x-75 ${isRTL ? 'right-0 left-0' : 'left-0 right-0'
+                      }`}
                   />
                   <Image
                     source={item.image}
@@ -257,7 +275,7 @@ export default function ServicesSection() {
           )}
         />
       </View>
-      
+
       {/* Pagination dots */}
       <View className="flex-row justify-center items-center py-5 gap-2">
         {services.map((_, index) => (

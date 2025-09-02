@@ -10,22 +10,16 @@ import en from "../locales/en.json";
 const locales = getLocales();
 const lng = (locales.length > 0 && locales[0].languageCode) ? locales[0].languageCode : "en";
 
-// RTL languages
-const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
+// Force the UI direction to always be LTR regardless of language
+I18nManager.allowRTL(false);
+I18nManager.forceRTL(false);
+// Ensure no auto mirroring of left/right styles
+// @ts-ignore - older React Native types may not include this API
+I18nManager.swapLeftAndRightInRTL && I18nManager.swapLeftAndRightInRTL(false);
 
-// Function to change language and handle RTL
+// Function to change language only (no direction changes)
 export const changeLanguage = (languageCode: string) => {
-  const isRTL = RTL_LANGUAGES.includes(languageCode);
-  
-  // Force RTL/LTR layout
-  I18nManager.allowRTL(true);
-  I18nManager.forceRTL(isRTL);
-  
-  // Change i18n language
   i18n.changeLanguage(languageCode);
-  
-  // Note: App restart may be required for RTL changes to take full effect
-  // This is a React Native limitation
 };
 
 i18n
@@ -40,9 +34,6 @@ i18n
     interpolation: { escapeValue: false },
   });
 
-// Set initial RTL state
-const isRTL = RTL_LANGUAGES.includes(lng);
-I18nManager.allowRTL(true);
-I18nManager.forceRTL(isRTL);
+// Direction is locked to LTR above; no further init needed
 
 export default i18n;

@@ -1,17 +1,31 @@
-import React, { useEffect, useState } from "react";
+import { AppFonts } from "@/utils/fonts";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Animated,
-  I18nManager,
+  Pressable,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import Feather from "react-native-vector-icons/Feather";
 
 export default function LanguageSwitcher() {
-  const { i18n, ready } = useTranslation();
+  const { t, i18n, ready } = useTranslation();
   const [isReady, setIsReady] = useState(ready);
   const [scaleValue] = useState(new Animated.Value(1));
+  const isArabic = i18n.language === "ar";
+
+  const activeColors = useMemo(
+    () => ({
+      primary: "#4f46e5",
+      primaryText: "#ffffff",
+      mutedBg: "#f3f4f6",
+      mutedBorder: "#e5e7eb",
+      text: "#111827",
+      subText: "#6b7280",
+    }),
+    []
+  );
 
   useEffect(() => {
     if (i18n.isInitialized && !isReady) {
@@ -36,15 +50,6 @@ export default function LanguageSwitcher() {
     ]).start();
 
     const newLang = i18n.language === "en" ? "ar" : "en";
-
-    if (newLang === "ar") {
-      I18nManager.allowRTL(true);
-      I18nManager.forceRTL(true);
-    } else {
-      I18nManager.allowRTL(false);
-      I18nManager.forceRTL(false);
-    }
-
     await i18n.changeLanguage(newLang);
 
     // if (Updates.reloadAsync) {
@@ -52,59 +57,49 @@ export default function LanguageSwitcher() {
     // }
   };
 
-  const isArabic = i18n.language === "ar";
-
   return (
     <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-      <TouchableOpacity
+      <Pressable
         onPress={toggleLanguage}
-        activeOpacity={0.8}
         style={{
-          flexDirection: "row",
+          flexDirection: isArabic ? "row-reverse" : "row",
           alignItems: "center",
-          justifyContent: "center",
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-          borderRadius: 30,
-          backgroundColor: "#ffffff",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 1,
-          borderWidth: 1,
-          borderColor: "#fff",
-          minWidth: 110,
+          justifyContent: "space-between",
         }}
       >
-        <View
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            backgroundColor: isArabic ? "#1e7e34" : "#dc3545",
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: isArabic ? 0 : 8,
-            marginLeft: isArabic ? 8 : 0,
-          }}
-        >
-          <Text style={{ fontSize: 12, color: "white", fontWeight: "bold" }}>
-            {isArabic ? "AR" : "EN"}
-          </Text>
+        <View style={{ flexDirection: isArabic ? "row-reverse" : "row", alignItems: "center" }}>
+          <Feather
+            name="globe"
+            size={20}
+            color={activeColors.text}
+            style={isArabic ? { marginLeft: 12 } : { marginRight: 12 }}
+          />
+          <View>
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "600",
+                color: activeColors.text,
+                textAlign: isArabic ? "right" : "left",
+                fontFamily: AppFonts.semibold,
+              }}
+            >
+              {t("drawer.items.language")}
+            </Text>
+            <Text
+              style={{
+                fontSize: 12,
+                color: activeColors.subText,
+                marginTop: 2,
+                textAlign: isArabic ? "right" : "left",
+                fontFamily: AppFonts.regular,
+              }}
+            >
+              {isArabic ? "العربية" : "English"}
+            </Text>
+          </View>
         </View>
-        <Text
-          style={{
-            fontSize: 14,
-            color: "#1f2937",
-            fontWeight: "600",
-            letterSpacing: 0.5,
-            marginLeft: isArabic ? 8 : 0,
-          }}
-        >
-          {isArabic ? "English" : "العربية"}
-        </Text>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 }

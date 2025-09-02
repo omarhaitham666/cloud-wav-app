@@ -19,8 +19,7 @@ export default function WelcomeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const { t } = useTranslation();
   
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -36,7 +35,7 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View className="flex-1 pb-5 bg-red-600">
+    <View className="flex-1 pb-5 bg-red-600 font-cairo">
       <FlatList
         data={slides}
         ref={flatListRef}
@@ -56,12 +55,12 @@ export default function WelcomeScreen() {
               resizeMode="contain"
             />
             <Text 
-              className="text-white text-2xl font-bold text-center mb-3"
+              className="text-white text-2xl text-center font-noto-arabic-semibold mb-3"
             >
               {t(item.title)}
             </Text>
             <Text 
-              className="text-gray-50 text-center text-sm leading-5"
+              className="text-gray-50 text-center text-sm leading-5 font-noto-arabic"
             >
               {t(item.description)}
             </Text>
@@ -84,7 +83,7 @@ export default function WelcomeScreen() {
           className="bg-white px-10 py-2.5 rounded-full"
           onPress={handleNext}
         >
-          <Text className="text-red-600 font-bold text-base">
+          <Text className="text-red-600 font-noto-arabic-bold text-base">
             {currentIndex === slides.length - 1 
               ? t("welcome.buttons.getStarted") 
               : t("welcome.buttons.next")

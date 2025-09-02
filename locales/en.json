@@ -423,5 +423,27 @@
     "sections": {
       "trendingSongs": "Trending Songs"
     }
+  },
+  "drawer": {
+    "sections": {
+      "navigation": "Navigation",
+      "account": "Account"
+    },
+    "items": {
+      "home": "Home",
+      "contact": "Contact",
+      "faq": "FAQ",
+      "services": "Services",
+      "profile": "Profile",
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout",
+      "loggingOut": "Logging Out",
+      "language": "Language"
+    },
+    "footer": {
+      "brand": "CloudWav Production",
+      "version": "Version {{version}}"
+    }
   }
 }

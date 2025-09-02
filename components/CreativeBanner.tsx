@@ -3,6 +3,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Text, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { AppFonts } from "@/utils/fonts";
+
 
 interface CreativeBannerProps {
   titleKey: string;
@@ -47,14 +49,18 @@ const CreativeBanner: React.FC<CreativeBannerProps> = ({
         </View>
         <View className="flex-1">
           <Text 
-            className="text-white text-2xl font-bold mb-1"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            className="text-white text-2xl mb-1"
+            style={{ textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+             }}
           >
             {t(`${namespace}.banner.${titleKey}`)}
           </Text>
           <Text 
             className="text-white/90 text-sm leading-5"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            style={{ textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+             }}
           >
             {t(`${namespace}.banner.${subtitleKey}`)}
           </Text>

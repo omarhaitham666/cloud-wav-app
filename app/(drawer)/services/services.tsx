@@ -22,6 +22,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AppFonts } from "@/utils/fonts";
+
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -132,7 +134,8 @@ export default function ServicesScreen() {
         colors={service.gradientColors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className={`w-14 h-14 rounded-xl items-center justify-center shadow ${isRTL ? 'ml-4' : 'mr-4'}`}
+        className={`w-14 h-14 items-center justify-center shadow ${isRTL ? 'ml-4' : 'mr-4'}`}
+        style={{ borderRadius: 24 }}
       >
         {service.icon}
       </LinearGradient>
@@ -143,13 +146,20 @@ export default function ServicesScreen() {
             className={`flex-1 text-lg font-semibold 
               ${service.isComingSoon ? "text-gray-500" : "text-gray-900"}
             `}
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {service.title}
           </Text>
           {service.isComingSoon && (
             <View className={`bg-violet-600 px-2 py-1 rounded-md ${isRTL ? 'mr-2' : 'ml-2'}`}>
-              <Text className="text-white text-[10px] font-semibold">{t("services.main.comingSoon")}</Text>
+              <Text className="text-white text-[10px] font-semibold"
+                style={{
+                  fontFamily: AppFonts.semibold,
+                }}
+              >{t("services.main.comingSoon")}</Text>
             </View>
           )}
         </View>
@@ -157,7 +167,10 @@ export default function ServicesScreen() {
           className={`text-sm leading-5 
             ${service.isComingSoon ? "text-gray-400" : "text-gray-500"}
           `}
-          style={{ textAlign: isRTL ? 'right' : 'left' }}
+          style={{
+            textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
+          }}
         >
           {service.description}
         </Text>
@@ -188,13 +201,19 @@ export default function ServicesScreen() {
           <View className="items-center mt-5 mb-8">
             <Text
               className="text-2xl font-bold text-gray-900 mb-2"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("services.main.title")}
             </Text>
             <Text
               className="text-base text-gray-500 text-center leading-6 px-5"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("services.main.subtitle")}
             </Text>
@@ -214,7 +233,10 @@ export default function ServicesScreen() {
           <View className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl">
             <Text
               className="text-lg font-bold text-gray-900 mb-4 text-center"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("services.clothesStore.modal.title")}
             </Text>
@@ -229,7 +251,11 @@ export default function ServicesScreen() {
                 }
               >
                 <Facebook size={36} color="#1877F2" />
-                <Text className="text-xs text-gray-700 mt-2">Facebook</Text>
+                <Text className="text-xs text-gray-700 mt-2"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >Facebook</Text>
               </TouchableOpacity>
 
               {/* Instagram */}
@@ -243,7 +269,11 @@ export default function ServicesScreen() {
                 }
               >
                 <Instagram size={36} color="#E4405F" />
-                <Text className="text-xs text-gray-700 mt-2">Instagram</Text>
+                <Text className="text-xs text-gray-700 mt-2"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >Instagram</Text>
               </TouchableOpacity>
 
               {/* TikTok */}
@@ -257,7 +287,11 @@ export default function ServicesScreen() {
                 }
               >
                 <Video size={36} color="#000000" />
-                <Text className="text-xs text-gray-700 mt-2">TikTok</Text>
+                <Text className="text-xs text-gray-700 mt-2"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >TikTok</Text>
               </TouchableOpacity>
             </View>
 
@@ -265,7 +299,11 @@ export default function ServicesScreen() {
               onPress={() => setModalVisible(false)}
               className="bg-purple-600 py-3 rounded-xl"
             >
-              <Text className="text-white text-center font-semibold">
+              <Text className="text-white text-center font-semibold"
+                style={{
+                  fontFamily: AppFonts.semibold,
+                }}
+              >
                 {t("services.clothesStore.modal.close")}
               </Text>
             </TouchableOpacity>

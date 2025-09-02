@@ -14,6 +14,8 @@ import {
   View,
 } from "react-native";
 import { z } from "zod";
+import { AppFonts } from "@/utils/fonts";
+
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -53,7 +55,7 @@ export default function ServiceRequestModal({
 }: Props) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  
+
   const {
     control,
     handleSubmit,
@@ -101,18 +103,25 @@ export default function ServiceRequestModal({
     <Modal visible={visible} animationType="fade" transparent>
       <View className="flex-1 bg-black/40 justify-center items-center px-4">
         <View className="bg-white rounded-2xl w-full max-h-[80%]">
-          <View 
+          <View
             className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
             style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
           >
-            <Text 
-              className="text-lg font-bold text-indigo-600"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+            <Text
+              className="text-lg text-indigo-600"
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("services.platformManagement.modal.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-xl text-gray-600">{t("services.platformManagement.modal.close")}</Text>
+              <Text className="text-xl text-gray-600"
+                style={{
+                  fontFamily: AppFonts.semibold,
+                }}
+              >{t("services.platformManagement.modal.close")}</Text>
             </TouchableOpacity>
           </View>
 
@@ -130,17 +139,21 @@ export default function ServiceRequestModal({
                       multiline={field.multiline || false}
                       className="border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800"
                       placeholderTextColor="#9CA3AF"
-                      style={{ 
+                      style={{
                         textAlign: isRTL ? 'right' : 'left',
-                        textAlignVertical: 'top'
+                        textAlignVertical: 'top',
+                        fontFamily: AppFonts.semibold,
                       }}
                     />
                   )}
                 />
                 {errors[field.name as keyof FormData] && (
-                  <Text 
+                  <Text
                     className="text-red-500 text-xs mt-1"
-                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    style={{
+                      textAlign: isRTL ? 'right' : 'left',
+                      fontFamily: AppFonts.semibold,
+                    }}
                   >
                     {errors[field.name as keyof FormData]?.message?.toString()}
                   </Text>
@@ -152,7 +165,11 @@ export default function ServiceRequestModal({
               onPress={handleSubmit(onSubmit)}
               className="bg-indigo-600 py-4 rounded-full mt-4"
             >
-              <Text className="text-white text-center font-bold text-base">
+              <Text className="text-white text-center text-base"
+                style={{
+                  fontFamily: AppFonts.semibold,
+                }}
+              >
                 {isLoading ? <ActivityIndicator color="#fff" /> : t("services.platformManagement.modal.submit")}
               </Text>
             </TouchableOpacity>
