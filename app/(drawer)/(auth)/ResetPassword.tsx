@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AppFonts } from "@/utils/fonts";
 
 import Toast from "react-native-toast-message";
 
@@ -62,8 +63,10 @@ export default function ResetPassword() {
     <SafeAreaView className="flex-1 min-h-screen bg-white">
       <View className="flex-1 justify-center px-6 bg-white">
         <Text 
-          className="text-2xl font-bold text-center text-red-600 mb-6"
-          style={{ textAlign: isRTL ? 'right' : 'left' }}
+          className="text-2xl text-center text-red-600 mb-6"
+          style={{ textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
+           }}
         >
           {t("auth.resetPassword.title")}
         </Text>
@@ -75,6 +78,7 @@ export default function ResetPassword() {
           className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
             writingDirection: isRTL ? 'rtl' : 'ltr'
           }}
         />
@@ -86,6 +90,7 @@ export default function ResetPassword() {
           className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
             writingDirection: isRTL ? 'rtl' : 'ltr'
           }}
         />
@@ -97,6 +102,7 @@ export default function ResetPassword() {
           className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
             writingDirection: isRTL ? 'rtl' : 'ltr'
           }}
         />
@@ -105,7 +111,10 @@ export default function ResetPassword() {
           onPress={handleResetPassword}
         >
           <Text 
-            className="text-white text-center font-semibold text-base"
+            className="text-white text-center text-base"
+            style={{
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {isLoading ? <ActivityIndicator color="#fff" /> : t("auth.resetPassword.resetPassword")}
           </Text>
