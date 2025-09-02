@@ -1,9 +1,13 @@
+import CreatorCard from "@/components/CreatorCard";
+import { useSearchCreatorQuery } from "@/store/api/global/search";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
+  Dimensions,
+  FlatList,
   Platform,
-  ScrollView,
   StatusBar,
   Text,
   TextInput,
@@ -12,11 +16,16 @@ import {
 } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 
+const { width: screenWidth } = Dimensions.get("window");
+
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
+
+  // Fixed: Use searchQuery directly, don't skip empty queries
+  const { data, refetch, isLoading } = useSearchCreatorQuery(searchQuery);
 
   useEffect(() => {
     Animated.parallel([
@@ -35,17 +44,23 @@ const Search = () => {
 
   const categories = [
     { id: "all", label: "All", emoji: "🎭" },
-    { id: "actors", label: "Actors", emoji: "🎬" },
-    { id: "musicians", label: "Musicians", emoji: "🎵" },
+    { id: "actor", label: "Actors", emoji: "🎬" },
+    { id: "musician", label: "Musicians", emoji: "🎵" },
     { id: "content", label: "Content Creators", emoji: "📹" },
-    { id: "youtubers", label: "YouTubers", emoji: "📺" },
-    { id: "athletes", label: "Athletes", emoji: "⚽" },
+    { id: "youtuber", label: "YouTubers", emoji: "📺" },
+    { id: "athlete", label: "Athletes", emoji: "⚽" },
     { id: "public", label: "Public Figures", emoji: "👑" },
-    { id: "tiktokers", label: "TikTokers", emoji: "🎪" },
+    { id: "tiktoker", label: "TikTokers", emoji: "🎪" },
   ];
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+    // Auto-trigger search after a delay
+    if (query.length > 0) {
+      setTimeout(() => {
+        refetch();
+      }, 500);
+    }
   };
 
   const SearchIcon = () => (
@@ -60,8 +75,36 @@ const Search = () => {
     </Svg>
   );
 
-  return (
-    <View className="flex-1   bg-gray-50">
+  const CloseIcon = () => (
+    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M18 6L6 18M6 6l12 12"
+        stroke="#6B7280"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+
+  const handleCategoryPress = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    if (categoryId === "all") {
+      setSearchQuery("");
+    } else {
+      setSearchQuery(categoryId);
+    }
+  };
+
+  // Fixed: Handle popular category press
+  const handlePopularCategoryPress = (categoryType: string) => {
+    setActiveCategory(categoryType);
+    setSearchQuery(categoryType);
+  };
+
+  // Header component
+  const renderHeader = () => (
+    <View>
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -73,16 +116,13 @@ const Search = () => {
         className="absolute inset-0"
       />
 
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
+      <View
+        style={{
           paddingTop:
             Platform.OS === "android"
               ? (StatusBar.currentHeight ?? 0) + 20
               : 60,
-          paddingBottom: 20,
         }}
-        showsVerticalScrollIndicator={false}
       >
         <Animated.View
           className="px-6 mb-8"
@@ -110,39 +150,43 @@ const Search = () => {
             <SearchIcon />
             <TextInput
               className="flex-1 text-gray-900 text-base ml-3 placeholder:text-gray-500"
-              placeholder="Search creators..."
+              placeholder="Search creators by name or category..."
               placeholderTextColor="#6B7280"
               value={searchQuery}
               onChangeText={handleSearch}
+              returnKeyType="search"
+              onSubmitEditing={() => refetch()}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity
-                onPress={() => handleSearch("")}
+                onPress={() => {
+                  setSearchQuery("");
+                  setActiveCategory("all");
+                }}
                 className="w-6 h-6 bg-gray-300 rounded-full justify-center items-center"
               >
-                <Text className="text-gray-600 text-xs">✕</Text>
+                <CloseIcon />
               </TouchableOpacity>
             )}
           </View>
         </Animated.View>
 
-        {/* Categories */}
         <Animated.View
           style={{
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }}
         >
-          <ScrollView
+          <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
             className="mb-8"
             contentContainerStyle={{ paddingHorizontal: 24 }}
-          >
-            {categories.map((category) => (
+            data={categories}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item: category }) => (
               <TouchableOpacity
-                key={category.id}
-                onPress={() => setActiveCategory(category.id)}
+                onPress={() => handleCategoryPress(category.id)}
                 className={`flex-row items-center px-4 py-3 rounded-full mr-3 ${
                   activeCategory === category.id ? "bg-blue-500" : "bg-white"
                 } shadow-sm`}
@@ -159,58 +203,170 @@ const Search = () => {
                   {category.label}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            )}
+          />
         </Animated.View>
+      </View>
+    </View>
+  );
 
-        <View className="px-6 mt-12">
-          <View className="items-center py-12">
-            <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
-              <Text className="text-4xl">🔍</Text>
-            </View>
-            <Text className="text-gray-900 text-xl font-bold mb-2">
-              Start Searching
-            </Text>
-            <Text className="text-gray-600 text-center text-base leading-6">
-              Search for your favorite creators by name or browse by category
-            </Text>
-          </View>
+  const renderEmptyState = () => {
+    if (isLoading) {
+      return (
+        <View className="flex-1 justify-center items-center my-8">
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text className="text-gray-600 mt-2">Searching creators...</Text>
         </View>
+      );
+    }
 
-        <View className="px-6 mb-20">
-          <Text className="text-gray-900 text-xl font-bold mb-4">
-            Popular Categories
+    if (searchQuery.length > 0) {
+      return (
+        <View className="items-center py-12">
+          <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
+            <Text className="text-4xl">😔</Text>
+          </View>
+          <Text className="text-gray-900 text-xl font-bold mb-2">
+            No Results Found
           </Text>
-
-          <View className="flex-row mb-4">
-            <TouchableOpacity className="flex-1 bg-white rounded-xl p-4 mr-2 shadow-sm border border-gray-200">
-              <Text className="text-2xl mb-2">🎬</Text>
-              <Text className="text-gray-900 font-medium">Actors</Text>
-              <Text className="text-gray-600 text-sm">Movie & TV Stars</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-1 bg-white rounded-xl p-4 ml-2 shadow-sm border border-gray-200">
-              <Text className="text-2xl mb-2">🎵</Text>
-              <Text className="text-gray-900 font-medium">Musicians</Text>
-              <Text className="text-gray-600 text-sm">Artists & Singers</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View className="flex-row">
-            <TouchableOpacity className="flex-1 bg-white rounded-xl p-4 mr-2 shadow-sm border border-gray-200">
-              <Text className="text-2xl mb-2">📺</Text>
-              <Text className="text-gray-900 font-medium">YouTubers</Text>
-              <Text className="text-gray-600 text-sm">Content Creators</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-1 bg-white rounded-xl p-4 ml-2 shadow-sm border border-gray-200">
-              <Text className="text-2xl mb-2">🎪</Text>
-              <Text className="text-gray-900 font-medium">TikTokers</Text>
-              <Text className="text-gray-600 text-sm">Short Video Stars</Text>
-            </TouchableOpacity>
-          </View>
+          <Text className="text-gray-600 text-center text-base leading-6">
+            No creators found for &quot;{searchQuery}&quot;. Try a different
+            search term.
+          </Text>
         </View>
-      </ScrollView>
+      );
+    }
+
+    return (
+      <View className="items-center py-12">
+        <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
+          <Text className="text-4xl">🔍</Text>
+        </View>
+        <Text className="text-gray-900 text-xl font-bold mb-2">
+          Start Searching
+        </Text>
+        <Text className="text-gray-600 text-center text-base leading-6">
+          Search for your favorite creators by name or browse by category
+        </Text>
+      </View>
+    );
+  };
+  const renderFooter = () => (
+    <View className="px-6 mt-8 mb-20">
+      <Text className="text-gray-900 text-xl font-bold mb-4">
+        Popular Categories
+      </Text>
+
+      <View className="flex-row mb-4">
+        <TouchableOpacity
+          onPress={() => handlePopularCategoryPress("actor")}
+          className="flex-1 bg-white rounded-xl p-4 mr-2 shadow-sm border border-gray-200"
+        >
+          <Text className="text-2xl mb-2">🎬</Text>
+          <Text className="text-gray-900 font-medium">Actors</Text>
+          <Text className="text-gray-600 text-sm">Movie & TV Stars</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handlePopularCategoryPress("musician")}
+          className="flex-1 bg-white rounded-xl p-4 ml-2 shadow-sm border border-gray-200"
+        >
+          <Text className="text-2xl mb-2">🎵</Text>
+          <Text className="text-gray-900 font-medium">Musicians</Text>
+          <Text className="text-gray-600 text-sm">Artists & Singers</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className="flex-row">
+        <TouchableOpacity
+          onPress={() => handlePopularCategoryPress("youtuber")}
+          className="flex-1 bg-white rounded-xl p-4 mr-2 shadow-sm border border-gray-200"
+        >
+          <Text className="text-2xl mb-2">📺</Text>
+          <Text className="text-gray-900 font-medium">YouTubers</Text>
+          <Text className="text-gray-600 text-sm">Content Creators</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handlePopularCategoryPress("tiktoker")}
+          className="flex-1 bg-white rounded-xl p-4 ml-2 shadow-sm border border-gray-200"
+        >
+          <Text className="text-2xl mb-2">🎪</Text>
+          <Text className="text-gray-900 font-medium">TikTokers</Text>
+          <Text className="text-gray-600 text-sm">Short Video Stars</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  const flatListData = [
+    { type: "header", id: "header" },
+    ...(data && data.length > 0
+      ? [
+          { type: "results-header", id: "results-header" },
+          ...data.map((item, index) => ({
+            type: "creator",
+            id: item.id?.toString() ?? index.toString(),
+            data: item,
+          })),
+        ]
+      : [{ type: "empty-state", id: "empty-state" }]),
+    { type: "footer", id: "footer" },
+  ];
+
+  const renderItem = ({
+    item,
+  }: {
+    item: { type: string; id: string; data?: any };
+  }) => {
+    switch (item.type) {
+      case "header":
+        return renderHeader();
+
+      case "results-header":
+        return (
+          <View className="px-6 mb-4">
+            <Text className="text-gray-900 text-xl font-bold">
+              Search Results ({data?.length})
+            </Text>
+          </View>
+        );
+
+      case "creator":
+        return (
+          <View className="px-6 mb-4">
+            <View style={{ width: screenWidth - 48 }}>
+              <CreatorCard
+                id={item.data.id?.toString() ?? ""}
+                image={`https://api.cloudwavproduction.com/storage/${item.data.profile_image}`}
+                name={item.data.name || "Unknown Creator"}
+                price={`$${item.data.private_price || 0}`}
+                bussiness_price={`$${item.data.bussiness_price || 0}`}
+              />
+            </View>
+          </View>
+        );
+
+      case "empty-state":
+        return <View className="px-6">{renderEmptyState()}</View>;
+
+      case "footer":
+        return renderFooter();
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <View className="flex-1">
+      <FlatList
+        data={flatListData}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      />
     </View>
   );
 };
