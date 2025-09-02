@@ -1,7 +1,9 @@
 import { PricingCard } from "@/components/PricingCard";
 import { pricingPlans } from "@/utils/data";
+import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   interpolate,
@@ -12,25 +14,35 @@ import Animated, {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PricingScreen() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
   const [isYearly, setIsYearly] = useState(false);
   const toggleAnimation = useSharedValue(0);
 
-  const handleToggle = () => {
-    setIsYearly((prev) => !prev);
-    toggleAnimation.value = withTiming(isYearly ? 0 : 1, { duration: 300 });
+  const setToMonthly = () => {
+    setIsYearly(false);
+    toggleAnimation.value = withTiming(0, { duration: 300 });
   };
+
+  const setToYearly = () => {
+    setIsYearly(true);
+    toggleAnimation.value = withTiming(1, { duration: 300 });
+  };
+
 
   const toggleSwitchStyle = useAnimatedStyle(() => {
     const translateX = interpolate(toggleAnimation.value, [0, 1], [4, 84]);
+    const scale = interpolate(toggleAnimation.value, [0, 1], [1, 1.02]);
     return {
-      transform: [{ translateX }],
+      transform: [{ translateX }, { scale }],
     };
   });
 
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient
-        colors={["#F8FAFC", "#EDE9FE", "#F1F5F9"]}
+        colors={["#ffffff", "#f8fafc", "#f1f5f9"]}
         className="flex-1"
       >
         <ScrollView
@@ -39,51 +51,95 @@ export default function PricingScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="items-center mt-6 mb-10">
-            <Text className="text-3xl font-bold text-gray-800 mb-4 text-center">
-              Pricing Plans
+            <Text
+              className="text-3xl text-gray-800 mb-4 text-center"
+              style={{
+                fontFamily: AppFonts.bold,
+                textAlign: isRTL ? 'right' : 'left',
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
+            >
+              {t("pricing.title")}
             </Text>
-            <Text className="text-base text-gray-600 text-center leading-6 px-4">
-              Choose the perfect plan that fits your needs, and unlock the full
-              potential of your career right now
+            <Text
+              className="text-base text-gray-600 text-center leading-6 px-4"
+              style={{
+                fontFamily: AppFonts.medium,
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
+            >
+              {t("pricing.subtitle")}
             </Text>
           </View>
+          {isYearly && (
+              <View className="self-center mb-4 px-3 py-1 rounded-full bg-green-50 border border-green-200">
+                <Text
+                  className="text-green-700 text-sm font-medium"
+                  style={{
+                    fontFamily: AppFonts.medium,
+                    textAlign: 'center',
+                    writingDirection: isRTL ? 'rtl' : 'ltr'
+                  }}
+                >
+                  {t("pricing.toggle.savings")}
+                </Text>
+              </View>
+            )}
           <View className="items-center mb-10">
-            <View className="flex-row w-44 h-14  bg-gray-100 rounded-full -2 relative">
+            <View className={`flex-row w-44 h-[50px] border border-gray-200 rounded-full relative bg-gray-50 shadow-sm`}>
               <Animated.View
-                style={[toggleSwitchStyle, { position: "absolute", zIndex: 1 }]}
-                className="w-20 h-12 mt-1 -ml-1 bg-violet-500 rounded-full shadow-lg"
+                style={[
+                  toggleSwitchStyle,
+                  {
+                    position: "absolute",
+                    zIndex: 1,
+                    left: -2,
+                  }
+                ]}
+                className="w-[4.8rem] h-12 mt-1 bg-red-500 rounded-full shadow-xl"
               />
               <TouchableOpacity
-                onPress={() => !isYearly && handleToggle()}
-                activeOpacity={0.8}
+                onPress={setToMonthly}
+                activeOpacity={0.7}
                 className="flex-1 items-center justify-center z-10"
+                style={{
+                  transform: [{ scale: !isYearly ? 1 : 0.98 }]
+                }}
               >
                 <Text
-                  className={`text-sm font-semibold ${
-                    !isYearly ? "text-white" : "text-gray-600"
-                  }`}
+                  className={`text-sm font-semibold ${!isYearly ? "text-white" : "text-gray-700"
+                    }`}
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                    textAlign: 'center',
+                    writingDirection: isRTL ? 'rtl' : 'ltr'
+                  }}
                 >
-                  Monthly
+                  {t("pricing.toggle.monthly")}
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => isYearly || handleToggle()}
-                activeOpacity={0.8}
+                onPress={setToYearly}
+                activeOpacity={0.7}
                 className="flex-1 items-center justify-center z-10"
+                style={{
+                  transform: [{ scale: isYearly ? 1 : 0.98 }]
+                }}
               >
-                <Text
-                  className={`text-sm font-semibold ${
-                    isYearly ? "text-white" : "text-gray-600"
-                  }`}
-                >
-                  Yearly
-                </Text>
-                {isYearly && (
-                  <Text className="text-xs text-green-500 font-medium">
-                    Save 20%
+                <View className="items-center">
+                  <Text
+                    className={`text-sm font-semibold ${isYearly ? "text-white" : "text-gray-700"
+                      }`}
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                      textAlign: 'center',
+                      writingDirection: isRTL ? 'rtl' : 'ltr'
+                    }}
+                  >
+                    {t("pricing.toggle.yearly")}
                   </Text>
-                )}
+                </View>
               </TouchableOpacity>
             </View>
           </View>

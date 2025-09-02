@@ -445,5 +445,98 @@
       "brand": "CloudWav Production",
       "version": "Version {{version}}"
     }
+  },
+  "otp": {
+    "title": "Verify Your Account",
+    "subtitle": "Enter the 6-digit OTP sent to your email.",
+    "placeholder": "Enter OTP",
+    "verifyButton": "Verify",
+    "verifying": "Verifying...",
+    "alerts": {
+      "errorTitle": "Error",
+      "invalidOTP": "Please enter a valid 6-digit OTP.",
+      "verificationSuccess": "Account Verified 🎉",
+      "verificationFailed": "Verification Failed",
+      "verificationFailedMessage": "Something went wrong"
+    }
+  },
+  "profile": {
+    "auth": {
+      "welcome": "Welcome to",
+      "appName": "CloudWav",
+      "subtitle": "Discover amazing features and connect with the world",
+      "login": "LOGIN",
+      "register": "REGISTER",
+      "terms": "By continuing, you agree to our Terms & Privacy Policy"
+    },
+    "dashboard": {
+      "welcomeBack": "Welcome Back!",
+      "stats": "Your Stats",
+      "posts": "Posts",
+      "followers": "Followers",
+      "following": "Following",
+      "menu": "Menu",
+      "editProfile": "Edit Profile",
+      "editProfileSubtitle": "Update your personal information",
+      "settings": "Settings",
+      "settingsSubtitle": "App preferences and privacy",
+      "notifications": "Notifications",
+      "notificationsSubtitle": "Manage your notifications",
+      "helpSupport": "Help & Support",
+      "helpSupportSubtitle": "Get help and contact support",
+      "about": "About",
+      "aboutSubtitle": "App version and information",
+      "logout": "Logout",
+      "addNew": "Add new content feature",
+      "defaultName": "John Doe",
+      "defaultEmail": "john.doe@example.com",
+      "alerts": {
+        "editProfileTitle": "Edit Profile",
+        "editProfileMessage": "Profile editing feature",
+        "settingsTitle": "Settings",
+        "settingsMessage": "Settings feature",
+        "notificationsTitle": "Notifications",
+        "notificationsMessage": "Notifications feature",
+        "helpTitle": "Help",
+        "helpMessage": "Help & Support feature",
+        "aboutTitle": "About",
+        "aboutMessage": "About feature",
+        "addTitle": "Add",
+        "addMessage": "Add new content feature"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Pricing Plans",
+    "subtitle": "Choose the perfect plan that fits your needs, and unlock the full potential of your career right now",
+    "toggle": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "savings": "Save 20%"
+    },
+    "periods": {
+      "monthly": "/Mo",
+      "yearly": "/Year"
+    },
+    "savings": "Save ${{amount}} per year",
+    "getStarted": "Get Started",
+    "plans": {
+      "basic": "Basic",
+      "starter": "Starter",
+      "proTune": "Pro Tune"
+    },
+    "features": {
+      "unlimitedListening": "Unlimited listening",
+      "unlimitedDownloading": "Unlimited downloading",
+      "noAds": "No ads",
+      "directDownloads": "Direct downloads",
+      "easierBrowsing": "Easier browsing",
+      "contentProtection": "Content protection and copyright security during the contract period",
+      "ensuringSuccessfulRevenue": "Ensuring successful revenue access",
+      "protectingArtistPlatforms": "Protecting and developing the artist's platforms",
+      "customizingArtistProfile": "Customizing an artist profile on our platform",
+      "providingRealJobs": "Providing real job opportunities through our platform",
+      "exclusiveMarketing": "Uploading content to all our official platforms (Exclusive marketing service)"
+    }
   }
 }

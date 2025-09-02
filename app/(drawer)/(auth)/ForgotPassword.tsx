@@ -11,6 +11,8 @@ import {
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
+import { AppFonts } from "@/utils/fonts";
+
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -48,8 +50,10 @@ export default function ForgotPassword() {
     <SafeAreaView className="flex-1 min-h-screen">
       <View className="flex-1 justify-center px-6 bg-white">
         <Text 
-          className="text-2xl font-bold text-center text-red-600 mb-6"
-          style={{ textAlign: isRTL ? 'right' : 'left' }}
+          className="text-2xl text-center text-red-600 mb-6"
+          style={{ textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
+           }}
         >
           {t("auth.forgotPassword.title")}
         </Text>
@@ -62,7 +66,8 @@ export default function ForgotPassword() {
           className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
-            writingDirection: isRTL ? 'rtl' : 'ltr'
+            writingDirection: isRTL ? 'rtl' : 'ltr',
+            fontFamily: AppFonts.semibold,
           }}
         />
         <TouchableOpacity
@@ -70,7 +75,10 @@ export default function ForgotPassword() {
           onPress={handleSendOTP}
         >
           <Text 
-            className="text-white text-center font-semibold text-base"
+            className="text-white text-center text-base"
+            style={{
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {isLoading ? <ActivityIndicator color="#fff" /> : t("auth.forgotPassword.sendOTP")}
           </Text>

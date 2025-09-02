@@ -7,17 +7,19 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    SafeAreaView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import * as yup from "yup";
+import { AppFonts } from "@/utils/fonts";
+
 interface LoginFormValues {
   email: string;
   password: string;
@@ -107,9 +109,10 @@ export default function LoginScreen() {
               className="flex-1 py-3 text-base text-black"
               placeholderTextColor="#888"
               autoCapitalize="none"
-              style={{ 
+              style={{
                 textAlign: isRTL ? 'right' : 'left',
-                writingDirection: isRTL ? 'rtl' : 'ltr'
+                writingDirection: isRTL ? 'rtl' : 'ltr',
+                fontFamily: AppFonts.semibold,
               }}
             />
             {showToggle && (
@@ -123,9 +126,12 @@ export default function LoginScreen() {
             )}
           </View>
           {errors[name] && (
-            <Text 
+            <Text
               className="text-red-600 text-sm mt-1"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {errors[name]?.message}
             </Text>
@@ -142,8 +148,11 @@ export default function LoginScreen() {
           source={require("../../../assets/images/login.png")}
           className="w-40 h-40 self-center mb-6"
         />
-        <Text 
-          className="text-2xl font-bold text-red-600 text-center mb-6"
+        <Text
+          className="text-2xl text-red-600 text-center mb-6"
+          style={{
+            fontFamily: AppFonts.semibold,
+          }}
         >
           {t("auth.login.title")}
         </Text>
@@ -160,9 +169,12 @@ export default function LoginScreen() {
           onPress={() => router.push("/(drawer)/(auth)/ForgotPassword")}
           className="mb-4 self-end"
         >
-          <Text 
-            className="text-sm text-red-600 font-medium"
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className="text-sm text-red-600"
+            style={{
+              textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("auth.login.forgotPassword")}
           </Text>
@@ -175,17 +187,22 @@ export default function LoginScreen() {
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text 
+            <Text
               className="text-white text-center font-semibold text-base"
+              style={{
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("auth.login.signIn")}
             </Text>
           )}
         </TouchableOpacity>
 
-        <Text 
+        <Text
           className="text-center text-gray-500 mb-4"
-          style={{ textAlign: isRTL ? 'right' : 'left' }}
+          style={{ textAlign: isRTL ? 'right' : 'left',
+            fontFamily: AppFonts.semibold,
+           }}
         >
           {t("auth.login.orSignInWith")}
         </Text>
@@ -194,9 +211,11 @@ export default function LoginScreen() {
           onPress={() => Alert.alert("Social Login", "Sign in with Google")}
         >
           <Ionicons name="logo-google" size={20} color="#DB4437" />
-          <Text 
-            className={`text-base font-medium text-gray-800 ${isRTL ? 'mr-3' : 'ml-3'}`}
-            style={{ textAlign: isRTL ? 'right' : 'left' }}
+          <Text
+            className={`text-base text-gray-800 ${isRTL ? 'mr-3' : 'ml-3'}`}
+            style={{ textAlign: isRTL ? 'right' : 'left',
+              fontFamily: AppFonts.semibold,
+             }}
           >
             {t("auth.login.continueWithGoogle")}
           </Text>
@@ -205,8 +224,11 @@ export default function LoginScreen() {
         <TouchableOpacity
           onPress={() => router.push("/(drawer)/(auth)/register")}
         >
-          <Text 
+          <Text
             className="text-red-600 text-center text-sm"
+            style={{
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("auth.login.noAccount")}
           </Text>

@@ -3,25 +3,27 @@ import { useRegisterMutation } from "@/store/api/user/user";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DateTimePicker, {
-    DateTimePickerEvent,
+  DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Image,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Image,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import * as yup from "yup";
+import { AppFonts } from "@/utils/fonts";
+
 
 interface FormValues {
   fullName: string;
@@ -120,14 +122,15 @@ export default function RegisterScreen() {
                 !(showToggle && name === "password"
                   ? showPassword
                   : name === "confirmPassword"
-                  ? showConfirmPassword
-                  : false)
+                    ? showConfirmPassword
+                    : false)
               }
               keyboardType={keyboardType}
               className="flex-1 py-3 text-base text-black"
               placeholderTextColor="#888"
-              style={{ 
+              style={{
                 textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
                 writingDirection: isRTL ? 'rtl' : 'ltr'
               }}
             />
@@ -142,7 +145,7 @@ export default function RegisterScreen() {
                 <Ionicons
                   name={
                     (name === "password" && showPassword) ||
-                    (name === "confirmPassword" && showConfirmPassword)
+                      (name === "confirmPassword" && showConfirmPassword)
                       ? "eye-off"
                       : "eye"
                   }
@@ -153,9 +156,13 @@ export default function RegisterScreen() {
             )}
           </View>
           {errors[name] && (
-            <Text 
+            <Text
               className="text-red-600 text-sm mt-1"
-              style={{ textAlign: isRTL ? 'right' : 'left' }}
+              style={{
+                textAlign: isRTL ? 'right' : 'left',
+                fontFamily: AppFonts.semibold,
+
+              }}
             >
               {errors[name]?.message}
             </Text>
@@ -173,8 +180,11 @@ export default function RegisterScreen() {
             source={require("../../../assets/images/register.png")}
             className="w-40 h-40 self-center mb-6"
           />
-          <Text 
-            className="text-2xl font-bold text-red-600 text-center mb-6"
+          <Text
+            className="text-2xl text-red-600 text-center mb-6"
+            style={{
+              fontFamily: AppFonts.semibold,
+            }}
           >
             {t("auth.register.title")}
           </Text>
@@ -195,18 +205,21 @@ export default function RegisterScreen() {
                   className="border border-gray-300 rounded-md px-4 py-3"
                 >
                   <Text
-                    className={`text-base ${
-                      value ? "text-black" : "text-gray-400"
-                    }`}
-                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    className={`text-base ${value ? "text-black" : "text-gray-400"
+                      }`}
+                    style={{ textAlign: isRTL ? 'right' : 'left',
+                      fontFamily: AppFonts.semibold,
+                     }}
                   >
                     {value || t("auth.register.birthDate")}
                   </Text>
                 </TouchableOpacity>
                 {errors.birthDate && (
-                  <Text 
+                  <Text
                     className="text-red-600 text-sm mt-1"
-                    style={{ textAlign: isRTL ? 'right' : 'left' }}
+                    style={{ textAlign: isRTL ? 'right' : 'left',
+                      fontFamily: AppFonts.semibold,
+                     }}
                   >
                     {errors.birthDate.message}
                   </Text>
@@ -258,8 +271,11 @@ export default function RegisterScreen() {
             className="bg-red-600 py-3 rounded-md mb-4"
             onPress={handleSubmit(onSubmit)}
           >
-            <Text 
-              className="text-white text-center font-semibold text-base"
+            <Text
+              className="text-white text-center text-base"
+              style={{
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {isLoading ? <ActivityIndicator color="#fff" /> : t("auth.register.signUp")}
             </Text>
@@ -268,8 +284,11 @@ export default function RegisterScreen() {
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/(auth)/login")}
           >
-            <Text 
+            <Text
               className="text-red-600 text-center mb-24 text-sm"
+              style={{
+                fontFamily: AppFonts.semibold,
+              }}
             >
               {t("auth.register.haveAccount")}
             </Text>

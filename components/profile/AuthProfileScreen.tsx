@@ -1,7 +1,9 @@
 // components/AuthScreen.js
+import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Dimensions,
@@ -13,9 +15,13 @@ import {
 } from "react-native";
 import Svg, { Circle, Polygon } from "react-native-svg";
 
+
 const { width, height } = Dimensions.get("window");
 
 const AuthScreen = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -92,7 +98,7 @@ const AuthScreen = () => {
   );
 
   return (
-    <View className="flex-1 bg-indigo-500">
+    <View className="flex-1 bg-red-500">
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -100,7 +106,7 @@ const AuthScreen = () => {
       />
 
       <LinearGradient
-        colors={["#667eea", "#764ba2", "#f093fb"]}
+        colors={["#FF512F", "#DD2476"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         className="absolute inset-0"
@@ -142,12 +148,23 @@ const AuthScreen = () => {
         }}
       >
         <View className="items-center mb-16">
-          <Text className="text-2xl text-white/80 font-light tracking-widest">
-            Welcome to
+          <Text
+            className="text-2xl text-white/80 tracking-widest mb-2"
+            style={{ fontFamily: AppFonts.medium, textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("profile.auth.welcome")}
           </Text>
-          <Text className="text-5xl text-white font-bold my-2">YourApp</Text>
-          <Text className="text-base text-white/70 text-center leading-6 mt-3 font-light">
-            Discover amazing features and connect with the world
+          <Text
+            className="text-5xl text-white my-2"
+            style={{ fontFamily: AppFonts.bold, textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("profile.auth.appName")}
+          </Text>
+          <Text
+            className="text-base text-white/70 text-center leading-6 mt-3"
+            style={{ fontFamily: AppFonts.regular, textAlign: isRTL ? 'right' : 'left' }}
+          >
+            {t("profile.auth.subtitle")}
           </Text>
         </View>
 
@@ -165,13 +182,19 @@ const AuthScreen = () => {
             }}
           >
             <LinearGradient
-              colors={["#FF6B6B", "#FF8E53"]}
+              colors={["#FF512F", "#DD2476"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              className="flex-1 justify-center items-center rounded-3xl"
+              className="flex-1 justify-center items-center"
+              style={{
+                borderRadius: 24
+              }}
             >
-              <Text className="text-white text-lg font-bold tracking-widest">
-                LOGIN
+              <Text
+                className="text-white text-lg tracking-widest"
+                style={{ fontFamily: AppFonts.bold }}
+              >
+                {t("profile.auth.login")}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -188,14 +211,20 @@ const AuthScreen = () => {
               elevation: 5,
             }}
           >
-            <Text className="text-white text-lg font-bold tracking-widest">
-              REGISTER
+            <Text
+              className="text-white text-lg tracking-widest"
+              style={{ fontFamily: AppFonts.bold }}
+            >
+              {t("profile.auth.register")}
             </Text>
           </TouchableOpacity>
         </View>
 
-        <Text className="text-white/60 text-xs text-center leading-5 mt-5">
-          By continuing, you agree to our Terms & Privacy Policy
+        <Text
+          className="text-white/60 text-xs text-center leading-5 mt-5"
+          style={{ fontFamily: AppFonts.regular, textAlign: isRTL ? 'right' : 'left' }}
+        >
+          {t("profile.auth.terms")}
         </Text>
       </Animated.View>
 
