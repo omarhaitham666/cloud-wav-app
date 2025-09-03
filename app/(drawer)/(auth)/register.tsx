@@ -1,4 +1,4 @@
-import OTPModal from "@/components/OTPModal";
+import OTPModal from "@/components/modals/OTPModal";
 import { useRegisterMutation } from "@/store/api/user/user";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -24,7 +24,6 @@ import Toast from "react-native-toast-message";
 import * as yup from "yup";
 import { AppFonts } from "@/utils/fonts";
 
-
 interface FormValues {
   fullName: string;
   email: string;
@@ -37,7 +36,7 @@ interface FormValues {
 export default function RegisterScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
   const [otpVisible, setOtpVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,7 +45,10 @@ export default function RegisterScreen() {
 
   const schema = yup.object().shape({
     fullName: yup.string().required(t("auth.validation.fullNameRequired")),
-    email: yup.string().email(t("auth.validation.invalidEmail")).required(t("auth.validation.emailRequired")),
+    email: yup
+      .string()
+      .email(t("auth.validation.invalidEmail"))
+      .required(t("auth.validation.emailRequired")),
     birthDate: yup.string().required(t("auth.validation.birthDateRequired")),
     phone: yup.string().required(t("auth.validation.phoneRequired")),
     password: yup
@@ -89,7 +91,8 @@ export default function RegisterScreen() {
         Toast.show({
           type: "error",
           text1: t("auth.register.alerts.registerFailed"),
-          text2: e?.data?.message || t("auth.register.alerts.registerFailedMessage"),
+          text2:
+            e?.data?.message || t("auth.register.alerts.registerFailedMessage"),
         });
       });
   };
@@ -112,7 +115,11 @@ export default function RegisterScreen() {
       name={name}
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
-          <View className={`flex-row items-center border border-gray-300 rounded-md px-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <View
+            className={`flex-row items-center border border-gray-300 rounded-md px-3 ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
             <TextInput
               placeholder={placeholder}
               value={value}
@@ -122,16 +129,16 @@ export default function RegisterScreen() {
                 !(showToggle && name === "password"
                   ? showPassword
                   : name === "confirmPassword"
-                    ? showConfirmPassword
-                    : false)
+                  ? showConfirmPassword
+                  : false)
               }
               keyboardType={keyboardType}
               className="flex-1 py-3 text-base text-black"
               placeholderTextColor="#888"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
-                writingDirection: isRTL ? 'rtl' : 'ltr'
+                writingDirection: isRTL ? "rtl" : "ltr",
               }}
             />
             {showToggle && (
@@ -145,7 +152,7 @@ export default function RegisterScreen() {
                 <Ionicons
                   name={
                     (name === "password" && showPassword) ||
-                      (name === "confirmPassword" && showConfirmPassword)
+                    (name === "confirmPassword" && showConfirmPassword)
                       ? "eye-off"
                       : "eye"
                   }
@@ -159,9 +166,8 @@ export default function RegisterScreen() {
             <Text
               className="text-red-600 text-sm mt-1"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
-
               }}
             >
               {errors[name]?.message}
@@ -188,7 +194,10 @@ export default function RegisterScreen() {
           >
             {t("auth.register.title")}
           </Text>
-          {renderInput({ name: "fullName", placeholder: t("auth.register.fullName") })}
+          {renderInput({
+            name: "fullName",
+            placeholder: t("auth.register.fullName"),
+          })}
           {renderInput({
             name: "email",
             placeholder: t("auth.register.email"),
@@ -205,11 +214,13 @@ export default function RegisterScreen() {
                   className="border border-gray-300 rounded-md px-4 py-3"
                 >
                   <Text
-                    className={`text-base ${value ? "text-black" : "text-gray-400"
-                      }`}
-                    style={{ textAlign: isRTL ? 'right' : 'left',
+                    className={`text-base ${
+                      value ? "text-black" : "text-gray-400"
+                    }`}
+                    style={{
+                      textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.semibold,
-                     }}
+                    }}
                   >
                     {value || t("auth.register.birthDate")}
                   </Text>
@@ -217,9 +228,10 @@ export default function RegisterScreen() {
                 {errors.birthDate && (
                   <Text
                     className="text-red-600 text-sm mt-1"
-                    style={{ textAlign: isRTL ? 'right' : 'left',
+                    style={{
+                      textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.semibold,
-                     }}
+                    }}
                   >
                     {errors.birthDate.message}
                   </Text>
@@ -277,7 +289,11 @@ export default function RegisterScreen() {
                 fontFamily: AppFonts.semibold,
               }}
             >
-              {isLoading ? <ActivityIndicator color="#fff" /> : t("auth.register.signUp")}
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                t("auth.register.signUp")
+              )}
             </Text>
           </TouchableOpacity>
 

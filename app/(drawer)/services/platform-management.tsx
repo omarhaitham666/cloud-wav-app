@@ -1,7 +1,8 @@
 import ServiceRequestModal, {
   FormData,
-} from "@/components/ServiceRequestModal";
+} from "@/components/modals/ServiceRequestModal";
 import { useServicesMutation } from "@/store/api/global/services";
+import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -23,39 +24,47 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { AppFonts } from "@/utils/fonts";
-
 
 const PlatformManagement = () => {
   const [visible, setVisible] = useState(false);
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
   const [Services, { isLoading }] = useServicesMutation();
 
   const features = [
     {
       title: t("services.platformManagement.features.artistProfile.title"),
-      description: t("services.platformManagement.features.artistProfile.description"),
+      description: t(
+        "services.platformManagement.features.artistProfile.description"
+      ),
       icon: <User size={20} color="#7C3AED" />,
     },
     {
       title: t("services.platformManagement.features.providingRealJob.title"),
-      description: t("services.platformManagement.features.providingRealJob.description"),
+      description: t(
+        "services.platformManagement.features.providingRealJob.description"
+      ),
       icon: <Briefcase size={20} color="#7C3AED" />,
     },
     {
       title: t("services.platformManagement.features.directDownload.title"),
-      description: t("services.platformManagement.features.directDownload.description"),
+      description: t(
+        "services.platformManagement.features.directDownload.description"
+      ),
       icon: <Download size={20} color="#7C3AED" />,
     },
     {
       title: t("services.platformManagement.features.dataSecurity.title"),
-      description: t("services.platformManagement.features.dataSecurity.description"),
+      description: t(
+        "services.platformManagement.features.dataSecurity.description"
+      ),
       icon: <ShieldCheck size={20} color="#7C3AED" />,
     },
     {
       title: t("services.platformManagement.features.ensuringSuccessful.title"),
-      description: t("services.platformManagement.features.ensuringSuccessful.description"),
+      description: t(
+        "services.platformManagement.features.ensuringSuccessful.description"
+      ),
       icon: <TrendingUp size={20} color="#7C3AED" />,
     },
   ];
@@ -125,7 +134,7 @@ const PlatformManagement = () => {
           <Text
             className="text-white text-center my-4 text-lg"
             style={{
-              textAlign: isRTL ? 'right' : 'left',
+              textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,
             }}
           >
@@ -134,14 +143,18 @@ const PlatformManagement = () => {
           <Text
             className="text-white text-base leading-6 mb-6 mt-4"
             style={{
-              textAlign: isRTL ? 'right' : 'left',
+              textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,
             }}
           >
             {t("services.platformManagement.description")}
           </Text>
 
-          <View className={`flex-row justify-between mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <View
+            className={`flex-row justify-between mb-8 ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
             <TouchableOpacity
               onPress={() => router.push("/(drawer)/(tabs)/price")}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
@@ -149,7 +162,7 @@ const PlatformManagement = () => {
               <Text
                 className="text-white text-base"
                 style={{
-                  textAlign: isRTL ? 'right' : 'left',
+                  textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                 }}
               >
@@ -163,7 +176,7 @@ const PlatformManagement = () => {
               <Text
                 className="text-white text-base"
                 style={{
-                  textAlign: isRTL ? 'right' : 'left',
+                  textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                 }}
               >
@@ -182,7 +195,7 @@ const PlatformManagement = () => {
             <Text
               className="text-2xl font-bold text-gray-900 mt-10 mb-6"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             >
@@ -193,7 +206,9 @@ const PlatformManagement = () => {
               {features.map((item, idx) => (
                 <View
                   key={idx}
-                  className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${isRTL ? 'flex-row-reverse' : 'flex-row'} items-center space-x-5`}
+                  className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${
+                    isRTL ? "flex-row-reverse" : "flex-row"
+                  } items-center space-x-5`}
                   style={{
                     shadowColor: "#7C3AED",
                     shadowOpacity: 0.1,
@@ -201,14 +216,18 @@ const PlatformManagement = () => {
                     elevation: 3,
                   }}
                 >
-                  <View className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${isRTL ? 'ml-2' : 'mr-2'}`}>
+                  <View
+                    className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${
+                      isRTL ? "ml-2" : "mr-2"
+                    }`}
+                  >
                     {item.icon}
                   </View>
                   <View className="flex-1">
                     <Text
                       className="text-lg text-gray-900"
                       style={{
-                        textAlign: isRTL ? 'right' : 'left',
+                        textAlign: isRTL ? "right" : "left",
                         fontFamily: AppFonts.semibold,
                       }}
                     >
@@ -217,7 +236,7 @@ const PlatformManagement = () => {
                     <Text
                       className="text-sm text-gray-600 mt-1 leading-snug"
                       style={{
-                        textAlign: isRTL ? 'right' : 'left',
+                        textAlign: isRTL ? "right" : "left",
                         fontFamily: AppFonts.semibold,
                       }}
                     >

@@ -439,7 +439,7 @@
       "register": "Register",
       "logout": "Logout",
       "loggingOut": "Logging Out",
-      "creators":"Creators"
+      "creators": "Creators"
     },
     "footer": {
       "brand": "CloudWav Production",
@@ -468,6 +468,14 @@
       "login": "LOGIN",
       "register": "REGISTER",
       "terms": "By continuing, you agree to our Terms & Privacy Policy"
+    },
+    "user": {
+      "editProfile": "Edit Profile",
+      "fullName": "Full Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "saveChanges": "Save Changes"
     },
     "dashboard": {
       "welcomeBack": "Welcome Back!",

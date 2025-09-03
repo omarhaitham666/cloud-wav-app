@@ -1,5 +1,5 @@
-import AuthScreen from "@/components/profile/AuthProfileScreen";
-import ProfileDashboard from "@/components/profile/ProfileDashboard";
+import AuthProfile from "@/components/profile/AuthProfile";
+import ProfileUser from "@/components/profile/ProfileUser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -32,7 +32,7 @@ const Profile = () => {
     );
   }
 
-  return isAuthenticated ? <ProfileDashboard /> : <AuthScreen />;
+  return !isAuthenticated ? <ProfileUser /> : <AuthProfile />;
 };
 
 export default Profile;

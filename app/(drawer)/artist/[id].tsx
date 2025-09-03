@@ -1,5 +1,5 @@
-import AlbumCard from "@/components/AlbumCard";
-import { SongCard } from "@/components/SongCard";
+import AlbumCard from "@/components/cards/AlbumCard";
+import { SongCard } from "@/components/cards/SongCard";
 import { Albums } from "@/store/api/global/albums";
 import { useGetArtistQuery } from "@/store/api/global/artists";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -31,100 +30,109 @@ const ArtistProfile = () => {
     );
   }
 
+  const renderSong = ({ item }: any) => (
+    <View className="flex-1 m-2">
+      <SongCard
+        id={item.id}
+        title={item.title}
+        artist={(artistData?.name as string) || ""}
+        audio_url={item.song_path}
+        cover_url={item.cover_path}
+      />
+    </View>
+  );
+
   return (
-    <ScrollView
-      className="flex-1 bg-gray-50"
-      contentContainerStyle={{ flexGrow: 1 }}
+    <FlatList
+      data={artistData?.songs || []}
+      keyExtractor={(item) => item.id.toString()}
       showsVerticalScrollIndicator={false}
-    >
-      <LinearGradient
-        colors={["#4f46e5", "#6d28d9"]}
-        className="pt-12 pb-10 px-5"
-      >
-        <StatusBar barStyle="light-content" />
-
-        <View className="flex-row justify-between items-center mb-8">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white/20 justify-center items-center"
+      numColumns={2}
+      columnWrapperStyle={{ justifyContent: "space-between" }}
+      contentContainerStyle={{ paddingBottom: 40 }}
+      renderItem={renderSong}
+      ListHeaderComponent={
+        <>
+          <LinearGradient
+            colors={["#4f46e5", "#6d28d9"]}
+            className="pt-12 pb-10 px-5"
           >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-10 h-10 rounded-full bg-white/20 justify-center items-center">
-            <Ionicons name="ellipsis-horizontal" size={22} color="#fff" />
-          </TouchableOpacity>
-        </View>
+            <StatusBar barStyle="light-content" />
 
-        <View className="items-center mb-6">
-          <View className="relative mb-4">
-            <Image
-              source={{ uri: artistData?.profile_image }}
-              className="w-36 h-36 rounded-full border-4 border-white"
-              style={{ resizeMode: "cover" }}
-            />
-            <View className="absolute bottom-2 right-1 w-8 h-8 rounded-full bg-green-500 justify-center items-center border-2 border-white shadow-lg">
-              <Ionicons name="checkmark" size={18} color="#fff" />
+            <View className="flex-row justify-between items-center mb-8">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                className="w-10 h-10 rounded-full bg-white/20 justify-center items-center"
+              >
+                <Ionicons name="arrow-back" size={22} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity className="w-10 h-10 rounded-full bg-white/20 justify-center items-center">
+                <Ionicons name="ellipsis-horizontal" size={22} color="#fff" />
+              </TouchableOpacity>
             </View>
-          </View>
 
-          <Text className="text-2xl font-bold text-white mb-1 text-center">
-            {artistData?.name}
-          </Text>
-          <Text className="text-sm text-white/90">{artistData?.division}</Text>
-        </View>
-      </LinearGradient>
+            <View className="items-center mb-6">
+              <View className="relative mb-4">
+                <Image
+                  source={{ uri: artistData?.profile_image }}
+                  className="w-36 h-36 rounded-full border-4 border-white"
+                  style={{ resizeMode: "cover" }}
+                />
+                <View className="absolute bottom-2 right-1 w-8 h-8 rounded-full bg-green-500 justify-center items-center border-2 border-white shadow-lg">
+                  <Ionicons name="checkmark" size={18} color="#fff" />
+                </View>
+              </View>
 
-      <View className="px-5 mt-6 ">
-        <View className="mb-6">
-          <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-2xl font-bold text-white mb-1 text-center">
+                {artistData?.name}
+              </Text>
+              <Text className="text-sm text-white/90">
+                {artistData?.division}
+              </Text>
+            </View>
+          </LinearGradient>
+
+          <View className="px-5 mt-6 mb-4">
             <Text className="text-xl font-bold text-gray-800">All Songs</Text>
           </View>
+        </>
+      }
+      ListFooterComponent={
+        <>
+          <View className="px-5 mb-6">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-xl font-bold text-gray-800">
+                All Albums
+              </Text>
+            </View>
 
-          <FlatList
-            data={artistData?.songs || []}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            renderItem={({ item }) => (
-              <SongCard
-                id={item.id}
-                title={item.title}
-                artist={(artistData?.name as string) || ""}
-                audio_url={item.song_path}
-                cover_url={item.cover_path}
-              />
-            )}
-          />
-        </View>
-
-        <View className="mb-6">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-xl font-bold text-gray-800">All Albums</Text>
+            <FlatList
+              data={(artistData?.albums as Albums[]) || []}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: 10,
+              }}
+              renderItem={({ item }) => (
+                <AlbumCard
+                  id={item.id}
+                  title={(artistData?.name as string) || ""}
+                  imageUrl={item.album_cover}
+                />
+              )}
+              ListEmptyComponent={() => (
+                <View className="flex items-center mx-auto justify-center py-10 w-full">
+                  <Text className="text-gray-500 text-base">
+                    No albums found
+                  </Text>
+                </View>
+              )}
+            />
           </View>
-
-          <FlatList
-            data={(artistData?.albums as Albums[]) || []}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10 }}
-            renderItem={({ item }) => (
-              <AlbumCard
-                id={item.id}
-                title={(artistData?.name as string) || ""}
-                imageUrl={item.album_cover}
-              />
-            )}
-            ListEmptyComponent={() => (
-              <View className="flex items-center mx-auto justify-center py-10 w-full">
-                <Text className="text-gray-500 text-base">No albums found</Text>
-              </View>
-            )}
-          />
-        </View>
-        <View className="h-20" />
-      </View>
-    </ScrollView>
+        </>
+      }
+    />
   );
 };
 

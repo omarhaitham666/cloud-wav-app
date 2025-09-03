@@ -1,4 +1,4 @@
-import CreatorCard from "@/components/CreatorCard";
+import CreatorCard from "@/components/cards/CreatorCard";
 import { useSearchCreatorQuery } from "@/store/api/global/search";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
+import Icon from "react-native-vector-icons/Feather";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -24,7 +24,6 @@ const Search = () => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
 
-  // Fixed: Use searchQuery directly, don't skip empty queries
   const { data, refetch, isLoading } = useSearchCreatorQuery(searchQuery);
 
   useEffect(() => {
@@ -43,49 +42,24 @@ const Search = () => {
   }, []);
 
   const categories = [
-    { id: "all", label: "All", emoji: "🎭" },
-    { id: "actor", label: "Actors", emoji: "🎬" },
-    { id: "musician", label: "Musicians", emoji: "🎵" },
-    { id: "content", label: "Content Creators", emoji: "📹" },
-    { id: "youtuber", label: "YouTubers", emoji: "📺" },
-    { id: "athlete", label: "Athletes", emoji: "⚽" },
-    { id: "public", label: "Public Figures", emoji: "👑" },
-    { id: "tiktoker", label: "TikTokers", emoji: "🎪" },
+    { id: "all", label: "All", icon: "grid" },
+    { id: "actor", label: "Actors", icon: "video" },
+    { id: "musician", label: "Musicians", icon: "music" },
+    { id: "content", label: "Content Creators", icon: "camera" },
+    { id: "youtuber", label: "YouTubers", icon: "play" },
+    { id: "athlete", label: "Athletes", icon: "award" },
+    { id: "public", label: "Public Figures", icon: "users" },
+    { id: "tiktoker", label: "TikTokers", icon: "zap" },
   ];
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    // Auto-trigger search after a delay
     if (query.length > 0) {
       setTimeout(() => {
         refetch();
       }, 500);
     }
   };
-
-  const SearchIcon = () => (
-    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-      <Circle cx="11" cy="11" r="8" stroke="#6B7280" strokeWidth="2" />
-      <Path
-        d="m21 21-4.35-4.35"
-        stroke="#6B7280"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </Svg>
-  );
-
-  const CloseIcon = () => (
-    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M18 6L6 18M6 6l12 12"
-        stroke="#6B7280"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
 
   const handleCategoryPress = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -96,13 +70,11 @@ const Search = () => {
     }
   };
 
-  // Fixed: Handle popular category press
   const handlePopularCategoryPress = (categoryType: string) => {
     setActiveCategory(categoryType);
     setSearchQuery(categoryType);
   };
 
-  // Header component
   const renderHeader = () => (
     <View>
       <StatusBar
@@ -147,7 +119,7 @@ const Search = () => {
           }}
         >
           <View className="bg-white rounded-2xl flex-row items-center px-4 py-3 shadow-sm border border-gray-200">
-            <SearchIcon />
+            <Icon name="search" size={20} color="#6B7280" />
             <TextInput
               className="flex-1 text-gray-900 text-base ml-3 placeholder:text-gray-500"
               placeholder="Search creators by name or category..."
@@ -165,7 +137,7 @@ const Search = () => {
                 }}
                 className="w-6 h-6 bg-gray-300 rounded-full justify-center items-center"
               >
-                <CloseIcon />
+                <Icon name="x" size={12} color="#6B7280" />
               </TouchableOpacity>
             )}
           </View>
@@ -192,7 +164,12 @@ const Search = () => {
                 } shadow-sm`}
                 activeOpacity={0.8}
               >
-                <Text className="text-lg mr-2">{category.emoji}</Text>
+                <Icon
+                  name={category.icon}
+                  size={16}
+                  color={activeCategory === category.id ? "#ffffff" : "#374151"}
+                  style={{ marginRight: 8 }}
+                />
                 <Text
                   className={`font-medium ${
                     activeCategory === category.id
@@ -224,7 +201,7 @@ const Search = () => {
       return (
         <View className="items-center py-12">
           <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
-            <Text className="text-4xl">😔</Text>
+            <Icon name="search" size={32} color="#9CA3AF" />
           </View>
           <Text className="text-gray-900 text-xl font-bold mb-2">
             No Results Found
@@ -240,7 +217,7 @@ const Search = () => {
     return (
       <View className="items-center py-12">
         <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
-          <Text className="text-4xl">🔍</Text>
+          <Icon name="search" size={32} color="#fff" />
         </View>
         <Text className="text-gray-900 text-xl font-bold mb-2">
           Start Searching
@@ -251,6 +228,7 @@ const Search = () => {
       </View>
     );
   };
+
   const renderFooter = () => (
     <View className="px-6 mt-8 mb-20">
       <Text className="text-gray-900 text-xl font-bold mb-4">
@@ -262,7 +240,12 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("actor")}
           className="flex-1 bg-white rounded-xl p-4 mr-2 shadow-sm border border-gray-200"
         >
-          <Text className="text-2xl mb-2">🎬</Text>
+          <Icon
+            name="video"
+            size={24}
+            color="#3B82F6"
+            style={{ marginBottom: 8 }}
+          />
           <Text className="text-gray-900 font-medium">Actors</Text>
           <Text className="text-gray-600 text-sm">Movie & TV Stars</Text>
         </TouchableOpacity>
@@ -271,7 +254,12 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("musician")}
           className="flex-1 bg-white rounded-xl p-4 ml-2 shadow-sm border border-gray-200"
         >
-          <Text className="text-2xl mb-2">🎵</Text>
+          <Icon
+            name="music"
+            size={24}
+            color="#3B82F6"
+            style={{ marginBottom: 8 }}
+          />
           <Text className="text-gray-900 font-medium">Musicians</Text>
           <Text className="text-gray-600 text-sm">Artists & Singers</Text>
         </TouchableOpacity>
@@ -282,7 +270,12 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("youtuber")}
           className="flex-1 bg-white rounded-xl p-4 mr-2 shadow-sm border border-gray-200"
         >
-          <Text className="text-2xl mb-2">📺</Text>
+          <Icon
+            name="play"
+            size={24}
+            color="#3B82F6"
+            style={{ marginBottom: 8 }}
+          />
           <Text className="text-gray-900 font-medium">YouTubers</Text>
           <Text className="text-gray-600 text-sm">Content Creators</Text>
         </TouchableOpacity>
@@ -291,7 +284,12 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("tiktoker")}
           className="flex-1 bg-white rounded-xl p-4 ml-2 shadow-sm border border-gray-200"
         >
-          <Text className="text-2xl mb-2">🎪</Text>
+          <Icon
+            name="zap"
+            size={24}
+            color="#3B82F6"
+            style={{ marginBottom: 8 }}
+          />
           <Text className="text-gray-900 font-medium">TikTokers</Text>
           <Text className="text-gray-600 text-sm">Short Video Stars</Text>
         </TouchableOpacity>

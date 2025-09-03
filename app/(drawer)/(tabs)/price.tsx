@@ -1,4 +1,4 @@
-import { PricingCard } from "@/components/PricingCard";
+import { PricingCard } from "@/components/cards/PricingCard";
 import { pricingPlans } from "@/utils/data";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PricingScreen() {
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
 
   const [isYearly, setIsYearly] = useState(false);
   const toggleAnimation = useSharedValue(0);
@@ -29,7 +29,6 @@ export default function PricingScreen() {
     setIsYearly(true);
     toggleAnimation.value = withTiming(1, { duration: 300 });
   };
-
 
   const toggleSwitchStyle = useAnimatedStyle(() => {
     const translateX = interpolate(toggleAnimation.value, [0, 1], [4, 84]);
@@ -55,8 +54,8 @@ export default function PricingScreen() {
               className="text-3xl text-gray-800 mb-4 text-center"
               style={{
                 fontFamily: AppFonts.bold,
-                textAlign: isRTL ? 'right' : 'left',
-                writingDirection: isRTL ? 'rtl' : 'ltr'
+                textAlign: isRTL ? "right" : "left",
+                writingDirection: isRTL ? "rtl" : "ltr",
               }}
             >
               {t("pricing.title")}
@@ -65,28 +64,30 @@ export default function PricingScreen() {
               className="text-base text-gray-600 text-center leading-6 px-4"
               style={{
                 fontFamily: AppFonts.medium,
-                writingDirection: isRTL ? 'rtl' : 'ltr'
+                writingDirection: isRTL ? "rtl" : "ltr",
               }}
             >
               {t("pricing.subtitle")}
             </Text>
           </View>
           {isYearly && (
-              <View className="self-center mb-4 px-3 py-1 rounded-full bg-green-50 border border-green-200">
-                <Text
-                  className="text-green-700 text-sm font-medium"
-                  style={{
-                    fontFamily: AppFonts.medium,
-                    textAlign: 'center',
-                    writingDirection: isRTL ? 'rtl' : 'ltr'
-                  }}
-                >
-                  {t("pricing.toggle.savings")}
-                </Text>
-              </View>
-            )}
+            <View className="self-center mb-4 px-3 py-1 rounded-full bg-green-50 border border-green-200">
+              <Text
+                className="text-green-700 text-sm font-medium"
+                style={{
+                  fontFamily: AppFonts.medium,
+                  textAlign: "center",
+                  writingDirection: isRTL ? "rtl" : "ltr",
+                }}
+              >
+                {t("pricing.toggle.savings")}
+              </Text>
+            </View>
+          )}
           <View className="items-center mb-10">
-            <View className={`flex-row w-44 h-[50px] border border-gray-200 rounded-full relative bg-gray-50 shadow-sm`}>
+            <View
+              className={`flex-row w-44 h-[50px] border border-gray-200 rounded-full relative bg-gray-50 shadow-sm`}
+            >
               <Animated.View
                 style={[
                   toggleSwitchStyle,
@@ -94,7 +95,7 @@ export default function PricingScreen() {
                     position: "absolute",
                     zIndex: 1,
                     left: -2,
-                  }
+                  },
                 ]}
                 className="w-[4.8rem] h-12 mt-1 bg-red-500 rounded-full shadow-xl"
               />
@@ -103,16 +104,17 @@ export default function PricingScreen() {
                 activeOpacity={0.7}
                 className="flex-1 items-center justify-center z-10"
                 style={{
-                  transform: [{ scale: !isYearly ? 1 : 0.98 }]
+                  transform: [{ scale: !isYearly ? 1 : 0.98 }],
                 }}
               >
                 <Text
-                  className={`text-sm font-semibold ${!isYearly ? "text-white" : "text-gray-700"
-                    }`}
+                  className={`text-sm font-semibold ${
+                    !isYearly ? "text-white" : "text-gray-700"
+                  }`}
                   style={{
                     fontFamily: AppFonts.semibold,
-                    textAlign: 'center',
-                    writingDirection: isRTL ? 'rtl' : 'ltr'
+                    textAlign: "center",
+                    writingDirection: isRTL ? "rtl" : "ltr",
                   }}
                 >
                   {t("pricing.toggle.monthly")}
@@ -124,17 +126,18 @@ export default function PricingScreen() {
                 activeOpacity={0.7}
                 className="flex-1 items-center justify-center z-10"
                 style={{
-                  transform: [{ scale: isYearly ? 1 : 0.98 }]
+                  transform: [{ scale: isYearly ? 1 : 0.98 }],
                 }}
               >
                 <View className="items-center">
                   <Text
-                    className={`text-sm font-semibold ${isYearly ? "text-white" : "text-gray-700"
-                      }`}
+                    className={`text-sm font-semibold ${
+                      isYearly ? "text-white" : "text-gray-700"
+                    }`}
                     style={{
                       fontFamily: AppFonts.semibold,
-                      textAlign: 'center',
-                      writingDirection: isRTL ? 'rtl' : 'ltr'
+                      textAlign: "center",
+                      writingDirection: isRTL ? "rtl" : "ltr",
                     }}
                   >
                     {t("pricing.toggle.yearly")}

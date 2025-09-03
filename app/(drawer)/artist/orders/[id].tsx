@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 
-import CreatorOrderModal from "@/components/CreatorOrderModal";
+import CreatorOrderModal from "@/components/modals/CreatorOrderModal";
 import {
   useGetVedioCreatersQuery,
   useGetVediosQuery,

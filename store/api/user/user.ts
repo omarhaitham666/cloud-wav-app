@@ -7,6 +7,17 @@ export interface AuthUser {
   avatar_url?: string | null;
 }
 
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  request_status: string;
+  video_creator_id: null;
+  private_price: null;
+  bussiness_price: null;
+  artist_id: null;
+}
 export interface Tokens {
   accessToken: string;
   refreshToken?: string;
@@ -100,6 +111,28 @@ const authApi = mainApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    getUser: builder.query<User, void>({
+      query: () => ({
+        url: "/user",
+        method: "GET",
+      }),
+    }),
+    UpdateUser: builder.mutation<
+      User,
+      {
+        new_name: string;
+        email: string;
+        password: string;
+        password_confirmation: string;
+        type: string;
+      }
+    >({
+      query: (body) => ({
+        url: "/update-name",
+        method: "PUST",
+        data: body,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
@@ -111,6 +144,8 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useLogoutMutation,
+  useGetUserQuery,
+  useUpdateUserMutation,
 } = authApi;
 
 export default authApi;

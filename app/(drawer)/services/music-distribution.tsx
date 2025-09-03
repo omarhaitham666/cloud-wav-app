@@ -1,4 +1,4 @@
-import MusicServiceModal from "@/components/MusicServiceModal";
+import MusicServiceModal from "@/components/modals/MusicServiceModal";
 import { services } from "@/utils/data";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,7 +19,7 @@ import { AppFonts } from "@/utils/fonts";
 const MusicDistribution = () => {
   const [visible, setVisible] = useState(false);
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
 
   return (
     <LinearGradient
@@ -29,15 +29,15 @@ const MusicDistribution = () => {
       className="flex-1"
     >
       <SafeAreaView className="flex-1 py-3">
-        <View className="flex-row items-center px-5 pt-10"
-        >
+        <View className="flex-row items-center px-5 pt-10">
           <TouchableOpacity
             onPress={() => router.push("/(drawer)/services/services")}
             className="p-2 bg-white/20 rounded-full"
           >
             <Ionicons name="arrow-back" size={22} color="#fff" />
           </TouchableOpacity>
-          <Text className="text-white text-lg ms-4"
+          <Text
+            className="text-white text-lg ms-4"
             style={{
               fontFamily: AppFonts.semibold,
             }}
@@ -50,14 +50,16 @@ const MusicDistribution = () => {
           showsVerticalScrollIndicator={false}
           className="flex-1 px-5"
         >
-          <Text className="text-white text-center my-4 text-lg ml-4"
+          <Text
+            className="text-white text-center my-4 text-lg ml-4"
             style={{
               fontFamily: AppFonts.semibold,
             }}
           >
             {t("services.musicDistribution.title")}
           </Text>
-          <Text className="text-white text-base leading-6 mb-6 mt-4"
+          <Text
+            className="text-white text-base leading-6 mb-6 mt-4"
             style={{
               fontFamily: AppFonts.semibold,
             }}
@@ -70,7 +72,8 @@ const MusicDistribution = () => {
               onPress={() => setVisible(true)}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base"
+              <Text
+                className="text-white text-base"
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}
@@ -82,7 +85,8 @@ const MusicDistribution = () => {
               onPress={() => router.push("/(drawer)/contact/contact")}
               className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
             >
-              <Text className="text-white text-base"
+              <Text
+                className="text-white text-base"
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}
@@ -93,9 +97,10 @@ const MusicDistribution = () => {
           </View>
 
           <View className="mb-8">
-            <Text className="text-xl font-bold text-white mb-4"
+            <Text
+              className="text-xl font-bold text-white mb-4"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             >
@@ -108,7 +113,7 @@ const MusicDistribution = () => {
               >
                 <View
                   className="flex-row items-center mb-2"
-                  style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}
+                  style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
                 >
                   <Ionicons name={service.icon as any} size={22} color="#fff" />
                   <Text
@@ -116,7 +121,7 @@ const MusicDistribution = () => {
                     style={{
                       marginLeft: isRTL ? 0 : 8,
                       marginRight: isRTL ? 8 : 0,
-                      textAlign: isRTL ? 'right' : 'left',
+                      textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.semibold,
                     }}
                   >
@@ -126,7 +131,7 @@ const MusicDistribution = () => {
                 <Text
                   className="text-teal-100 text-sm leading-5"
                   style={{
-                    textAlign: isRTL ? 'right' : 'left',
+                    textAlign: isRTL ? "right" : "left",
                     fontFamily: AppFonts.semibold,
                   }}
                 >
@@ -148,7 +153,7 @@ const MusicDistribution = () => {
             <Text
               className="text-lg font-bold text-gray-900 mb-4"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             >
@@ -159,7 +164,7 @@ const MusicDistribution = () => {
               placeholder={t("services.musicDistribution.form.name")}
               placeholderTextColor="#888"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             />
@@ -168,7 +173,7 @@ const MusicDistribution = () => {
               placeholder={t("services.musicDistribution.form.email")}
               placeholderTextColor="#888"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             />
@@ -178,15 +183,16 @@ const MusicDistribution = () => {
               placeholderTextColor="#888"
               multiline
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             />
             <TouchableOpacity className="bg-blue-600 py-3 rounded-xl items-center">
-              <Text className="text-white text-base font-medium"
-              style={{
-                fontFamily: AppFonts.semibold,
-              }}
+              <Text
+                className="text-white text-base font-medium"
+                style={{
+                  fontFamily: AppFonts.semibold,
+                }}
               >
                 {t("services.musicDistribution.form.sendMessage")}
               </Text>

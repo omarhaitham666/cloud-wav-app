@@ -1,8 +1,8 @@
-import AlbumCard from "@/components/AlbumCard";
-import ArtistCard from "@/components/ArtistCard";
 import BannerMusic from "@/components/BannerMusic";
+import AlbumCard from "@/components/cards/AlbumCard";
+import ArtistCard from "@/components/cards/ArtistCard";
+import { SongCard } from "@/components/cards/SongCard";
 import SectionHeader from "@/components/SectionHeader";
-import { SongCard } from "@/components/SongCard";
 import {
   Albums,
   useGetalbumsQuery,
@@ -53,8 +53,6 @@ const Music = () => {
     useGetSongByDivisionQuery(activeGenre === "All Genres" ? "" : activeGenre, {
       skip: activeGenre === "All Genres",
     });
-  console.log(songsByDivision, "songsByDivision");
-
   const browseCategories: BrowseCategory[] = [
     { name: "Home", filter: "home", data: null },
     { name: "Trending songs", filter: "tsongs", data: trendSongs },
@@ -146,7 +144,7 @@ const Music = () => {
             <SongCard
               id={item.id}
               title={item.title}
-              artist={item.artist_name ?? "Unknown Artist"}
+              artist={item.artist_name ?? item.artist}
               audio_url={item.song_url ?? item.audio_url}
               cover_url={item.cover_url}
             />
@@ -357,7 +355,6 @@ const Music = () => {
           </ScrollView>
         </View>
 
-        {/* Genres - Always visible */}
         <View className="mb-8">
           <View className="px-5 mb-4">
             <Text className="text-2xl font-bold text-gray-900">Genres</Text>
@@ -397,6 +394,8 @@ const Music = () => {
         </View>
 
         <View className="px-0">{getFilteredContent()}</View>
+
+        <View className="h-16" />
       </ScrollView>
     </View>
   );

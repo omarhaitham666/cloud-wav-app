@@ -11,6 +11,7 @@ export interface Songs {
   isLiked?: boolean;
   plays?: number;
   debug_path?: string;
+  cover_image?: string;
   artist_name?: string;
   song_url?: string;
 }
@@ -35,6 +36,13 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    getSongStreem: builder.query<Songs, string>({
+      query: (id) => ({
+        url: `/songs/${id}/stream`,
+        method: "GET",
+        responseType: "blob",
+      }),
+    }),
     getSongByDivision: builder.query<Songs, string>({
       query: (name) => ({
         url: `/songs/division/${name}`,
@@ -49,4 +57,5 @@ export const {
   useGetSongsQuery,
   useGetSongQuery,
   useGetSongByDivisionQuery,
+  useGetSongStreemQuery,
 } = songApi;

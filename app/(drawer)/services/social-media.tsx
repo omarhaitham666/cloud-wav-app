@@ -13,33 +13,36 @@ import {
 
 import ServiceRequestModal, {
   FormData,
-} from "@/components/ServiceRequestModal";
+} from "@/components/modals/ServiceRequestModal";
 import { useServicesMutation } from "@/store/api/global/services";
+import { AppFonts } from "@/utils/fonts";
 import { Lightbulb, Megaphone, ShieldCheck } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
-import { AppFonts } from "@/utils/fonts";
-
 
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
 
   const [Services, { isLoading }] = useServicesMutation();
 
   const services = [
     {
       title: t("services.socialMedia.services.creatingPlatforms.title"),
-      description: t("services.socialMedia.services.creatingPlatforms.description"),
+      description: t(
+        "services.socialMedia.services.creatingPlatforms.description"
+      ),
       price: t("services.socialMedia.services.creatingPlatforms.price"),
       icon: <Lightbulb size={26} color="#6D28D9" />,
       type: t("services.socialMedia.services.creatingPlatforms.type"),
     },
     {
       title: t("services.socialMedia.services.recoverAccounts.title"),
-      description: t("services.socialMedia.services.recoverAccounts.description"),
+      description: t(
+        "services.socialMedia.services.recoverAccounts.description"
+      ),
       price: t("services.socialMedia.services.recoverAccounts.price"),
       icon: <ShieldCheck size={26} color="#6D28D9" />,
       type: t("services.socialMedia.services.recoverAccounts.type"),
@@ -117,7 +120,7 @@ const SocialMedia = () => {
           <Text
             className="text-white text-center my-4 text-lg"
             style={{
-              textAlign: isRTL ? 'right' : 'left',
+              textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,
             }}
           >
@@ -126,14 +129,18 @@ const SocialMedia = () => {
           <Text
             className="text-white text-base leading-6 mb-6 mt-4"
             style={{
-              textAlign: isRTL ? 'right' : 'left',
+              textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,
             }}
           >
             {t("services.socialMedia.description")}
           </Text>
 
-          <View className={`flex-row justify-between mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <View
+            className={`flex-row justify-between mb-8 ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
             <TouchableOpacity
               onPress={() => {
                 setSelectedService("account_creation");
@@ -144,7 +151,7 @@ const SocialMedia = () => {
               <Text
                 className="text-white text-base"
                 style={{
-                  textAlign: isRTL ? 'right' : 'left',
+                  textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                 }}
               >
@@ -158,7 +165,7 @@ const SocialMedia = () => {
               <Text
                 className="text-white text-base"
                 style={{
-                  textAlign: isRTL ? 'right' : 'left',
+                  textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                 }}
               >
@@ -179,7 +186,7 @@ const SocialMedia = () => {
             <Text
               className="text-2xl text-gray-900 mt-10 mb-6"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             >
@@ -192,14 +199,22 @@ const SocialMedia = () => {
                   key={idx}
                   className="bg-white rounded-2xl p-5 my-2 shadow-md border border-gray-100"
                 >
-                  <View className={`flex-row items-center space-x-4 mb-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                    <View className={`bg-purple-100 p-3 rounded-xl ${isRTL ? 'ml-2' : 'mr-2'}`}>
+                  <View
+                    className={`flex-row items-center space-x-4 mb-3 ${
+                      isRTL ? "flex-row-reverse" : ""
+                    }`}
+                  >
+                    <View
+                      className={`bg-purple-100 p-3 rounded-xl ${
+                        isRTL ? "ml-2" : "mr-2"
+                      }`}
+                    >
                       {service.icon}
                     </View>
                     <Text
                       className="text-lg text-gray-900 flex-1"
                       style={{
-                        textAlign: isRTL ? 'right' : 'left',
+                        textAlign: isRTL ? "right" : "left",
                         fontFamily: AppFonts.semibold,
                       }}
                     >
@@ -208,7 +223,7 @@ const SocialMedia = () => {
                     <Text
                       className="text-purple-700"
                       style={{
-                        textAlign: isRTL ? 'right' : 'left',
+                        textAlign: isRTL ? "right" : "left",
                         fontFamily: AppFonts.semibold,
                       }}
                     >
@@ -218,14 +233,16 @@ const SocialMedia = () => {
                   <Text
                     className="text-sm text-gray-600 leading-relaxed mb-4"
                     style={{
-                      textAlign: isRTL ? 'right' : 'left',
+                      textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.semibold,
                     }}
                   >
                     {service.description}
                   </Text>
                   <TouchableOpacity
-                    className={`bg-purple-600 px-5 py-2 rounded-full ${isRTL ? 'self-end' : 'self-start'}`}
+                    className={`bg-purple-600 px-5 py-2 rounded-full ${
+                      isRTL ? "self-end" : "self-start"
+                    }`}
                     onPress={() => {
                       setSelectedService(service.type);
                       setVisible(true);
@@ -234,7 +251,7 @@ const SocialMedia = () => {
                     <Text
                       className="text-white text-sm font-medium"
                       style={{
-                        textAlign: isRTL ? 'right' : 'left',
+                        textAlign: isRTL ? "right" : "left",
                         fontFamily: AppFonts.semibold,
                       }}
                     >

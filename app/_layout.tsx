@@ -10,7 +10,6 @@ import "./global.css";
 export default function RootLayout() {
   const fontsLoaded = useAppFonts();
 
-  // Show a loader until fonts are ready
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

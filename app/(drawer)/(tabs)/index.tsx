@@ -1,6 +1,6 @@
 import CustomHeader from "@/components/CustomHeader";
 import ServicesSection from "@/components/ServicesSection";
-import { SongCard } from "@/components/SongCard";
+import { SongCard } from "@/components/cards/SongCard";
 import { useGetTrendSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
@@ -20,7 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
   const { data, isLoading } = useGetTrendSongQuery();
 
   return (
@@ -40,7 +40,7 @@ const HomePage = () => {
               className="text-white text-xs mb-1"
               style={{
                 fontFamily: AppFonts.semibold,
-                textAlign: isRTL ? 'right' : 'left'
+                textAlign: isRTL ? "right" : "left",
               }}
             >
               {t("home.brand")}
@@ -50,7 +50,7 @@ const HomePage = () => {
               className="text-white text-2xl leading-7"
               style={{
                 fontFamily: AppFonts.semibold,
-                textAlign: isRTL ? 'right' : 'left'
+                textAlign: isRTL ? "right" : "left",
               }}
             >
               {t("home.hero.title")}
@@ -60,7 +60,7 @@ const HomePage = () => {
               className="text-white text-base mb-4"
               style={{
                 fontFamily: AppFonts.semibold,
-                textAlign: isRTL ? 'right' : 'left'
+                textAlign: isRTL ? "right" : "left",
               }}
             >
               {t("home.hero.subtitle")}
@@ -71,7 +71,8 @@ const HomePage = () => {
                 onPress={() => router.push("/music")}
                 className="bg-white flex-row items-center gap-3 px-4 py-2.5 rounded-full"
               >
-                <Text className="text-red-500 text-sm"
+                <Text
+                  className="text-red-500 text-sm"
                   style={{
                     fontFamily: AppFonts.semibold,
                   }}
@@ -89,7 +90,7 @@ const HomePage = () => {
             className="text-2xl mx-3 mb-4"
             style={{
               fontFamily: AppFonts.semibold,
-              textAlign: isRTL ? 'right' : 'left'
+              textAlign: isRTL ? "right" : "left",
             }}
           >
             {t("home.sections.trendingSongs")}
@@ -119,6 +120,7 @@ const HomePage = () => {
             />
           )}
         </View>
+        <View className="h-16" />
       </ScrollView>
     </SafeAreaView>
   );

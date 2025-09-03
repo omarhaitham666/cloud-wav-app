@@ -1,5 +1,5 @@
-import CreatorCard from "@/components/CreatorCard";
-import CreatorRegister from "@/components/CreatorRegisterModal";
+import CreatorCard from "@/components/cards/CreatorCard";
+import CreatorRegister from "@/components/modals/CreatorRegisterModal";
 import {
   useTopVideoCreatorsAllQuery,
   useTopVideoCreatorsQuery,

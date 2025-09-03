@@ -13,11 +13,30 @@ export interface Albums {
   album_cover: string;
   songs: Songs[];
 }
+
+export interface AlbumsResponse {
+  album: {
+    id: 34;
+    title: string;
+    artist: {
+      id: 28;
+      name: string;
+    };
+    album_cover: string;
+  };
+  songs: Songs[];
+}
 const songApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
     getalbums: builder.query<Albums[], void>({
       query: () => ({
         url: `/albums`,
+        method: "GET",
+      }),
+    }),
+    getalbum: builder.query<AlbumsResponse, string>({
+      query: (id) => ({
+        url: `/albums/${id}`,
         method: "GET",
       }),
     }),
@@ -30,4 +49,5 @@ const songApi = mainApi.injectEndpoints({
   }),
 });
 
-export const { useGetalbumsQuery, useGetTrendalbumsQuery } = songApi;
+export const { useGetalbumsQuery, useGetalbumQuery, useGetTrendalbumsQuery } =
+  songApi;

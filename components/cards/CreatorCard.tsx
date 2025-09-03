@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import CreatorOrderModal from "./CreatorOrderModal";
+import CreatorOrderModal from "../modals/CreatorOrderModal";
 
 const CreatorCard = ({
   image,
