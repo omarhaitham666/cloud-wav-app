@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { slides } from "../utils/data";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const { width } = Dimensions.get("window");
 
@@ -19,8 +20,9 @@ export default function WelcomeScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter();
-  const { t } = useTranslation();
-  
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setCurrentIndex(index);
@@ -35,7 +37,11 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View className="flex-1 pb-5 bg-red-600 font-cairo">
+    <View className="flex-1 py-5 bg-red-600 font-cairo">
+      {/* LanguageSwitcher at the top of each slide */}
+      <View className={`w-full p-9 items-${isRTL ? "end" : "start"}`}>
+        <LanguageSwitcher />
+      </View>
       <FlatList
         data={slides}
         ref={flatListRef}
@@ -54,12 +60,12 @@ export default function WelcomeScreen() {
               className="w-72 h-72 mb-8"
               resizeMode="contain"
             />
-            <Text 
+            <Text
               className="text-white text-2xl text-center font-noto-arabic-semibold mb-3"
             >
               {t(item.title)}
             </Text>
-            <Text 
+            <Text
               className="text-gray-50 text-center text-sm leading-5 font-noto-arabic"
             >
               {t(item.description)}
@@ -72,9 +78,8 @@ export default function WelcomeScreen() {
         {slides.map((_, index) => (
           <View
             key={index}
-            className={`h-2 rounded-full mx-1 ${
-              index === currentIndex ? "w-6 bg-white" : "w-2 bg-gray-300"
-            }`}
+            className={`h-2 rounded-full mx-1 ${index === currentIndex ? "w-6 bg-white" : "w-2 bg-gray-300"
+              }`}
           />
         ))}
       </View>
@@ -84,8 +89,8 @@ export default function WelcomeScreen() {
           onPress={handleNext}
         >
           <Text className="text-red-600 font-noto-arabic-bold text-base">
-            {currentIndex === slides.length - 1 
-              ? t("welcome.buttons.getStarted") 
+            {currentIndex === slides.length - 1
+              ? t("welcome.buttons.getStarted")
               : t("welcome.buttons.next")
             }
           </Text>

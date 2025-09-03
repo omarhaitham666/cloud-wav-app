@@ -10,7 +10,7 @@ import {
 import Feather from "react-native-vector-icons/Feather";
 
 export default function LanguageSwitcher() {
-  const { t, i18n, ready } = useTranslation();
+  const { i18n, ready } = useTranslation();
   const [isReady, setIsReady] = useState(ready);
   const [scaleValue] = useState(new Animated.Value(1));
   const isArabic = i18n.language === "ar";
@@ -51,10 +51,6 @@ export default function LanguageSwitcher() {
 
     const newLang = i18n.language === "en" ? "ar" : "en";
     await i18n.changeLanguage(newLang);
-
-    // if (Updates.reloadAsync) {
-    //   await Updates.reloadAsync();
-    // }
   };
 
   return (
@@ -72,7 +68,7 @@ export default function LanguageSwitcher() {
             name="globe"
             size={20}
             color={activeColors.text}
-            style={isArabic ? { marginLeft: 12 } : { marginRight: 12 }}
+            style={isArabic ? { marginLeft: 10 } : { marginRight: 10 }}
           />
           <View>
             <Text
@@ -84,19 +80,9 @@ export default function LanguageSwitcher() {
                 fontFamily: AppFonts.semibold,
               }}
             >
-              {t("drawer.items.language")}
-            </Text>
-            <Text
-              style={{
-                fontSize: 12,
-                color: activeColors.subText,
-                marginTop: 2,
-                textAlign: isArabic ? "right" : "left",
-                fontFamily: AppFonts.regular,
-              }}
-            >
               {isArabic ? "العربية" : "English"}
             </Text>
+
           </View>
         </View>
       </Pressable>
