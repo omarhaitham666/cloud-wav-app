@@ -6,11 +6,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const CustomHeader = ({
   transparent,
-  showLanguageSwitcher,
   colorIcon = "#000",
 }: {
   transparent?: boolean;
-  showLanguageSwitcher?: boolean;
   colorIcon?: string;
 }) => {
   const navigation = useNavigation<any>();
@@ -31,8 +29,6 @@ const CustomHeader = ({
         <TouchableOpacity onPress={toggleDrawer}>
           <Ionicons name="menu" size={26} color={colorIcon} />
         </TouchableOpacity>
-
-        {/* {showLanguageSwitcher && <LanguageSwitcher />} */}
       </View>
     </SafeAreaView>
   );

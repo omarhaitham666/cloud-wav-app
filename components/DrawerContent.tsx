@@ -2,7 +2,7 @@ import { useLogoutMutation } from "@/store/api/user/user";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { RelativePathString, router } from "expo-router";
+import { RelativePathString, router, useRootNavigation } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -74,6 +74,8 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const [token, setToken] = useState<string | null>(null);
   const [logout, { isLoading }] = useLogoutMutation();
   const isArabic = i18n.language === "ar";
+  const navigation = useRootNavigation();
+
   const rowDirection: ViewStyle = useMemo(
     () => ({
       flexDirection: (isArabic ? "row-reverse" : "row") as
@@ -92,25 +94,29 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   }, [state.index]);
 
   const handleLogout = async () => {
-    await deleteToken("access_token");
-    await logout()
-      .unwrap()
-      .then(() => {
-        setToken(null);
-        Toast.show({
-          type: "success",
-          text1: "Logout Successful",
-          text2: "You have been logged out.",
-        });
-        router.replace("/(drawer)/(auth)/login");
-      })
-      .catch((e) => {
-        Toast.show({
-          type: "error",
-          text1: "Logout Failed",
-          text2: e?.data?.message || "Something went wrong",
-        });
+    try {
+      await deleteToken("access_token");
+      await logout().unwrap();
+      setToken(null);
+      Toast.show({
+        type: "success",
+        text1: "Logout Successful",
+        text2: "You have been logged out.",
       });
+
+      // Reset navigation state and redirect to login
+      navigation?.reset({
+        index: 0,
+        routes: [{ name: "(drawer)" }],
+      });
+      router.replace("/(drawer)/(auth)/login");
+    } catch (e: any) {
+      Toast.show({
+        type: "error",
+        text1: "Logout Failed",
+        text2: e?.data?.message || "Something went wrong",
+      });
+    }
   };
 
   const drawerItems = [
@@ -302,9 +308,11 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
               {t("drawer.footer.version", { version: "1.0.0" })}
             </Text>
           </View>
-          <TouchableOpacity onPress={handleLogout} className="p-2">
-            <Feather name="log-out" size={18} color="#64748b" />
-          </TouchableOpacity>
+          {token && (
+            <TouchableOpacity onPress={handleLogout} className="p-2">
+              <Feather name="log-out" size={18} color="#64748b" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </SafeAreaView>
