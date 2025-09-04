@@ -1,6 +1,6 @@
 import AuthProfile from "@/components/profile/AuthProfile";
 import ProfileUser from "@/components/profile/ProfileUser";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getToken } from "@/utils/secureStore";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
@@ -14,7 +14,7 @@ const Profile = () => {
 
   const checkAuthToken = async () => {
     try {
-      const token = await AsyncStorage.getItem("access_token");
+      const token = await getToken("access_token");
       setIsAuthenticated(!!token);
     } catch (error) {
       console.error("Error checking auth token:", error);
@@ -32,7 +32,7 @@ const Profile = () => {
     );
   }
 
-  return !isAuthenticated ? <ProfileUser /> : <AuthProfile />;
+  return isAuthenticated ? <ProfileUser /> : <AuthProfile />;
 };
 
 export default Profile;
