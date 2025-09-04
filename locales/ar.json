@@ -609,5 +609,22 @@
       "youtuber": "منشئو المحتوى",
       "tiktoker": "نجوم الفيديو القصير"
     }
+  },
+  "updatePrice": {
+    "title": "تحديث السعر",
+    "privatePrice": "السعر الخاص",
+    "businessPrice": "السعر التجاري",
+    "privatePricePlaceholder": "أدخل السعر الخاص",
+    "businessPricePlaceholder": "أدخل السعر التجاري",
+    "submit": "تحديث الأسعار",
+    "updating": "جارٍ التحديث...",
+    "validation": {
+      "privatePriceRequired": "السعر الخاص مطلوب",
+      "businessPriceRequired": "السعر التجاري مطلوب",
+      "invalidPrice": "يرجى إدخال سعر صحيح",
+      "priceMinValue": "السعر يجب أن يكون أكبر من 0"
+    },
+    "success": "تم تحديث الأسعار بنجاح",
+    "error": "فشل في تحديث الأسعار"
   }
 }

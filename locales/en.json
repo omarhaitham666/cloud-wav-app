@@ -609,5 +609,22 @@
       "youtuber": "Content Creators",
       "tiktoker": "Short Video Stars"
     }
+  },
+  "updatePrice": {
+    "title": "Update Price",
+    "privatePrice": "Private Price",
+    "businessPrice": "Business Price",
+    "privatePricePlaceholder": "Enter private price",
+    "businessPricePlaceholder": "Enter business price",
+    "submit": "Update Prices",
+    "updating": "Updating...",
+    "validation": {
+      "privatePriceRequired": "Private price is required",
+      "businessPriceRequired": "Business price is required",
+      "invalidPrice": "Please enter a valid price",
+      "priceMinValue": "Price must be greater than 0"
+    },
+    "success": "Prices updated successfully",
+    "error": "Failed to update prices"
   }
 }
