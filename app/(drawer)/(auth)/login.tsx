@@ -59,9 +59,6 @@ export default function LoginScreen() {
       .unwrap()
       .then(async (res) => {
         await saveToken("access_token", res.access_token);
-
-        // Update auth context with basic data
-        // Note: User data will be fetched separately after login
         setUser({
           id: "",
           name: "",
