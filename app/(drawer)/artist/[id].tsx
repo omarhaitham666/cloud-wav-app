@@ -1,12 +1,14 @@
 import AlbumCard from "@/components/cards/AlbumCard";
 import { SongCard } from "@/components/cards/SongCard";
+import UploadModal from "@/components/modals/UploadModal";
 import { Albums } from "@/store/api/global/albums";
 import { useGetArtistQuery } from "@/store/api/global/artists";
+import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -21,7 +23,7 @@ const ArtistProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: artistData, isLoading: isFetching } = useGetArtistQuery(id);
-
+  const [UploadSong, setUploadSong] = useState(false);
   if (isFetching) {
     return (
       <View className="flex-1 justify-center items-center bg-black">
@@ -90,6 +92,21 @@ const ArtistProfile = () => {
                 {artistData?.division}
               </Text>
             </View>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => setUploadSong(true)}
+              className="border border-white/20 h-12 rounded-xl justify-center items-center"
+            >
+              <View className="flex-row items-center">
+                <Ionicons name="add-circle" size={18} color="white" />
+                <Text
+                  className="text-white text-base ml-2"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  Upload Song
+                </Text>
+              </View>
+            </TouchableOpacity>
           </LinearGradient>
 
           <View className="px-5 mt-6 mb-4">
@@ -130,6 +147,11 @@ const ArtistProfile = () => {
               )}
             />
           </View>
+          <UploadModal
+            visible={UploadSong}
+            onClose={() => setUploadSong(false)}
+            artist_id={Number(id)}
+          />
         </>
       }
     />

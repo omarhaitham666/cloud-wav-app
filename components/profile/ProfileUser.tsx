@@ -313,8 +313,6 @@ const ProfileUser: React.FC = () => {
     }
   }, [data, reset]);
 
-  const navigateToSongs = () => {};
-
   const getRoleDisplayName = (role?: string, type?: string) => {
     if (!role && !type) return "User";
 
@@ -399,6 +397,8 @@ const ProfileUser: React.FC = () => {
     userData?.role?.includes("artist") ||
     userData?.role?.includes("videoCreator") ||
     userData?.role?.includes("videoCreator,artist") ||
+    userData?.role?.includes("user,artist") ||
+    userData?.role?.includes("user,videoCreator") ||
     (userData?.type && userData.type !== "user");
   const isUpdating = updateLoading || updateProfileLoading;
 
@@ -507,6 +507,7 @@ const ProfileUser: React.FC = () => {
                 </Text>
                 <View className="flex-row justify-between gap-3">
                   {(userData?.role === "videoCreator" ||
+                    userData?.role === "user,videoCreator" ||
                     userData?.role === "artist,videoCreator") && (
                     <TouchableOpacity
                       onPress={() => setUpdatePrice(true)}
@@ -533,9 +534,16 @@ const ProfileUser: React.FC = () => {
                   )}
 
                   {(userData?.role === "artist" ||
+                    userData?.role === "user,artist" ||
                     userData?.role === "artist,videoCreator") && (
                     <TouchableOpacity
-                      onPress={navigateToSongs}
+                      onPress={() =>
+                        data?.artist_id &&
+                        router.push({
+                          pathname: "/(drawer)/artist/[id]",
+                          params: { id: data.artist_id },
+                        })
+                      }
                       className="flex-1"
                       activeOpacity={0.8}
                     >
@@ -887,6 +895,7 @@ const ProfileUser: React.FC = () => {
         initialPrivatePrice={data?.private_price ?? ""}
         video_creator_id={data?.video_creator_id ?? 0}
       />
+
       <Toast />
     </SafeAreaView>
   );
