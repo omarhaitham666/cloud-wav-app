@@ -123,17 +123,33 @@ const authApi = mainApi.injectEndpoints({
         new_name: string;
         email: string;
         password: string;
-        password_confirmation: string;
-        type: string;
       }
     >({
       query: (body) => ({
         url: "/update-name",
-        method: "PUST",
+        method: "POST",
         data: body,
       }),
     }),
+    UpdateProfileARTISTORCREATORUser: builder.mutation<
+      User,
+      | FormData
+      | {
+          name: string;
+          profile_image: any;
+          type: string;
+        }
+    >({
+      query: (body) => {
+        return {
+          url: "/profile-update-request",
+          method: "POST",
+          data: body,
+        };
+      },
+    }),
   }),
+
   overrideExisting: false,
 });
 
@@ -146,6 +162,7 @@ export const {
   useLogoutMutation,
   useGetUserQuery,
   useUpdateUserMutation,
+  useUpdateProfileARTISTORCREATORUserMutation,
 } = authApi;
 
 export default authApi;

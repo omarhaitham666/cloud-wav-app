@@ -1,7 +1,6 @@
 import DrawerContent from "@/components/DrawerContent";
 import { Drawer } from "expo-router/drawer";
 import { useTranslation } from "react-i18next";
-import Toast from "react-native-toast-message";
 
 export default function DrawerLayout() {
   const { i18n } = useTranslation();
@@ -50,7 +49,6 @@ export default function DrawerLayout() {
           drawerLabel: "Auth",
         }}
       />
-      <Toast />
     </Drawer>
   );
 }

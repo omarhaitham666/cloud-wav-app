@@ -22,8 +22,8 @@ export default function RootLayout() {
     <StoreProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
-        <Toast />
       </Stack>
+      <Toast />
     </StoreProvider>
   );
 }
