@@ -11,6 +11,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  profile_image?: string | null;
   role: string;
   request_status: string;
   video_creator_id: null;
@@ -123,6 +124,7 @@ const authApi = mainApi.injectEndpoints({
         new_name: string;
         email: string;
         password: string;
+        type: string;
       }
     >({
       query: (body) => ({

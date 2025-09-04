@@ -1,11 +1,19 @@
-import { useGetUserQuery, useUpdateUserMutation } from "@/store/api/user/user";
+import {
+  useGetUserQuery,
+  useUpdateProfileARTISTORCREATORUserMutation,
+  useUpdateUserMutation,
+} from "@/store/api/user/user";
 import { AppFonts } from "@/utils/fonts";
+import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
   ScrollView,
   StatusBar,
   Text,
@@ -22,15 +30,33 @@ type FormValues = {
   confirmPassword: string;
 };
 
+type UserData = {
+  name?: string;
+  email?: string;
+  profile_image?: string;
+  role?: string;
+  type?: string;
+};
+
 const ProfileUser = () => {
   const { t } = useTranslation();
-  const { data, isLoading } = useGetUserQuery();
-  const [UpdateUser, { isLoading: updateLoading }] = useUpdateUserMutation();
+  const { data, isLoading, error, refetch } = useGetUserQuery();
+  const [updateUser, { isLoading: updateLoading }] = useUpdateUserMutation();
+  const [
+    updateProfileARTISTORCREATORUser,
+    { isLoading: updateProfileLoading },
+  ] = useUpdateProfileARTISTORCREATORUserMutation();
+
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<any>(null);
+
   const {
     control,
     handleSubmit,
     setValue,
-    formState: { errors },
+    watch,
+    reset,
+    formState: { errors, isDirty },
   } = useForm<FormValues>({
     defaultValues: {
       fullName: "",
@@ -40,46 +66,172 @@ const ProfileUser = () => {
     },
   });
 
+  const password = watch("password");
+
   useEffect(() => {
     if (data) {
-      setValue("fullName", data.name || "");
-      setValue("email", data.email || "");
+      const userData = data as UserData;
+      setValue("fullName", userData.name || "");
+      setValue("email", userData.email || "");
+      setProfileImage(userData.profile_image || null);
     }
   }, [data, setValue]);
 
-  const onSubmit = async (formData: FormValues) => {
-    await UpdateUser({
-      new_name: formData.fullName,
-      email: formData.email,
-      password: formData.password,
-      password_confirmation: formData.confirmPassword,
-      type: "user",
-    })
-      .unwrap()
-      .then((res) => {
-        console.log(res);
+  useEffect(() => {
+    requestPermissions();
+  }, []);
 
-        Toast.show({
-          type: "success",
-          text1: "User Updated Successfully",
-        });
-      })
-      .catch((e) => {
-        Toast.show({
-          type: "error",
-          text1: "Service Artist Failed",
-          text2: e?.data?.message || "Something went wrong",
-        });
-      });
+  const requestPermissions = async () => {
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "Sorry, we need camera roll permissions to change your profile picture!"
+        );
+      }
+    }
   };
+
+  const pickImage = useCallback(async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        const asset = result.assets[0];
+        const fileName = asset.fileName || `image_${Date.now()}.jpg`;
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        setProfileImage(asset.uri);
+        setImageFile({
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+        });
+      }
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Image Selection Failed",
+        text2: "Unable to select image. Please try again.",
+      });
+    }
+  }, []);
+
+  const onSubmit = async (formData: FormValues) => {
+    try {
+      const userData = data as UserData;
+      const isRegularUser =
+        userData?.role === "user" || userData?.type === "user";
+
+      if (isRegularUser) {
+        const payload = {
+          email: formData.email.trim(),
+          new_name: formData.fullName.trim(),
+          type: userData?.type || "user",
+          password: formData.password ?? "",
+        };
+
+        await updateUser(payload).unwrap();
+      } else {
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.fullName.trim());
+        formDataToSend.append("type", userData?.type || "artist");
+        if (imageFile) {
+          formDataToSend.append("profile_image", {
+            uri: imageFile.uri,
+            type: imageFile.type,
+            name: imageFile.name,
+          } as any);
+        }
+        console.log(typeof imageFile);
+        await updateProfileARTISTORCREATORUser(formDataToSend).unwrap();
+      }
+
+      setValue("password", "");
+      setValue("confirmPassword", "");
+      refetch();
+
+      Toast.show({
+        type: "success",
+        text1:
+          t("profile.user.updateSuccess") || "Profile Updated Successfully",
+      });
+    } catch (err: any) {
+      const message =
+        err?.data?.message ||
+        err?.data?.errors?.profile_image?.[0] ||
+        "Update failed";
+
+      Toast.show({
+        type: "error",
+        text1: t("profile.user.updateFailed") || "Update Failed",
+        text2: message,
+      });
+    }
+  };
+
+  const resetForm = useCallback(() => {
+    if (data) {
+      const userData = data as UserData;
+      reset({
+        fullName: userData.name || "",
+        email: userData.email || "",
+        password: "",
+        confirmPassword: "",
+      });
+      setProfileImage(userData.profile_image || null);
+      setImageFile(null);
+    }
+  }, [data, reset]);
 
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center bg-black">
         <ActivityIndicator size="large" color="#f9a826" />
+        <Text
+          className="text-white mt-2"
+          style={{ fontFamily: AppFonts.medium }}
+        >
+          {t("common.loading") || "Loading..."}
+        </Text>
       </View>
     );
   }
+
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center bg-black px-6">
+        <Text
+          className="text-red-400 text-center mb-4"
+          style={{ fontFamily: AppFonts.medium }}
+        >
+          {t("common.error") || "Something went wrong"}
+        </Text>
+        <TouchableOpacity
+          onPress={refetch}
+          className="bg-purple-600 px-6 py-3 rounded-lg"
+        >
+          <Text className="text-white" style={{ fontFamily: AppFonts.medium }}>
+            {t("common.retry") || "Try Again"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const userData = data as UserData;
+  const isArtistOrCreator =
+    userData?.type !== "user" && userData?.role !== "user";
+  const isUpdating = updateLoading || updateProfileLoading;
+
   return (
     <View className="flex-1 bg-dark-100">
       <StatusBar
@@ -99,6 +251,7 @@ const ProfileUser = () => {
         className="flex-1 mt-20 px-6"
         contentContainerStyle={{ paddingTop: 80, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <Text
           className="text-white text-2xl mb-8 text-center"
@@ -107,123 +260,251 @@ const ProfileUser = () => {
           {t("profile.user.editProfile") || "Edit Profile"}
         </Text>
 
-        <Controller
-          control={control}
-          name="fullName"
-          rules={{ required: "Full name is required" }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder={t("profile.user.fullName") || "Full Name"}
-              placeholderTextColor="#aaa"
-              value={value}
-              onChangeText={onChange}
-              className="bg-white/10 text-white rounded-xl px-4 py-3 mb-2"
-              style={{ fontFamily: AppFonts.medium }}
-            />
-          )}
-        />
-        {errors.fullName && (
-          <Text className="text-red-400 text-sm mb-2">
-            {errors.fullName.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          name="email"
-          rules={{ required: "Email is required" }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder={t("profile.user.email") || "Email Address"}
-              placeholderTextColor="#aaa"
-              keyboardType="email-address"
-              value={value}
-              onChangeText={onChange}
-              className="bg-white/10 text-white rounded-xl px-4 py-3 mb-2"
-              style={{ fontFamily: AppFonts.medium }}
-            />
-          )}
-        />
-        {errors.email && (
-          <Text className="text-red-400 text-sm mb-2">
-            {errors.email.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          name="password"
-          rules={{
-            minLength: {
-              value: 6,
-              message: "Password must be at least 6 characters",
-            },
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder={t("profile.user.password") || "Password"}
-              placeholderTextColor="#aaa"
-              secureTextEntry
-              value={value}
-              onChangeText={onChange}
-              className="bg-white/10 text-white rounded-xl px-4 py-3 mb-2"
-              style={{ fontFamily: AppFonts.medium }}
-            />
-          )}
-        />
-        {errors.password && (
-          <Text className="text-red-400 text-sm mb-2">
-            {errors.password.message}
-          </Text>
-        )}
-
-        <Controller
-          control={control}
-          name="confirmPassword"
-          rules={{
-            validate: (val, formValues) =>
-              val === formValues.password || "Passwords do not match",
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder={
-                t("profile.user.confirmPassword") || "Confirm Password"
-              }
-              placeholderTextColor="#aaa"
-              secureTextEntry
-              value={value}
-              onChangeText={onChange}
-              className="bg-white/10 text-white rounded-xl px-4 py-3 mb-4"
-              style={{ fontFamily: AppFonts.medium }}
-            />
-          )}
-        />
-        {errors.confirmPassword && (
-          <Text className="text-red-400 text-sm mb-2">
-            {errors.confirmPassword.message}
-          </Text>
-        )}
-
-        <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit(onSubmit)}>
-          <LinearGradient
-            colors={["#4C1D95", "#1E3A8A"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="h-14 rounded-xl justify-center items-center"
-          >
-            <Text
-              className="text-white text-lg"
-              style={{ fontFamily: AppFonts.bold }}
+        {isArtistOrCreator && (
+          <View className="items-center mb-6">
+            <TouchableOpacity
+              onPress={pickImage}
+              className="relative"
+              activeOpacity={0.7}
             >
-              {updateLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                t("profile.user.saveChanges") || "Save Changes"
-              )}
+              <View className="w-32 h-32 rounded-full overflow-hidden border-2 border-purple-500">
+                {profileImage ? (
+                  <Image
+                    source={{ uri: profileImage }}
+                    className="w-full h-full"
+                    style={{ resizeMode: "cover" }}
+                  />
+                ) : (
+                  <View className="w-full h-full bg-gray-700 justify-center items-center">
+                    <Text
+                      className="text-white text-sm"
+                      style={{ fontFamily: AppFonts.medium }}
+                    >
+                      {t("profile.user.addPhoto") || "Add Photo"}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View className="absolute bottom-0 right-0 bg-purple-600 p-2 rounded-full">
+                <Text
+                  className="text-white text-xs"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  {t("common.edit") || "Edit"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <View className="mb-4">
+          <Controller
+            control={control}
+            name="fullName"
+            rules={{
+              required:
+                t("validation.fullNameRequired") || "Full name is required",
+              minLength: {
+                value: 2,
+                message:
+                  t("validation.fullNameMinLength") ||
+                  "Name must be at least 2 characters",
+              },
+              maxLength: {
+                value: 50,
+                message:
+                  t("validation.fullNameMaxLength") ||
+                  "Name must be less than 50 characters",
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder={t("profile.user.fullName") || "Full Name"}
+                placeholderTextColor="#aaa"
+                value={value}
+                onChangeText={onChange}
+                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
+                style={{ fontFamily: AppFonts.medium }}
+                autoCapitalize="words"
+                returnKeyType="next"
+              />
+            )}
+          />
+          {errors.fullName && (
+            <Text className="text-red-400 text-sm mt-1 ml-2">
+              {errors.fullName.message}
             </Text>
-          </LinearGradient>
-        </TouchableOpacity>
+          )}
+        </View>
+
+        <View className="mb-4">
+          <Controller
+            control={control}
+            name="email"
+            rules={{
+              required: t("validation.emailRequired") || "Email is required",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message:
+                  t("validation.emailInvalid") || "Invalid email address",
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder={t("profile.user.email") || "Email Address"}
+                placeholderTextColor="#aaa"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                value={value}
+                onChangeText={onChange}
+                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
+                style={{ fontFamily: AppFonts.medium }}
+                returnKeyType="next"
+              />
+            )}
+          />
+          {errors.email && (
+            <Text className="text-red-400 text-sm mt-1 ml-2">
+              {errors.email.message}
+            </Text>
+          )}
+        </View>
+
+        <View className="mb-4">
+          <Controller
+            control={control}
+            name="password"
+            rules={{
+              minLength: {
+                value: 6,
+                message:
+                  t("validation.passwordMinLength") ||
+                  "Password must be at least 6 characters",
+              },
+              maxLength: {
+                value: 128,
+                message:
+                  t("validation.passwordMaxLength") ||
+                  "Password must be less than 128 characters",
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder={
+                  t("profile.user.password") || "New Password (optional)"
+                }
+                placeholderTextColor="#aaa"
+                secureTextEntry
+                autoComplete="new-password"
+                value={value}
+                onChangeText={onChange}
+                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
+                style={{ fontFamily: AppFonts.medium }}
+                returnKeyType="next"
+              />
+            )}
+          />
+          {errors.password && (
+            <Text className="text-red-400 text-sm mt-1 ml-2">
+              {errors.password.message}
+            </Text>
+          )}
+        </View>
+
+        <View className="mb-6">
+          <Controller
+            control={control}
+            name="confirmPassword"
+            rules={{
+              validate: (val) => {
+                if (password && !val) {
+                  return (
+                    t("validation.confirmPasswordRequired") ||
+                    "Please confirm your password"
+                  );
+                }
+                if (password && val !== password) {
+                  return (
+                    t("validation.passwordsDoNotMatch") ||
+                    "Passwords do not match"
+                  );
+                }
+                return true;
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                placeholder={
+                  t("profile.user.confirmPassword") || "Confirm New Password"
+                }
+                placeholderTextColor="#aaa"
+                secureTextEntry
+                autoComplete="new-password"
+                value={value}
+                onChangeText={onChange}
+                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
+                style={{ fontFamily: AppFonts.medium }}
+                returnKeyType="done"
+                onSubmitEditing={handleSubmit(onSubmit)}
+              />
+            )}
+          />
+          {errors.confirmPassword && (
+            <Text className="text-red-400 text-sm mt-1 ml-2">
+              {errors.confirmPassword.message}
+            </Text>
+          )}
+        </View>
+
+        <View className="space-y-3">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isUpdating || !isDirty}
+          >
+            <LinearGradient
+              colors={
+                isUpdating || !isDirty
+                  ? ["#6B7280", "#4B5563"]
+                  : ["#4C1D95", "#1E3A8A"]
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              className="h-14 rounded-xl justify-center items-center"
+            >
+              {isUpdating ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Text
+                  className="text-white text-lg"
+                  style={{ fontFamily: AppFonts.bold }}
+                >
+                  {t("profile.user.saveChanges") || "Save Changes"}
+                </Text>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {isDirty && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={resetForm}
+              disabled={isUpdating}
+              className="border border-white/20 h-12 rounded-xl justify-center items-center"
+            >
+              <Text
+                className="text-white text-base"
+                style={{ fontFamily: AppFonts.medium }}
+              >
+                {t("common.reset") || "Reset"}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
+
+      <Toast />
     </View>
   );
 };
