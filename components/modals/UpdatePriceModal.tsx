@@ -1,17 +1,19 @@
+import { useUpdatePriceVedioCreatersMutation } from "@/store/api/global/videoCreator";
 import { AppFonts } from "@/utils/fonts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Modal,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { z } from "zod";
 
 const priceSchema = z.object({
@@ -49,24 +51,23 @@ export type PriceFormData = z.infer<typeof priceSchema>;
 
 type Props = {
   visible: boolean;
-  isLoading: boolean;
   onClose: () => void;
-  onSubmitForm: (data: PriceFormData) => void;
   initialPrivatePrice?: string;
   initialBusinessPrice?: string;
+  video_creator_id?: number;
 };
 
 function UpdatePriceModal({
   visible,
-  isLoading,
   onClose,
-  onSubmitForm,
   initialPrivatePrice = "",
   initialBusinessPrice = "",
+  video_creator_id,
 }: Props) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-
+  const [UpdatePriceVedioCreaters, { isLoading }] =
+    useUpdatePriceVedioCreatersMutation();
   const {
     control,
     handleSubmit,
@@ -81,7 +82,30 @@ function UpdatePriceModal({
   });
 
   const onSubmit = async (data: PriceFormData) => {
-    onSubmitForm(data);
+    await UpdatePriceVedioCreaters({
+      id: video_creator_id?.toString() || "0",
+      body: {
+        private_price: Number(data.privatePrice),
+        bussiness_price: Number(data.businessPrice),
+      },
+    })
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+        Toast.show({
+          type: "success",
+          text1: t("updatePrice.alerts.updateSuccess"),
+        });
+        onClose();
+      })
+      .catch((e) => {
+        Toast.show({
+          type: "error",
+          text1: t("updatePrice.alerts.updateFailed"),
+          text2:
+            e?.data?.message || t("updatePrice.alerts.updateFailedMessage"),
+        });
+      });
     reset();
   };
 
@@ -165,7 +189,9 @@ function UpdatePriceModal({
                       fontFamily: AppFonts.semibold,
                     }}
                   >
-                    {errors[field.name as keyof PriceFormData]?.message?.toString()}
+                    {errors[
+                      field.name as keyof PriceFormData
+                    ]?.message?.toString()}
                   </Text>
                 )}
               </View>

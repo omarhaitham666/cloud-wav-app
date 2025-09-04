@@ -4,8 +4,10 @@ import {
   useUpdateUserMutation,
 } from "@/store/api/user/user";
 import { AppFonts } from "@/utils/fonts";
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -21,7 +23,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import UpdatePriceModal from "../modals/UpdatePriceModal";
 
 type FormValues = {
   fullName: string;
@@ -38,7 +42,7 @@ type UserData = {
   type?: string;
 };
 
-const ProfileUser = () => {
+const ProfileUser: React.FC = () => {
   const { t } = useTranslation();
   const { data, isLoading, error, refetch } = useGetUserQuery();
   const [updateUser, { isLoading: updateLoading }] = useUpdateUserMutation();
@@ -49,6 +53,7 @@ const ProfileUser = () => {
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<any>(null);
+  const [UpdatePrice, setUpdatePrice] = useState(false);
 
   const {
     control,
@@ -129,11 +134,13 @@ const ProfileUser = () => {
   const onSubmit = async (formData: FormValues) => {
     try {
       const userData = data as UserData;
-      
-      // Fix user type detection in submission logic
+
       const isRegularUser =
-        userData?.role === "user" || 
-        (userData?.role && !userData.role.includes("artist") && !userData.role.includes("creator")) ||
+        userData?.role === "user" ||
+        (userData?.role &&
+          !userData.role.includes("artist") &&
+          !userData.role.includes("videoCreator") &&
+          !userData.role.includes("videoCreator,artist")) ||
         userData?.type === "user";
 
       if (isRegularUser) {
@@ -143,27 +150,38 @@ const ProfileUser = () => {
           type: userData?.type || "user",
           password: formData.password ?? "",
         };
-        
+
         await updateUser(payload).unwrap();
       } else {
         if (imageFile) {
-          // Try base64 method first (most likely to work)
           if (imageFile.base64) {
             try {
               const base64FormData = new FormData();
               base64FormData.append("name", formData.fullName.trim());
               base64FormData.append("type", userData?.type || "artist");
-              
               const base64File = {
                 uri: `data:${imageFile.type};base64,${imageFile.base64}`,
                 type: imageFile.type,
                 name: imageFile.name,
               };
-              
               base64FormData.append("profile_image", base64File as any);
-              
-              await updateProfileARTISTORCREATORUser(base64FormData).unwrap();
-              
+              await updateProfileARTISTORCREATORUser(base64FormData)
+                .unwrap()
+                .then(() => {
+                  Toast.show({
+                    type: "success",
+                    text1:
+                      t("profile.user.updateSuccess") ||
+                      "Profile Updated Successfully",
+                  });
+                })
+                .catch((e) => {
+                  Toast.show({
+                    type: "error",
+                    text1: t("profile.user.updateFailed") || "Update Failed",
+                    text2: e.data.message,
+                  });
+                });
               setValue("password", "");
               setValue("confirmPassword", "");
               setImageFile(null);
@@ -175,25 +193,33 @@ const ProfileUser = () => {
                 confirmPassword: "",
               });
               refetch();
-              
-              Toast.show({
-                type: "success",
-                text1: "Profile Updated Successfully (with image)",
-              });
-              
               return;
-              
             } catch (base64Error) {
-              // Fall back to regular user update if image upload fails
               const payload = {
                 email: formData.email.trim(),
                 new_name: formData.fullName.trim(),
                 type: "user",
                 password: formData.password ?? "",
               };
-              
-              await updateUser(payload).unwrap();
-              
+
+              await updateUser(payload)
+                .unwrap()
+                .then(() => {
+                  Toast.show({
+                    type: "success",
+                    text1:
+                      t("profile.user.updateSuccess") ||
+                      "Profile Updated Successfully",
+                  });
+                })
+                .catch((e) => {
+                  Toast.show({
+                    type: "error",
+                    text1: t("profile.user.updateFailed") || "Update Failed",
+                    text2: e.data.message,
+                  });
+                });
+
               setValue("password", "");
               setValue("confirmPassword", "");
               setImageFile(null);
@@ -205,27 +231,43 @@ const ProfileUser = () => {
                 confirmPassword: "",
               });
               refetch();
-              
+
               Toast.show({
                 type: "info",
                 text1: "Profile Updated (Text Only)",
-                text2: "Image upload failed, but text fields were updated successfully",
+                text2:
+                  "Image upload failed, but text fields were updated successfully",
               });
-              
+
               return;
             }
           }
         } else {
-          // No image selected, use regular user update for text-only changes
           const payload = {
             email: formData.email.trim(),
             new_name: formData.fullName.trim(),
             type: "user",
             password: formData.password ?? "",
           };
-          
-          await updateUser(payload).unwrap();
-          
+
+          await updateUser(payload)
+            .unwrap()
+            .then(() => {
+              Toast.show({
+                type: "success",
+                text1:
+                  t("profile.user.updateSuccess") ||
+                  "Profile Updated Successfully",
+              });
+            })
+            .catch((e) => {
+              Toast.show({
+                type: "error",
+                text1: t("profile.user.updateFailed") || "Update Failed",
+                text2: e.data.message,
+              });
+            });
+
           setValue("password", "");
           setValue("confirmPassword", "");
           setImageFile(null);
@@ -237,34 +279,9 @@ const ProfileUser = () => {
             confirmPassword: "",
           });
           refetch();
-
-          Toast.show({
-            type: "success",
-            text1: t("profile.user.updateSuccess") || "Profile Updated Successfully",
-          });
-          
           return;
         }
       }
-
-      setValue("password", "");
-      setValue("confirmPassword", "");
-      setImageFile(null);
-      setProfileImage(null);
-      
-      reset({
-        fullName: formData.fullName,
-        email: formData.email,
-        password: "",
-        confirmPassword: "",
-      });
-      
-      refetch();
-
-      Toast.show({
-        type: "success",
-        text1: t("profile.user.updateSuccess") || "Profile Updated Successfully",
-      });
     } catch (err: any) {
       const message =
         err?.data?.message ||
@@ -295,6 +312,52 @@ const ProfileUser = () => {
       setImageFile(null);
     }
   }, [data, reset]);
+
+  const navigateToSongs = () => {};
+
+  const getRoleDisplayName = (role?: string, type?: string) => {
+    if (!role && !type) return "User";
+
+    const roleString = role || type || "";
+
+    if (roleString.includes("artist") && roleString.includes("videoCreator")) {
+      return "Artist & Video Creator";
+    } else if (roleString.includes("artist")) {
+      return "Artist";
+    } else if (roleString.includes("videoCreator")) {
+      return "Video Creator";
+    } else {
+      return roleString.charAt(0).toUpperCase() + roleString.slice(1);
+    }
+  };
+
+  const getRoleIcon = (role?: string, type?: string) => {
+    const roleString = role || type || "";
+
+    if (roleString.includes("artist") && roleString.includes("videoCreator")) {
+      return "star";
+    } else if (roleString.includes("artist")) {
+      return "musical-note";
+    } else if (roleString.includes("videoCreator")) {
+      return "videocam";
+    } else {
+      return "person";
+    }
+  };
+
+  const getRoleColor = (role?: string, type?: string) => {
+    const roleString = role || type || "";
+
+    if (roleString.includes("artist") && roleString.includes("videoCreator")) {
+      return "#FFD700";
+    } else if (roleString.includes("artist")) {
+      return "#FF6B6B";
+    } else if (roleString.includes("videoCreator")) {
+      return "#4ECDC4";
+    } else {
+      return "#A0AEC0";
+    }
+  };
 
   if (isLoading) {
     return (
@@ -332,15 +395,15 @@ const ProfileUser = () => {
   }
 
   const userData = data as UserData;
-  // Fix user type detection - check if role contains "artist" or "creator"
   const isArtistOrCreator =
-    userData?.role?.includes("artist") || 
-    userData?.role?.includes("creator") ||
+    userData?.role?.includes("artist") ||
+    userData?.role?.includes("videoCreator") ||
+    userData?.role?.includes("videoCreator,artist") ||
     (userData?.type && userData.type !== "user");
   const isUpdating = updateLoading || updateProfileLoading;
 
   return (
-    <View className="flex-1 bg-dark-100">
+    <SafeAreaView className="flex-1 bg-black">
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -348,271 +411,484 @@ const ProfileUser = () => {
       />
 
       <LinearGradient
-        colors={["#1E3A8A", "#4C1D95"]}
+        colors={["#1A1A2E", "#16213E", "#0F3460"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="absolute inset-0"
-      />
-
-      <ScrollView
-        className="flex-1 mt-20 px-6"
-        contentContainerStyle={{ paddingTop: 80, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        className="flex-1"
       >
-        <Text
-          className="text-white text-2xl mb-8 text-center"
-          style={{ fontFamily: AppFonts.bold }}
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          {t("profile.user.editProfile") || "Edit Profile"}
-        </Text>
+          <View className="px-6 pt-12 pb-6">
+            <View className="flex-row items-center justify-between mb-4">
+              <TouchableOpacity onPress={() => router.back()}>
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+              <Text
+                className="text-white text-xl"
+                style={{ fontFamily: AppFonts.bold }}
+              >
+                {t("profile.user.editProfile") || "Edit Profile"}
+              </Text>
+              <View style={{ width: 24 }} />
+            </View>
+          </View>
 
-        {isArtistOrCreator && (
-          <View className="items-center mb-6">
-            <TouchableOpacity
-              onPress={pickImage}
-              className="relative"
-              activeOpacity={0.7}
-            >
-              <View className="w-32 h-32 rounded-full overflow-hidden border-2 border-purple-500">
-                {profileImage ? (
-                  <Image
-                    source={{ uri: profileImage }}
-                    className="w-full h-full"
-                    style={{ resizeMode: "cover" }}
-                  />
-                ) : (
-                  <View className="w-full h-full bg-gray-700 justify-center items-center">
-                    <Text
-                      className="text-white text-sm"
-                      style={{ fontFamily: AppFonts.medium }}
+          <View className="px-6 mb-8">
+            <View className="items-center mb-6">
+              <TouchableOpacity
+                onPress={pickImage}
+                className="relative mb-4"
+                activeOpacity={0.7}
+              >
+                <View className="w-36 h-36 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl">
+                  {profileImage ? (
+                    <Image
+                      source={{ uri: profileImage }}
+                      className="w-full h-full"
+                      style={{ resizeMode: "cover" }}
+                    />
+                  ) : (
+                    <LinearGradient
+                      colors={["#4C1D95", "#1E3A8A"]}
+                      className="w-full h-full justify-center items-center"
                     >
-                      {t("profile.user.addPhoto") || "Add Photo"}
-                    </Text>
+                      <Ionicons name="camera" size={40} color="white" />
+                      <Text
+                        className="text-white text-sm mt-2"
+                        style={{ fontFamily: AppFonts.medium }}
+                      >
+                        {t("profile.user.addPhoto") || "Add Photo"}
+                      </Text>
+                    </LinearGradient>
+                  )}
+                </View>
+                {isArtistOrCreator && (
+                  <View className="absolute bottom-2 right-2 bg-purple-600 p-3 rounded-full shadow-lg">
+                    <Ionicons name="camera" size={16} color="white" />
                   </View>
                 )}
-              </View>
-              <View className="absolute bottom-0 right-0 bg-purple-600 p-2 rounded-full">
+              </TouchableOpacity>
+
+              <View
+                className="flex-row items-center px-4 py-2 rounded-full mb-4"
+                style={{
+                  backgroundColor:
+                    getRoleColor(userData?.role, userData?.type) + "20",
+                }}
+              >
+                <Ionicons
+                  name={getRoleIcon(userData?.role, userData?.type)}
+                  size={18}
+                  color={getRoleColor(userData?.role, userData?.type)}
+                />
                 <Text
-                  className="text-white text-xs"
-                  style={{ fontFamily: AppFonts.medium }}
+                  className="ml-2 text-sm font-medium"
+                  style={{
+                    fontFamily: AppFonts.medium,
+                    color: getRoleColor(userData?.role, userData?.type),
+                  }}
                 >
-                  {t("common.edit") || "Edit"}
+                  {getRoleDisplayName(userData?.role, userData?.type)}
                 </Text>
               </View>
-            </TouchableOpacity>
-          </View>
-        )}
+            </View>
 
-        <View className="mb-4">
-          <Controller
-            control={control}
-            name="fullName"
-            rules={{
-              required:
-                t("validation.fullNameRequired") || "Full name is required",
-              minLength: {
-                value: 2,
-                message:
-                  t("validation.fullNameMinLength") ||
-                  "Name must be at least 2 characters",
-              },
-              maxLength: {
-                value: 50,
-                message:
-                  t("validation.fullNameMaxLength") ||
-                  "Name must be less than 50 characters",
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder={t("profile.user.fullName") || "Full Name"}
-                placeholderTextColor="#aaa"
-                value={value}
-                onChangeText={onChange}
-                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
-                style={{ fontFamily: AppFonts.medium }}
-                autoCapitalize="words"
-                returnKeyType="next"
-              />
-            )}
-          />
-          {errors.fullName && (
-            <Text className="text-red-400 text-sm mt-1 ml-2">
-              {errors.fullName.message}
-            </Text>
-          )}
-        </View>
-
-        <View className="mb-4">
-          <Controller
-            control={control}
-            name="email"
-            rules={{
-              required: t("validation.emailRequired") || "Email is required",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message:
-                  t("validation.emailInvalid") || "Invalid email address",
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder={t("profile.user.email") || "Email Address"}
-                placeholderTextColor="#aaa"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-                value={value}
-                onChangeText={onChange}
-                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
-                style={{ fontFamily: AppFonts.medium }}
-                returnKeyType="next"
-              />
-            )}
-          />
-          {errors.email && (
-            <Text className="text-red-400 text-sm mt-1 ml-2">
-              {errors.email.message}
-            </Text>
-          )}
-        </View>
-
-        <View className="mb-4">
-          <Controller
-            control={control}
-            name="password"
-            rules={{
-              minLength: {
-                value: 6,
-                message:
-                  t("validation.passwordMinLength") ||
-                  "Password must be at least 6 characters",
-              },
-              maxLength: {
-                value: 128,
-                message:
-                  t("validation.passwordMaxLength") ||
-                  "Password must be less than 128 characters",
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder={
-                  t("profile.user.password") || "New Password (optional)"
-                }
-                placeholderTextColor="#aaa"
-                secureTextEntry
-                autoComplete="new-password"
-                value={value}
-                onChangeText={onChange}
-                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
-                style={{ fontFamily: AppFonts.medium }}
-                returnKeyType="next"
-              />
-            )}
-          />
-          {errors.password && (
-            <Text className="text-red-400 text-sm mt-1 ml-2">
-              {errors.password.message}
-            </Text>
-          )}
-        </View>
-
-        <View className="mb-6">
-          <Controller
-            control={control}
-            name="confirmPassword"
-            rules={{
-              validate: (val) => {
-                if (password && !val) {
-                  return (
-                    t("validation.confirmPasswordRequired") ||
-                    "Please confirm your password"
-                  );
-                }
-                if (password && val !== password) {
-                  return (
-                    t("validation.passwordsDoNotMatch") ||
-                    "Passwords do not match"
-                  );
-                }
-                return true;
-              },
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder={
-                  t("profile.user.confirmPassword") || "Confirm New Password"
-                }
-                placeholderTextColor="#aaa"
-                secureTextEntry
-                autoComplete="new-password"
-                value={value}
-                onChangeText={onChange}
-                className="bg-white/10 text-white rounded-xl px-4 py-4 text-base"
-                style={{ fontFamily: AppFonts.medium }}
-                returnKeyType="done"
-                onSubmitEditing={handleSubmit(onSubmit)}
-              />
-            )}
-          />
-          {errors.confirmPassword && (
-            <Text className="text-red-400 text-sm mt-1 ml-2">
-              {errors.confirmPassword.message}
-            </Text>
-          )}
-        </View>
-
-        <View className="space-y-3">
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={handleSubmit(onSubmit)}
-            disabled={isUpdating || !isDirty}
-          >
-            <LinearGradient
-              colors={
-                isUpdating || !isDirty
-                  ? ["#6B7280", "#4B5563"]
-                  : ["#4C1D95", "#1E3A8A"]
-              }
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              className="h-14 rounded-xl justify-center items-center"
-            >
-              {isUpdating ? (
-                <ActivityIndicator color="#fff" size="small" />
-              ) : (
+            {isArtistOrCreator && (
+              <View className="mb-6">
                 <Text
-                  className="text-white text-lg"
+                  className="text-white text-lg mb-4"
                   style={{ fontFamily: AppFonts.bold }}
                 >
-                  {t("profile.user.saveChanges") || "Save Changes"}
+                  Quick Actions
                 </Text>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
+                <View className="flex-row justify-between gap-3">
+                  {(userData?.role === "videoCreator" ||
+                    userData?.role === "artist,videoCreator") && (
+                    <TouchableOpacity
+                      onPress={() => setUpdatePrice(true)}
+                      className="flex-1"
+                      activeOpacity={0.8}
+                    >
+                      <LinearGradient
+                        colors={["#F59E0B", "#D97706"]}
+                        className="p-4 rounded-xl items-center"
+                      >
+                        <MaterialIcons
+                          name="attach-money"
+                          size={28}
+                          color="white"
+                        />
+                        <Text
+                          className="text-white text-sm mt-2 text-center"
+                          style={{ fontFamily: AppFonts.bold }}
+                        >
+                          Update Pricing
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  )}
 
-          {isDirty && (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={resetForm}
-              disabled={isUpdating}
-              className="border border-white/20 h-12 rounded-xl justify-center items-center"
+                  {(userData?.role === "artist" ||
+                    userData?.role === "artist,videoCreator") && (
+                    <TouchableOpacity
+                      onPress={navigateToSongs}
+                      className="flex-1"
+                      activeOpacity={0.8}
+                    >
+                      <LinearGradient
+                        colors={["#10B981", "#059669"]}
+                        className="p-4 rounded-xl items-center"
+                      >
+                        <FontAwesome5 name="music" size={24} color="white" />
+                        <Text
+                          className="text-white text-sm mt-2 text-center"
+                          style={{ fontFamily: AppFonts.bold }}
+                        >
+                          Manage Songs
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
+
+          <View className="px-6">
+            <Text
+              className="text-white text-lg mb-6"
+              style={{ fontFamily: AppFonts.bold }}
             >
+              Profile Information
+            </Text>
+
+            <View className="mb-4">
               <Text
-                className="text-white text-base"
+                className="text-gray-300 text-sm mb-2"
                 style={{ fontFamily: AppFonts.medium }}
               >
-                {t("common.reset") || "Reset"}
+                {t("profile.user.fullName") || "Full Name"}
               </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </ScrollView>
+              <Controller
+                control={control}
+                name="fullName"
+                rules={{
+                  required:
+                    t("validation.fullNameRequired") || "Full name is required",
+                  minLength: {
+                    value: 2,
+                    message:
+                      t("validation.fullNameMinLength") ||
+                      "Name must be at least 2 characters",
+                  },
+                  maxLength: {
+                    value: 50,
+                    message:
+                      t("validation.fullNameMaxLength") ||
+                      "Name must be less than 50 characters",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <View className="relative">
+                    <TextInput
+                      placeholder={
+                        t("profile.user.fullName") || "Enter your full name"
+                      }
+                      placeholderTextColor="#6B7280"
+                      value={value}
+                      onChangeText={onChange}
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      style={{ fontFamily: AppFonts.medium }}
+                      autoCapitalize="words"
+                      returnKeyType="next"
+                    />
+                    <View className="absolute right-4 top-4">
+                      <Ionicons
+                        name="person-outline"
+                        size={20}
+                        color="#6B7280"
+                      />
+                    </View>
+                  </View>
+                )}
+              />
+              {errors.fullName && (
+                <Text
+                  className="text-red-400 text-sm mt-2 ml-2"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  {errors.fullName.message}
+                </Text>
+              )}
+            </View>
+            <View className="mb-4">
+              <Text
+                className="text-gray-300 text-sm mb-2"
+                style={{ fontFamily: AppFonts.medium }}
+              >
+                {t("profile.user.email") || "Email Address"}
+              </Text>
+              <Controller
+                control={control}
+                name="email"
+                rules={{
+                  required:
+                    t("validation.emailRequired") || "Email is required",
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message:
+                      t("validation.emailInvalid") || "Invalid email address",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <View className="relative">
+                    <TextInput
+                      placeholder={
+                        t("profile.user.email") || "Enter your email"
+                      }
+                      placeholderTextColor="#6B7280"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      value={value}
+                      onChangeText={onChange}
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      style={{ fontFamily: AppFonts.medium }}
+                      returnKeyType="next"
+                    />
+                    <View className="absolute right-4 top-4">
+                      <Ionicons name="mail-outline" size={20} color="#6B7280" />
+                    </View>
+                  </View>
+                )}
+              />
+              {errors.email && (
+                <Text
+                  className="text-red-400 text-sm mt-2 ml-2"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  {errors.email.message}
+                </Text>
+              )}
+            </View>
 
+            <View className="mb-4">
+              <Text
+                className="text-gray-300 text-sm mb-2"
+                style={{ fontFamily: AppFonts.medium }}
+              >
+                Account Type
+              </Text>
+              <View className="bg-white/5 rounded-xl px-4 py-4 border border-white/10 flex-row items-center justify-between">
+                <Text
+                  className="text-white text-base"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  {getRoleDisplayName(userData?.role, userData?.type)}
+                </Text>
+                <Ionicons
+                  name={getRoleIcon(
+                    userData?.role,
+                    userData?.type as unknown as string
+                  )}
+                  size={20}
+                  color={getRoleColor(userData?.role, userData?.type)}
+                />
+              </View>
+            </View>
+
+            <Text
+              className="text-white text-lg mb-4 mt-6"
+              style={{ fontFamily: AppFonts.bold }}
+            >
+              Security
+            </Text>
+
+            <View className="mb-4">
+              <Text
+                className="text-gray-300 text-sm mb-2"
+                style={{ fontFamily: AppFonts.medium }}
+              >
+                {t("profile.user.password") || "New Password (Optional)"}
+              </Text>
+              <Controller
+                control={control}
+                name="password"
+                rules={{
+                  minLength: {
+                    value: 6,
+                    message:
+                      t("validation.passwordMinLength") ||
+                      "Password must be at least 6 characters",
+                  },
+                  maxLength: {
+                    value: 128,
+                    message:
+                      t("validation.passwordMaxLength") ||
+                      "Password must be less than 128 characters",
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <View className="relative">
+                    <TextInput
+                      placeholder="Enter new password"
+                      placeholderTextColor="#6B7280"
+                      secureTextEntry
+                      autoComplete="new-password"
+                      value={value}
+                      onChangeText={onChange}
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      style={{ fontFamily: AppFonts.medium }}
+                      returnKeyType="next"
+                    />
+                    <View className="absolute right-4 top-4">
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={20}
+                        color="#6B7280"
+                      />
+                    </View>
+                  </View>
+                )}
+              />
+              {errors.password && (
+                <Text
+                  className="text-red-400 text-sm mt-2 ml-2"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  {errors.password.message}
+                </Text>
+              )}
+            </View>
+
+            <View className="mb-8">
+              <Text
+                className="text-gray-300 text-sm mb-2"
+                style={{ fontFamily: AppFonts.medium }}
+              >
+                {t("profile.user.confirmPassword") || "Confirm New Password"}
+              </Text>
+              <Controller
+                control={control}
+                name="confirmPassword"
+                rules={{
+                  validate: (val) => {
+                    if (password && !val) {
+                      return (
+                        t("validation.confirmPasswordRequired") ||
+                        "Please confirm your password"
+                      );
+                    }
+                    if (password && val !== password) {
+                      return (
+                        t("validation.passwordsDoNotMatch") ||
+                        "Passwords do not match"
+                      );
+                    }
+                    return true;
+                  },
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <View className="relative">
+                    <TextInput
+                      placeholder="Confirm your new password"
+                      placeholderTextColor="#6B7280"
+                      secureTextEntry
+                      autoComplete="new-password"
+                      value={value}
+                      onChangeText={onChange}
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      style={{ fontFamily: AppFonts.medium }}
+                      returnKeyType="done"
+                      onSubmitEditing={handleSubmit(onSubmit)}
+                    />
+                    <View className="absolute right-4 top-4">
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={20}
+                        color="#6B7280"
+                      />
+                    </View>
+                  </View>
+                )}
+              />
+              {errors.confirmPassword && (
+                <Text
+                  className="text-red-400 text-sm mt-2 ml-2"
+                  style={{ fontFamily: AppFonts.medium }}
+                >
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
+            </View>
+            <View className="space-y-4">
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleSubmit(onSubmit)}
+                disabled={isUpdating || !isDirty}
+              >
+                <LinearGradient
+                  colors={
+                    isUpdating || !isDirty
+                      ? ["#6B7280", "#4B5563"]
+                      : ["#8B5CF6", "#7C3AED"]
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  className="h-14 rounded-xl justify-center items-center shadow-lg"
+                >
+                  {isUpdating ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <View className="flex-row items-center">
+                      <Ionicons name="save-outline" size={20} color="white" />
+                      <Text
+                        className="text-white text-lg ml-2"
+                        style={{ fontFamily: AppFonts.bold }}
+                      >
+                        {t("profile.user.saveChanges") || "Save Changes"}
+                      </Text>
+                    </View>
+                  )}
+                </LinearGradient>
+              </TouchableOpacity>
+
+              {isDirty && (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={resetForm}
+                  disabled={isUpdating}
+                  className="border border-white/20 h-12 rounded-xl justify-center items-center"
+                >
+                  <View className="flex-row items-center">
+                    <Ionicons name="refresh-outline" size={18} color="white" />
+                    <Text
+                      className="text-white text-base ml-2"
+                      style={{ fontFamily: AppFonts.medium }}
+                    >
+                      {t("common.reset") || "Reset Changes"}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View className="h-20" />
+          </View>
+        </ScrollView>
+      </LinearGradient>
+      <UpdatePriceModal
+        visible={UpdatePrice}
+        onClose={() => setUpdatePrice(false)}
+        initialBusinessPrice={data?.bussiness_price ?? ""}
+        initialPrivatePrice={data?.private_price ?? ""}
+        video_creator_id={data?.video_creator_id ?? 0}
+      />
       <Toast />
-    </View>
+    </SafeAreaView>
   );
 };
 

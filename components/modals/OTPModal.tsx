@@ -3,13 +3,13 @@ import { AppFonts } from "@/utils/fonts";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -33,10 +33,7 @@ export default function OTPModal({
 
   const handleVerifyOTP = async () => {
     if (!otp || otp.length < 6) {
-      Alert.alert(
-        t("otp.alerts.errorTitle"),
-        t("otp.alerts.invalidOTP")
-      );
+      Alert.alert(t("otp.alerts.errorTitle"), t("otp.alerts.invalidOTP"));
       return;
     }
 
@@ -48,7 +45,7 @@ export default function OTPModal({
           type: "success",
           text1: t("otp.alerts.verificationSuccess"),
         });
-        onVerified(res.user || res);
+        onVerified(res.message || res);
       })
       .catch((e) => {
         Toast.show({
@@ -62,26 +59,26 @@ export default function OTPModal({
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View className="flex-1 justify-center items-center bg-black/50">
-        <View 
+        <View
           className="bg-white p-6 rounded-2xl w-80"
-          style={{ 
-            alignItems: isArabic ? "flex-end" : "flex-start"
+          style={{
+            alignItems: isArabic ? "flex-end" : "flex-start",
           }}
         >
-          <Text 
+          <Text
             className="text-lg font-bold text-center mb-4 text-red-600"
-            style={{ 
+            style={{
               fontFamily: AppFonts.bold,
-              width: "100%"
+              width: "100%",
             }}
           >
             {t("otp.title")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-center mb-4"
-            style={{ 
+            style={{
               fontFamily: AppFonts.regular,
-              width: "100%"
+              width: "100%",
             }}
           >
             {t("otp.subtitle")}
@@ -93,7 +90,7 @@ export default function OTPModal({
             maxLength={6}
             placeholder={t("otp.placeholder")}
             className="border border-gray-300 rounded-md px-4 py-3 text-center text-lg tracking-widest text-black"
-            style={{ 
+            style={{
               fontFamily: AppFonts.medium,
             }}
           />
@@ -108,7 +105,7 @@ export default function OTPModal({
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text 
+              <Text
                 className="text-white text-center font-semibold text-base"
                 style={{ fontFamily: AppFonts.semibold }}
               >

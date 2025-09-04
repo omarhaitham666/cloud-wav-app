@@ -91,6 +91,19 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    UpdatePriceVedioCreaters: builder.mutation<
+      videoCreator,
+      {
+        id: string;
+        body: { private_price: number; bussiness_price: number };
+      }
+    >({
+      query: ({ id, body }) => ({
+        url: `/videoCreator-update/${id}`,
+        method: "PUT",
+        data: body,
+      }),
+    }),
     GetVedios: builder.query<{ videos: videos[] }, string>({
       query: (id) => ({
         url: `/video-creators/${id}/videos`,
@@ -106,5 +119,6 @@ export const {
   useTopVideoCreatorsAllQuery,
   useOrderVideoCreatorsMutation,
   useGetVedioCreatersQuery,
+  useUpdatePriceVedioCreatersMutation,
   useGetVediosQuery,
 } = songApi;
