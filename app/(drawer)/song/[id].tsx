@@ -1,18 +1,19 @@
 import { useGetSongQuery } from "@/store/api/global/song";
+import { AppFonts } from "@/utils/fonts";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Slider from "@react-native-community/slider";
 import { Audio } from "expo-av";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
-  Image,
+  Alert, Image,
   ImageBackground,
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 const formatTime = (seconds: number) => {
@@ -32,6 +33,8 @@ const formatNumber = (num: number) => {
 };
 
 const SongDetail = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
   const { id } = useLocalSearchParams<{ id: string }>();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -169,7 +172,7 @@ const SongDetail = () => {
       }
     } catch (error) {
       console.log("Error toggling playback:", error);
-      Alert.alert("Playback Error", "Could not play/pause the audio");
+      Alert.alert(t('song.playbackError'), t('song.playbackErrorMessage'));
     }
   };
 
@@ -211,6 +214,16 @@ const SongDetail = () => {
     return (
       <View className="flex-1 justify-center items-center bg-black">
         <ActivityIndicator size="large" color="#2f00ac" />
+        <Text 
+          className="text-white mt-4"
+          style={{ 
+            fontFamily: AppFonts.semibold,
+            textAlign: 'center',
+            writingDirection: isRTL ? 'rtl' : 'ltr'
+          }}
+        >
+          {t('song.loading')}
+        </Text>
       </View>
     );
   }
@@ -219,19 +232,36 @@ const SongDetail = () => {
     return (
       <View className="flex-1 justify-center items-center bg-black">
         <Ionicons name="musical-notes-outline" size={64} color="#666" />
-        <Text className="text-white text-lg mt-4">Song not found</Text>
+        <Text 
+          className="text-white text-lg mt-4"
+          style={{ 
+            fontFamily: AppFonts.semibold,
+            textAlign: 'center',
+            writingDirection: isRTL ? 'rtl' : 'ltr'
+          }}
+        >
+          {t('song.songNotFound')}
+        </Text>
         <TouchableOpacity
           onPress={() => router.back()}
           className="mt-4 bg-orange-500 px-6 py-3 rounded-full"
         >
-          <Text className="text-white font-semibold">Go Back</Text>
+          <Text 
+            className="text-white"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              writingDirection: isRTL ? 'rtl' : 'ltr'
+            }}
+          >
+            {t('song.goBack')}
+          </Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1 bg-black" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       <StatusBar barStyle="light-content" backgroundColor="black" />
 
       {/* cover background */}
@@ -245,16 +275,16 @@ const SongDetail = () => {
       </View>
 
       {/* header */}
-      <View className="flex-row justify-between items-center pt-12 pb-4 px-6">
+      <View className={`flex-row justify-between items-center pt-12 pb-4 px-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
         <TouchableOpacity
           onPress={() => router.back()}
           className="bg-black/20 rounded-full p-2"
         >
-          <Ionicons name="chevron-back" size={24} color="white" />
+          <Ionicons name={isRTL ? "chevron-back" : "chevron-forward"} size={24} color="white" />
         </TouchableOpacity>
 
-        <View className="flex-row items-center">
-          <TouchableOpacity className="bg-black/20 rounded-full p-2 mr-3">
+        <View className={`flex-row items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <TouchableOpacity className={`bg-black/20 rounded-full p-2 ${isRTL ? 'ml-3' : 'mr-3'}`}>
             <Ionicons name="share-outline" size={20} color="white" />
           </TouchableOpacity>
           <TouchableOpacity className="bg-black/20 rounded-full p-2">
@@ -279,29 +309,62 @@ const SongDetail = () => {
             )}
           </View>
 
-          <Text className="text-2xl text-white font-bold mt-6 text-center">
+          <Text 
+            className="text-2xl text-white mt-6 text-center"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              textAlign: 'center',
+              writingDirection: isRTL ? 'rtl' : 'ltr'
+            }}
+          >
             {data.title}
           </Text>
-          <Text className="text-orange-400 text-lg mt-1 text-center">
+          <Text 
+            className="text-orange-400 text-lg mt-1 text-center"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              textAlign: 'center',
+              writingDirection: isRTL ? 'rtl' : 'ltr'
+            }}
+          >
             {data.artist_name}
           </Text>
           {data.division && (
-            <Text className="text-gray-400 text-sm mt-1 text-center">
+            <Text 
+              className="text-gray-400 text-sm mt-1 text-center"
+              style={{ 
+                fontFamily: AppFonts.semibold,
+                textAlign: 'center',
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
+            >
               {data.division}
             </Text>
           )}
 
-          <View className="flex-row gap-3 items-center mt-4">
-            <View className="flex-row items-center">
+          <View className={`flex-row gap-3 items-center mt-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <View className={`flex-row items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <Ionicons name="play-outline" size={16} color="#9CA3AF" />
-              <Text className="text-gray-400 text-sm ml-1">
-                {formatNumber(playsCount)}
+              <Text 
+                className={`text-gray-400 text-sm ${isRTL ? 'mr-1' : 'ml-1'}`}
+                style={{ 
+                  fontFamily: AppFonts.semibold,
+                  writingDirection: isRTL ? 'rtl' : 'ltr'
+                }}
+              >
+                {formatNumber(playsCount)} {t('song.plays')}
               </Text>
             </View>
-            <View className="flex-row items-center">
+            <View className={`flex-row items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <Ionicons name="heart-outline" size={16} color="#9CA3AF" />
-              <Text className="text-gray-400 text-sm ml-1">
-                {formatNumber(likesCount)}
+              <Text 
+                className={`text-gray-400 text-sm ${isRTL ? 'mr-1' : 'ml-1'}`}
+                style={{ 
+                  fontFamily: AppFonts.semibold,
+                  writingDirection: isRTL ? 'rtl' : 'ltr'
+                }}
+              >
+                {formatNumber(likesCount)} {t('song.likes')}
               </Text>
             </View>
           </View>
@@ -309,11 +372,23 @@ const SongDetail = () => {
 
         {/* slider */}
         <View className="mb-8">
-          <View className="flex-row justify-between mb-2">
-            <Text className="text-gray-300 text-sm">
+          <View className="flex-row justify-between mb-2 gap-1">
+            <Text 
+              className="text-gray-300 text-sm"
+              style={{ 
+                fontFamily: AppFonts.semibold,
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
+            >
               {formatTime(currentTime)}
             </Text>
-            <Text className="text-gray-300 text-sm">
+            <Text 
+              className="text-gray-300 text-sm"
+              style={{ 
+                fontFamily: AppFonts.semibold,
+                writingDirection: isRTL ? 'rtl' : 'ltr'
+              }}
+            >
               {duration > 0 ? formatTime(duration) : "0:00"}
             </Text>
           </View>
@@ -333,7 +408,7 @@ const SongDetail = () => {
         </View>
 
         {/* controls */}
-        <View className="flex-row gap-3 justify-center items-center">
+        <View className={`flex-row gap-3 justify-center items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
           <TouchableOpacity
             onPress={handleLike}
             className="bg-white/10 rounded-full p-3"
@@ -351,7 +426,7 @@ const SongDetail = () => {
             disabled={!soundRef.current || audioError}
           >
             <Ionicons
-              name="play-skip-back"
+              name={isRTL ? "play-skip-forward" : "play-skip-back"}
               size={28}
               color={!soundRef.current || audioError ? "#666" : "white"}
             />
@@ -379,7 +454,7 @@ const SongDetail = () => {
             onPress={handleNext}
             className="bg-white/10 rounded-full p-3"
           >
-            <Ionicons name="play-skip-forward" size={28} color="white" />
+            <Ionicons name={isRTL ? "play-skip-back" : "play-skip-forward"} size={28} color="white" />
           </TouchableOpacity>
 
           <TouchableOpacity className="bg-white/10 rounded-full p-3">

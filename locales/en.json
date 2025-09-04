@@ -546,5 +546,50 @@
       "providingRealJobs": "Providing real job opportunities through our platform",
       "exclusiveMarketing": "Uploading content to all our official platforms (Exclusive marketing service)"
     }
+  },
+  "creators": {
+    "title": "Explore Creators",
+    "subtitle": "Personalized videos from your favorite stars",
+    "joinUs": "Join us",
+    "vipCreators": "VIP Creators",
+    "topCreators": "Top Creators",
+    "orderNow": "Order Now",
+    "private": "Private",
+    "business": "Business",
+    "loading": "Loading creators...",
+    "noCreators": "No creators available"
+  },
+  "song": {
+    "songNotFound": "Song not found",
+    "goBack": "Go Back",
+    "playbackError": "Playback Error",
+    "playbackErrorMessage": "Could not play/pause the audio",
+    "searchPlaceholder": "Search creators by name or category...",
+    "searchingCreators": "Searching creators...",
+    "noResultsFound": "No Results Found",
+    "noResultsMessage": "No creators found for \"{{query}}\". Try a different search term.",
+    "startSearching": "Start Searching",
+    "startSearchingMessage": "Search for your favorite creators by name or browse by category",
+    "popularCategories": "Popular Categories",
+    "searchResults": "Search Results",
+    "loading": "Loading...",
+    "plays": "Plays",
+    "likes": "Likes",
+    "categories": {
+      "all": "All",
+      "actor": "Actors",
+      "musician": "Musicians",
+      "content": "Content Creators",
+      "youtuber": "YouTubers",
+      "athlete": "Athletes",
+      "public": "Public Figures",
+      "tiktoker": "TikTokers"
+    },
+    "categoryDescriptions": {
+      "actor": "Movie & TV Stars",
+      "musician": "Artists & Singers",
+      "youtuber": "Content Creators",
+      "tiktoker": "Short Video Stars"
+    }
   }
 }

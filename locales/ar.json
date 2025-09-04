@@ -546,5 +546,50 @@
       "providingRealJobs": "تقديم فرص عمل حقيقية من خلال منصتنا",
       "exclusiveMarketing": "رفع المحتوى لجميع منصاتنا الرسمية (خدمة تسويق حصرية)"
     }
+  },
+  "creators": {
+    "title": "استكشف المبدعين",
+    "subtitle": "فيديوهات شخصية من نجومك المفضلين",
+    "joinUs": "انضم إلينا",
+    "vipCreators": "المبدعون المميزون",
+    "topCreators": "أفضل المبدعين",
+    "orderNow": "اطلب الآن",
+    "private": "خاص",
+    "business": "تجاري",
+    "loading": "جارٍ تحميل المبدعين...",
+    "noCreators": "لا يوجد مبدعون متاحون"
+  },
+  "song": {
+    "songNotFound": "الأغنية غير موجودة",
+    "goBack": "العودة",
+    "playbackError": "خطأ في التشغيل",
+    "playbackErrorMessage": "لا يمكن تشغيل/إيقاف الصوت",
+    "searchPlaceholder": "ابحث عن المبدعين بالاسم أو الفئة...",
+    "searchingCreators": "جارٍ البحث عن المبدعين...",
+    "noResultsFound": "لم يتم العثور على نتائج",
+    "noResultsMessage": "لم يتم العثور على مبدعين لـ \"{{query}}\". جرب مصطلح بحث مختلف.",
+    "startSearching": "ابدأ البحث",
+    "startSearchingMessage": "ابحث عن المبدعين المفضلين لديك بالاسم أو تصفح حسب الفئة",
+    "popularCategories": "الفئات الشائعة",
+    "searchResults": "نتائج البحث",
+    "loading": "جارٍ التحميل...",
+    "plays": "المشاهدات",
+    "likes": "الإعجابات",
+    "categories": {
+      "all": "الكل",
+      "actor": "الممثلون",
+      "musician": "الموسيقيون",
+      "content": "منشئو المحتوى",
+      "youtuber": "مبدعو يوتيوب",
+      "athlete": "الرياضيون",
+      "public": "الشخصيات العامة",
+      "tiktoker": "مبدعو تيك توك"
+    },
+    "categoryDescriptions": {
+      "actor": "نجوم السينما والتلفزيون",
+      "musician": "الفنانون والمطربون",
+      "youtuber": "منشئو المحتوى",
+      "tiktoker": "نجوم الفيديو القصير"
+    }
   }
 }
