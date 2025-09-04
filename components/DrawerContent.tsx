@@ -1,4 +1,5 @@
 import { useLogoutMutation } from "@/store/api/user/user";
+import { useAuth } from "@/store/auth-context";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
@@ -73,6 +74,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const currentRoute = state.routes[state.index]?.name;
   const [token, setToken] = useState<string | null>(null);
   const [logout, { isLoading }] = useLogoutMutation();
+  const { user, setUser } = useAuth();
   const isArabic = i18n.language === "ar";
   const navigation = useRootNavigation();
 
@@ -97,18 +99,18 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     try {
       await deleteToken("access_token");
       await logout().unwrap();
+      
+      // Clear auth context
+      setUser(null);
       setToken(null);
+      
       Toast.show({
         type: "success",
         text1: "Logout Successful",
         text2: "You have been logged out.",
       });
 
-      // Reset navigation state and redirect to login
-      navigation?.reset({
-        index: 0,
-        routes: [{ name: "(drawer)" }],
-      });
+      // Force refresh by replacing the entire stack
       router.replace("/(drawer)/(auth)/login");
     } catch (e: any) {
       Toast.show({
@@ -152,7 +154,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     },
   ];
 
-  const secondaryItems = token
+  const secondaryItems = (token || user)
     ? [
         {
           label: t("drawer.items.profile"),
@@ -308,7 +310,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
               {t("drawer.footer.version", { version: "1.0.0" })}
             </Text>
           </View>
-          {token && (
+          {(token || user) && (
             <TouchableOpacity onPress={handleLogout} className="p-2">
               <Feather name="log-out" size={18} color="#64748b" />
             </TouchableOpacity>

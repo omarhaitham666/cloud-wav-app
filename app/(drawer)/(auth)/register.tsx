@@ -1,5 +1,7 @@
 import OTPModal from "@/components/modals/OTPModal";
 import { useRegisterMutation } from "@/store/api/user/user";
+import { useAuth } from "@/store/auth-context";
+import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DateTimePicker, {
@@ -22,7 +24,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import * as yup from "yup";
-import { AppFonts } from "@/utils/fonts";
 
 interface FormValues {
   fullName: string;
@@ -42,6 +43,7 @@ export default function RegisterScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [register, { isLoading }] = useRegisterMutation();
+  const { setUser } = useAuth();
 
   const schema = yup.object().shape({
     fullName: yup.string().required(t("auth.validation.fullNameRequired")),
@@ -313,9 +315,22 @@ export default function RegisterScreen() {
             visible={otpVisible}
             email={watch("email")}
             password={watch("password")}
-            onVerified={() => {
+            onVerified={(userData) => {
               setOtpVisible(false);
-              router.push("/(drawer)/(tabs)/profile");
+              
+              // Update auth context with basic data
+              // Note: User data will be fetched separately after verification
+              setUser({
+                id: "",
+                name: watch("fullName"),
+                email: watch("email"),
+                image: "",
+                role: "",
+                token: "",
+              });
+              
+              // Force refresh by replacing the entire stack
+              router.replace("/(drawer)/(tabs)");
             }}
           />
         </View>

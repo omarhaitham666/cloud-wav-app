@@ -1,4 +1,6 @@
 import { useLoginMutation } from "@/store/api/user/user";
+import { useAuth } from "@/store/auth-context";
+import { AppFonts } from "@/utils/fonts";
 import { saveToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -7,18 +9,17 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    SafeAreaView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import * as yup from "yup";
-import { AppFonts } from "@/utils/fonts";
 
 interface LoginFormValues {
   email: string;
@@ -31,6 +32,7 @@ export default function LoginScreen() {
   const isRTL = i18n.language === 'ar';
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
+  const { setUser } = useAuth();
 
   const schema = yup.object().shape({
     email: yup.string().email(t("auth.validation.invalidEmail")).required(t("auth.validation.emailRequired")),
@@ -62,11 +64,24 @@ export default function LoginScreen() {
       .then(async (res) => {
         await saveToken("access_token", res.access_token);
 
+        // Update auth context with basic data
+        // Note: User data will be fetched separately after login
+        setUser({
+          id: "",
+          name: "",
+          email: data.email,
+          image: "",
+          role: "",
+          token: res.access_token,
+        });
+
         Toast.show({
           type: "success",
           text1: t("auth.login.alerts.loginSuccess"),
           text2: t("auth.login.alerts.loginSuccessMessage"),
         });
+        
+        // Force refresh by replacing the entire stack
         router.replace("/(drawer)/(tabs)");
       })
       .catch((e) => {

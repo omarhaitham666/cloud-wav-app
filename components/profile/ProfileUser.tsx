@@ -101,7 +101,7 @@ const ProfileUser = () => {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
-        base64: false,
+        base64: true,
       });
 
       if (!result.canceled && result.assets?.[0]?.uri) {
@@ -114,6 +114,7 @@ const ProfileUser = () => {
           uri: asset.uri,
           name: fileName,
           type: mimeType,
+          base64: asset.base64,
         });
       }
     } catch (err) {
@@ -128,8 +129,12 @@ const ProfileUser = () => {
   const onSubmit = async (formData: FormValues) => {
     try {
       const userData = data as UserData;
+      
+      // Fix user type detection in submission logic
       const isRegularUser =
-        userData?.role === "user" || userData?.type === "user";
+        userData?.role === "user" || 
+        (userData?.role && !userData.role.includes("artist") && !userData.role.includes("creator")) ||
+        userData?.type === "user";
 
       if (isRegularUser) {
         const payload = {
@@ -138,36 +143,135 @@ const ProfileUser = () => {
           type: userData?.type || "user",
           password: formData.password ?? "",
         };
-
+        
         await updateUser(payload).unwrap();
       } else {
-        const formDataToSend = new FormData();
-        formDataToSend.append("name", formData.fullName.trim());
-        formDataToSend.append("type", userData?.type || "artist");
         if (imageFile) {
-          formDataToSend.append("profile_image", {
-            uri: imageFile.uri,
-            type: imageFile.type,
-            name: imageFile.name,
-          } as any);
+          // Try base64 method first (most likely to work)
+          if (imageFile.base64) {
+            try {
+              const base64FormData = new FormData();
+              base64FormData.append("name", formData.fullName.trim());
+              base64FormData.append("type", userData?.type || "artist");
+              
+              const base64File = {
+                uri: `data:${imageFile.type};base64,${imageFile.base64}`,
+                type: imageFile.type,
+                name: imageFile.name,
+              };
+              
+              base64FormData.append("profile_image", base64File as any);
+              
+              await updateProfileARTISTORCREATORUser(base64FormData).unwrap();
+              
+              setValue("password", "");
+              setValue("confirmPassword", "");
+              setImageFile(null);
+              setProfileImage(null);
+              reset({
+                fullName: formData.fullName,
+                email: formData.email,
+                password: "",
+                confirmPassword: "",
+              });
+              refetch();
+              
+              Toast.show({
+                type: "success",
+                text1: "Profile Updated Successfully (with image)",
+              });
+              
+              return;
+              
+            } catch (base64Error) {
+              // Fall back to regular user update if image upload fails
+              const payload = {
+                email: formData.email.trim(),
+                new_name: formData.fullName.trim(),
+                type: "user",
+                password: formData.password ?? "",
+              };
+              
+              await updateUser(payload).unwrap();
+              
+              setValue("password", "");
+              setValue("confirmPassword", "");
+              setImageFile(null);
+              setProfileImage(null);
+              reset({
+                fullName: formData.fullName,
+                email: formData.email,
+                password: "",
+                confirmPassword: "",
+              });
+              refetch();
+              
+              Toast.show({
+                type: "info",
+                text1: "Profile Updated (Text Only)",
+                text2: "Image upload failed, but text fields were updated successfully",
+              });
+              
+              return;
+            }
+          }
+        } else {
+          // No image selected, use regular user update for text-only changes
+          const payload = {
+            email: formData.email.trim(),
+            new_name: formData.fullName.trim(),
+            type: "user",
+            password: formData.password ?? "",
+          };
+          
+          await updateUser(payload).unwrap();
+          
+          setValue("password", "");
+          setValue("confirmPassword", "");
+          setImageFile(null);
+          setProfileImage(null);
+          reset({
+            fullName: formData.fullName,
+            email: formData.email,
+            password: "",
+            confirmPassword: "",
+          });
+          refetch();
+
+          Toast.show({
+            type: "success",
+            text1: t("profile.user.updateSuccess") || "Profile Updated Successfully",
+          });
+          
+          return;
         }
-        console.log(typeof imageFile);
-        await updateProfileARTISTORCREATORUser(formDataToSend).unwrap();
       }
 
       setValue("password", "");
       setValue("confirmPassword", "");
+      setImageFile(null);
+      setProfileImage(null);
+      
+      reset({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: "",
+        confirmPassword: "",
+      });
+      
       refetch();
 
       Toast.show({
         type: "success",
-        text1:
-          t("profile.user.updateSuccess") || "Profile Updated Successfully",
+        text1: t("profile.user.updateSuccess") || "Profile Updated Successfully",
       });
     } catch (err: any) {
       const message =
         err?.data?.message ||
         err?.data?.errors?.profile_image?.[0] ||
+        err?.data?.errors?.name?.[0] ||
+        err?.data?.errors?.email?.[0] ||
+        err?.message ||
         "Update failed";
 
       Toast.show({
@@ -228,8 +332,11 @@ const ProfileUser = () => {
   }
 
   const userData = data as UserData;
+  // Fix user type detection - check if role contains "artist" or "creator"
   const isArtistOrCreator =
-    userData?.type !== "user" && userData?.role !== "user";
+    userData?.role?.includes("artist") || 
+    userData?.role?.includes("creator") ||
+    (userData?.type && userData.type !== "user");
   const isUpdating = updateLoading || updateProfileLoading;
 
   return (

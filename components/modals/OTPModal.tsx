@@ -3,13 +3,13 @@ import { AppFonts } from "@/utils/fonts";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Modal,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -17,7 +17,7 @@ interface OTPModalProps {
   visible: boolean;
   email: string;
   password: string;
-  onVerified: () => void;
+  onVerified: (userData?: any) => void;
 }
 
 export default function OTPModal({
@@ -48,7 +48,7 @@ export default function OTPModal({
           type: "success",
           text1: t("otp.alerts.verificationSuccess"),
         });
-        onVerified();
+        onVerified(res.user || res);
       })
       .catch((e) => {
         Toast.show({
