@@ -626,5 +626,41 @@
     },
     "success": "تم تحديث الأسعار بنجاح",
     "error": "فشل في تحديث الأسعار"
+  },
+  "upload": {
+    "title": "رفع الموسيقى",
+    "chooseType": "اختر نوع الرفع",
+    "song": "رفع أغنية",
+    "album": "إنشاء ألبوم",
+    "addSongToAlbum": "إضافة أغنية للألبوم",
+    "addSongToAlbumTitle": "إضافة أغنية للألبوم",
+    "selectAlbum": "اختر الألبوم",
+    "selectSong": "اختر الأغنية",
+    "chooseSongFile": "اختر ملف الأغنية",
+    "noAlbumsAvailable": "لا توجد ألبومات متاحة. أنشئ ألبوم أولاً.",
+    "fileSelected": "تم اختيار الملف بنجاح",
+    "songUpload": {
+      "title": "ارفع موسيقاك إلى Cloud.Wave",
+      "subtitle": "Cloud.Wave يوفر لك تخزين غير محدود.",
+      "browseText": "تصفح الملفات أو اسحبها وأفلتها هنا",
+      "uploadButton": "ارفع ملفك",
+      "acceptedTypes": "أنواع الملفات المقبولة هي MP3، FLAC، WAV، AIFF، OGG، & M4A. الحد الأقصى 500 ميجابايت لكل ملف.",
+      "termsText": "بالرفع، أنت توافق على شروط الخدمة وسياسة الخصوصية. Cloud.Wave مخصص للفنانين ودي جي والعلامات التجارية فقط. رفع محتوى الطرف الثالث سيؤدي إلى حظر فوري"
+    },
+    "albumUpload": {
+      "title": "رفع ألبوم",
+      "albumTitle": "العنوان",
+      "albumTitlePlaceholder": "أدخل عنوان الألبوم",
+      "albumCover": "غلاف الألبوم",
+      "noFileChosen": "لم يتم اختيار ملف",
+      "chooseFile": "اختر ملف"
+    },
+    "validation": {
+      "titleRequired": "عنوان الألبوم مطلوب",
+      "coverRequired": "غلاف الألبوم مطلوب",
+      "fileRequired": "يرجى اختيار ملف"
+    },
+    "submit": "رفع",
+    "uploading": "جارٍ الرفع..."
   }
 }
