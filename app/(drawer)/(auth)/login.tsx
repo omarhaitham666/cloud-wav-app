@@ -1,5 +1,4 @@
 import { useLoginMutation } from "@/store/api/user/user";
-import { AppFonts } from "@/utils/fonts";
 import { saveToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,6 +12,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   SafeAreaView,
   Text,
@@ -34,6 +34,7 @@ export default function LoginScreen() {
   const isRTL = i18n.language === "ar";
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
+  const { setUser } = useAuth();
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -73,11 +74,24 @@ export default function LoginScreen() {
       .then(async (res) => {
         await saveToken("access_token", res.access_token);
 
+        // Update auth context with basic data
+        // Note: User data will be fetched separately after login
+        setUser({
+          id: "",
+          name: "",
+          email: data.email,
+          image: "",
+          role: "",
+          token: res.access_token,
+        });
+
         Toast.show({
           type: "success",
           text1: t("auth.login.alerts.loginSuccess"),
           text2: t("auth.login.alerts.loginSuccessMessage"),
         });
+
+        // Force refresh by replacing the entire stack
         router.replace("/(drawer)/(tabs)");
       })
       .catch((e) => {
