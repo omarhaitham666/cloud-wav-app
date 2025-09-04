@@ -1,14 +1,18 @@
 import { useLoginMutation } from "@/store/api/user/user";
+import { AppFonts } from "@/utils/fonts";
 import { saveToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   SafeAreaView,
   Text,
@@ -18,7 +22,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import * as yup from "yup";
-import { AppFonts } from "@/utils/fonts";
 
 interface LoginFormValues {
   email: string;
@@ -28,12 +31,20 @@ interface LoginFormValues {
 export default function LoginScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
+  const isRTL = i18n.language === "ar";
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
 
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+    });
+  }, []);
   const schema = yup.object().shape({
-    email: yup.string().email(t("auth.validation.invalidEmail")).required(t("auth.validation.emailRequired")),
+    email: yup
+      .string()
+      .email(t("auth.validation.invalidEmail"))
+      .required(t("auth.validation.emailRequired")),
     password: yup
       .string()
       .min(6, t("auth.validation.passwordMinLength"))
@@ -78,6 +89,57 @@ export default function LoginScreen() {
       });
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+
+      // Get the ID token
+      const { idToken } = await GoogleSignin.getTokens();
+      console.log("Google ID Token: ", idToken);
+
+      // Send token to your backend
+      const response = await fetch(
+        "https://api.cloudwavproduction.com/auth/google/redirect",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: idToken }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Backend response: ", data);
+
+      if (response.ok) {
+        await saveToken("access_token", data.access_token);
+        Toast.show({
+          type: "success",
+          text1: "Login Success",
+          text2: data.message || "Something went wrong",
+        });
+        router.replace("/(drawer)/(tabs)");
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Login Failed",
+          text2: data.message || "Something went wrong",
+        });
+      }
+    } catch (error: any) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log("User cancelled the login flow");
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log("Sign in is in progress");
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log("Play services not available");
+      } else {
+        console.error(error);
+      }
+    }
+  };
   const renderInput = ({
     name,
     placeholder,
@@ -96,7 +158,11 @@ export default function LoginScreen() {
       name={name}
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
-          <View className={`flex-row items-center border border-gray-300 rounded-md px-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <View
+            className={`flex-row items-center border border-gray-300 rounded-md px-3 ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
             <TextInput
               placeholder={placeholder}
               value={value}
@@ -110,8 +176,8 @@ export default function LoginScreen() {
               placeholderTextColor="#888"
               autoCapitalize="none"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
-                writingDirection: isRTL ? 'rtl' : 'ltr',
+                textAlign: isRTL ? "right" : "left",
+                writingDirection: isRTL ? "rtl" : "ltr",
                 fontFamily: AppFonts.semibold,
               }}
             />
@@ -129,7 +195,7 @@ export default function LoginScreen() {
             <Text
               className="text-red-600 text-sm mt-1"
               style={{
-                textAlign: isRTL ? 'right' : 'left',
+                textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             >
@@ -172,7 +238,7 @@ export default function LoginScreen() {
           <Text
             className="text-sm text-red-600"
             style={{
-              textAlign: isRTL ? 'right' : 'left',
+              textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,
             }}
           >
@@ -200,22 +266,26 @@ export default function LoginScreen() {
 
         <Text
           className="text-center text-gray-500 mb-4"
-          style={{ textAlign: isRTL ? 'right' : 'left',
+          style={{
+            textAlign: isRTL ? "right" : "left",
             fontFamily: AppFonts.semibold,
-           }}
+          }}
         >
           {t("auth.login.orSignInWith")}
         </Text>
         <TouchableOpacity
-          className={`flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-3 shadow-sm justify-center mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}
-          onPress={() => Alert.alert("Social Login", "Sign in with Google")}
+          className={`flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-3 shadow-sm justify-center mb-6 ${
+            isRTL ? "flex-row-reverse" : ""
+          }`}
+          onPress={() => handleGoogleLogin()}
         >
           <Ionicons name="logo-google" size={20} color="#DB4437" />
           <Text
-            className={`text-base text-gray-800 ${isRTL ? 'mr-3' : 'ml-3'}`}
-            style={{ textAlign: isRTL ? 'right' : 'left',
+            className={`text-base text-gray-800 ${isRTL ? "mr-3" : "ml-3"}`}
+            style={{
+              textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,
-             }}
+            }}
           >
             {t("auth.login.continueWithGoogle")}
           </Text>
