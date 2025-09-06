@@ -629,7 +629,7 @@
   },
   "upload": {
     "title": "Upload Music",
-    "chooseType": "Choose Upload Type",
+    "chooseType": "What would you like to upload?",
     "song": "Upload Song",
     "album": "Create Album",
     "addSongToAlbum": "Add Song to Album",
@@ -639,28 +639,28 @@
     "chooseSongFile": "Choose song file",
     "noAlbumsAvailable": "No albums available. Create an album first.",
     "fileSelected": "File selected successfully",
+    "submit": "Create Album",
+    "uploading": "Uploading...",
     "songUpload": {
-      "title": "Upload your music to Cloud.Wave",
+      "title": "Upload Your Song",
       "subtitle": "Cloud.Wave gives you unlimited storage.",
-      "browseText": "Browse for files or drag and drop them here",
-      "uploadButton": "Upload your file",
-      "acceptedTypes": "Accepted file types are MP3, FLAC, WAV, AIFF, OGG, & M4A. Limit of 500MB per file.",
+      "browseText": "Tap to select audio file",
+      "uploadButton": "Upload Song",
+      "acceptedTypes": "Supported: MP3, WAV, AAC, M4A, FLAC",
       "termsText": "By uploading, you agree to our Terms of Service and Privacy Policy. Cloud.Wave is for Artists, DJs, and Labels only. Uploading third-party content will result in an immediate ban"
     },
     "albumUpload": {
-      "title": "Upload Album",
-      "albumTitle": "Title",
+      "title": "Create New Album",
+      "albumTitle": "Album Title",
       "albumTitlePlaceholder": "Enter album title",
       "albumCover": "Album Cover",
       "noFileChosen": "No file chosen",
-      "chooseFile": "Choose File"
+      "chooseFile": "Select Album Cover"
     },
     "validation": {
       "titleRequired": "Album title is required",
       "coverRequired": "Album cover is required",
       "fileRequired": "Please select a file"
-    },
-    "submit": "Upload",
-    "uploading": "Uploading..."
+    }
   }
 }
