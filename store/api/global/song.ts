@@ -49,6 +49,23 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    UploadSong: builder.mutation<
+      Songs,
+      { title: string; cover_path: File; song_path: File }
+    >({
+      query: () => ({
+        url: `/songs/upload`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: "Songs", id: "LIST" }],
+    }),
+    delteSong: builder.mutation<Songs, string>({
+      query: (id) => ({
+        url: `/songs-delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Songs", id: "LIST" }],
+    }),
   }),
 });
 
@@ -58,4 +75,6 @@ export const {
   useGetSongQuery,
   useGetSongByDivisionQuery,
   useGetSongStreemQuery,
+  useUploadSongMutation,
+  useDelteSongMutation,
 } = songApi;

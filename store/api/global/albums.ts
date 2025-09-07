@@ -46,8 +46,43 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    AddAlbum: builder.mutation<Albums, { title: string; album_cover: File }>({
+      query: () => ({
+        url: `/albums`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+    }),
+    UpdateAlbum: builder.mutation<Albums, string>({
+      query: (id) => ({
+        url: `/album-update/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+    }),
+    AddSongToAlbum: builder.mutation<Albums, string>({
+      query: (id) => ({
+        url: `/albums/${id}/songs`,
+        method: "POST",
+      }),
+      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+    }),
+    delteAlbum: builder.mutation<Albums, string>({
+      query: (id) => ({
+        url: `/albums-delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+    }),
   }),
 });
 
-export const { useGetalbumsQuery, useGetalbumQuery, useGetTrendalbumsQuery } =
-  songApi;
+export const {
+  useGetalbumsQuery,
+  useGetalbumQuery,
+  useGetTrendalbumsQuery,
+  useAddAlbumMutation,
+  useUpdateAlbumMutation,
+  useAddSongToAlbumMutation,
+  useDelteAlbumMutation,
+} = songApi;
