@@ -5,8 +5,8 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
-import AlbumUploadForm, { AlbumFormData } from "../AlbumUploadForm";
-import SongUploadForm, { SongFormData } from "../SongUploadForm";
+import AlbumUploadForm from "../AlbumUploadForm";
+import SongUploadForm from "../SongUploadForm";
 
 type UploadType = "choose" | "song" | "album";
 
@@ -14,21 +14,9 @@ type Props = {
   visible: boolean;
   artist_id?: number;
   onClose: () => void;
-  onSongUpload?: (
-    data: SongFormData,
-    file: any,
-    artwork?: any
-  ) => Promise<void>;
-  onAlbumUpload?: (data: AlbumFormData, coverImage: any) => Promise<void>;
 };
 
-const UploadModal: React.FC<Props> = ({
-  visible,
-  onClose,
-  artist_id,
-  onSongUpload,
-  onAlbumUpload,
-}) => {
+const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [uploadType, setUploadType] = useState<UploadType>("choose");
@@ -36,27 +24,6 @@ const UploadModal: React.FC<Props> = ({
   const handleClose = () => {
     setUploadType("choose");
     onClose();
-  };
-
-  const handleSongUploadSuccess = async (
-    data: SongFormData,
-    file: any,
-    artwork?: any
-  ) => {
-    if (onSongUpload) {
-      await onSongUpload(data, file, artwork);
-    }
-    handleClose();
-  };
-
-  const handleAlbumUploadSuccess = async (
-    data: AlbumFormData,
-    coverImage: any
-  ) => {
-    if (onAlbumUpload) {
-      await onAlbumUpload(data, coverImage);
-    }
-    handleClose();
   };
 
   const renderChooseType = () => (
@@ -150,13 +117,9 @@ const UploadModal: React.FC<Props> = ({
   const renderContent = () => {
     switch (uploadType) {
       case "song":
-        return (
-          <SongUploadForm onSuccess={handleSongUploadSuccess} isRTL={isRTL} />
-        );
+        return <SongUploadForm isRTL={isRTL} />;
       case "album":
-        return (
-          <AlbumUploadForm onSuccess={handleAlbumUploadSuccess} isRTL={isRTL} />
-        );
+        return <AlbumUploadForm isRTL={isRTL} />;
       default:
         return renderChooseType();
     }
