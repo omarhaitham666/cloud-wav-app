@@ -1,11 +1,12 @@
 import CustomHeader from "@/components/CustomHeader";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/cards/SongCard";
+import FamousArtistRequestModal from "@/components/modals/FamousArtistRequestModal";
 import { useGetTrendSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
     ActivityIndicator,
@@ -22,6 +23,7 @@ const HomePage = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const { data, isLoading } = useGetTrendSongQuery();
+  const [showFamousArtistModal, setShowFamousArtistModal] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -81,6 +83,21 @@ const HomePage = () => {
                 </Text>
                 <Ionicons name="play" size={18} color="red" />
               </TouchableOpacity>
+              
+              <TouchableOpacity
+                onPress={() => setShowFamousArtistModal(true)}
+                className="bg-red-500 flex-row items-center gap-3 px-4 py-2.5 rounded-full"
+              >
+                <Text
+                  className="text-white text-sm"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
+                  {t("home.buttons.design")}
+                </Text>
+                <Ionicons name="brush" size={18} color="white" />
+              </TouchableOpacity>
             </View>
           </View>
         </ImageBackground>
@@ -122,6 +139,11 @@ const HomePage = () => {
         </View>
         <View className="h-16" />
       </ScrollView>
+      
+      <FamousArtistRequestModal
+        visible={showFamousArtistModal}
+        onClose={() => setShowFamousArtistModal(false)}
+      />
     </SafeAreaView>
   );
 };

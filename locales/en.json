@@ -418,10 +418,45 @@
       "subtitle": "Unleash your soundworld"
     },
     "buttons": {
-      "play": "play"
+      "play": "play",
+      "design": "Design"
     },
     "sections": {
       "trendingSongs": "Trending Songs"
+    }
+  },
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "fillRequiredFields": "Please fill in all required fields",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "submitting": "Submitting..."
+  },
+  "famousArtist": {
+    "title": "Famous Artist Request",
+    "submit": "Submit Request",
+    "requestSubmitted": "Your request has been submitted successfully!",
+    "fields": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "whatsapp": "WhatsApp Number",
+      "division": "Music Division",
+      "socialLinks": "Social Media Links",
+      "details": "Additional Details",
+      "idCard": "ID Card Image",
+      "profileImage": "Profile Image"
+    },
+    "placeholders": {
+      "name": "Enter your full name",
+      "email": "Enter your email address",
+      "phone": "Enter your phone number",
+      "whatsapp": "Enter your WhatsApp number",
+      "division": "e.g., Rap, Pop, Rock",
+      "socialLinks": "Enter your social media links",
+      "details": "Tell us more about yourself",
+      "selectIdCard": "Select ID Card Image",
+      "selectProfile": "Select Profile Image"
     }
   },
   "drawer": {

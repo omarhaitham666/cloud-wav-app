@@ -418,10 +418,45 @@
       "subtitle": "حرر عالمك الصوتي"
     },
     "buttons": {
-      "play": "تشغيل"
+      "play": "تشغيل",
+      "design": "تصميم"
     },
     "sections": {
       "trendingSongs": "الأغاني الرائجة"
+    }
+  },
+  "common": {
+    "error": "خطأ",
+    "success": "نجح",
+    "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+    "somethingWentWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "submitting": "جارٍ الإرسال..."
+  },
+  "famousArtist": {
+    "title": "طلب فنان مشهور",
+    "submit": "إرسال الطلب",
+    "requestSubmitted": "تم إرسال طلبك بنجاح!",
+    "fields": {
+      "name": "الاسم الكامل",
+      "email": "عنوان البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "whatsapp": "رقم الواتساب",
+      "division": "قسم الموسيقى",
+      "socialLinks": "روابط وسائل التواصل الاجتماعي",
+      "details": "تفاصيل إضافية",
+      "idCard": "صورة الهوية",
+      "profileImage": "صورة الملف الشخصي"
+    },
+    "placeholders": {
+      "name": "أدخل اسمك الكامل",
+      "email": "أدخل عنوان بريدك الإلكتروني",
+      "phone": "أدخل رقم هاتفك",
+      "whatsapp": "أدخل رقم واتسابك",
+      "division": "مثل: راب، بوب، روك",
+      "socialLinks": "أدخل روابط وسائل التواصل الاجتماعي",
+      "details": "أخبرنا المزيد عن نفسك",
+      "selectIdCard": "اختر صورة الهوية",
+      "selectProfile": "اختر صورة الملف الشخصي"
     }
   },
   "drawer": {
