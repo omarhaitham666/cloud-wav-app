@@ -53,9 +53,10 @@ const songApi = mainApi.injectEndpoints({
       Songs,
       { title: string; cover_path: File; song_path: File }
     >({
-      query: () => ({
+      query: (data) => ({
         url: `/songs/upload`,
         method: "POST",
+        data: data,
       }),
       invalidatesTags: [{ type: "Songs", id: "LIST" }],
     }),
