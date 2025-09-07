@@ -1,10 +1,9 @@
+import EnhancedAudioPlayer from "@/components/EnhancedAudioPlayer";
 import { useGetSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Slider from "@react-native-community/slider";
-import { Audio } from "expo-av";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -15,12 +14,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-
-const formatTime = (seconds: number) => {
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-  return `${min}:${sec < 10 ? `0${sec}` : sec}`;
-};
 
 const formatNumber = (num: number) => {
   if (num >= 1000000) {
@@ -37,172 +30,33 @@ const SongDetail = () => {
   const isRTL = i18n.language === "ar";
   const { id } = useLocalSearchParams<{ id: string }>();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [playsCount, setPlaysCount] = useState(0);
-  const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [audioError, setAudioError] = useState(false);
-  const [isSliding, setIsSliding] = useState(false);
-
-  const soundRef = useRef<Audio.Sound | null>(null);
 
   const { data, isLoading: isFetching } = useGetSongQuery(id, {
     skip: !id,
   });
-
-  // configure audio
-  useEffect(() => {
-    const configureAudio = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          staysActiveInBackground: true,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          playThroughEarpieceAndroid: false,
-        });
-      } catch (error) {
-        console.log("Error configuring audio:", error);
-      }
-    };
-    configureAudio();
-    return () => {
-      cleanupAudio();
-    };
-  }, []);
 
   useEffect(() => {
     if (data) {
       setIsLiked(data.isLiked || false);
       setLikesCount(data.likes_count || 0);
       setPlaysCount(data.plays || 0);
-      loadAudio();
     }
   }, [data]);
 
-  const cleanupAudio = async () => {
-    try {
-      if (soundRef.current) {
-        await soundRef.current.unloadAsync();
-        soundRef.current = null;
-      }
-    } catch (error) {
-      console.log("Error cleaning up audio:", error);
+  const handlePlaybackStateChange = (playing: boolean) => {
+    setIsPlaying(playing);
+    if (playing && playsCount === 0) {
+      setPlaysCount((prev) => prev + 1);
     }
   };
 
-  const loadAudio = async () => {
-    if (!data?.song_url) {
-      setAudioError(true);
-      return;
-    }
-
-    try {
-      setIsAudioLoading(true);
-      setAudioError(false);
-      setDuration(0);
-
-      await cleanupAudio();
-
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: data.song_url },
-        { shouldPlay: false }
-      );
-
-      soundRef.current = sound;
-
-      sound.setOnPlaybackStatusUpdate((status: any) => {
-        if (!status.isLoaded) {
-          if (status.error) {
-            console.log("Playback error:", status.error);
-            setAudioError(true);
-          }
-          return;
-        }
-
-        // duration
-        if (status.durationMillis) {
-          setDuration(status.durationMillis / 1000);
-        }
-
-        // current time
-        if (!isSliding && status.positionMillis !== undefined) {
-          setCurrentTime(status.positionMillis / 1000);
-        }
-
-        setIsPlaying(status.isPlaying);
-
-        if (status.didJustFinish) {
-          setIsPlaying(false);
-          setCurrentTime(0);
-          sound.setPositionAsync(0);
-        }
-      });
-
-      // force duration check once
-      const firstStatus = await sound.getStatusAsync();
-      if (firstStatus.isLoaded && firstStatus.durationMillis) {
-        setDuration(firstStatus.durationMillis / 1000);
-      }
-    } catch (error) {
-      console.log("Error loading audio:", error);
-      setAudioError(true);
-    } finally {
-      setIsAudioLoading(false);
-    }
-  };
-
-  const togglePlayback = async () => {
-    if (!soundRef.current) return;
-
-    try {
-      const status = await soundRef.current.getStatusAsync();
-
-      if (status.isLoaded) {
-        if (isPlaying) {
-          await soundRef.current.pauseAsync();
-        } else {
-          await soundRef.current.playAsync();
-          if (currentTime === 0) {
-            setPlaysCount((prev) => prev + 1);
-          }
-        }
-      }
-    } catch (error) {
-      console.log("Error toggling playback:", error);
-      Alert.alert(t('song.playbackError'), t('song.playbackErrorMessage'));
-    }
-  };
-
-  const handleSliderComplete = async (value: number) => {
-    if (!soundRef.current) {
-      setIsSliding(false);
-      return;
-    }
-    try {
-      await soundRef.current.setPositionAsync(value * 1000);
-    } catch (error) {
-      console.log("Error seeking:", error);
-    } finally {
-      setIsSliding(false);
-    }
-  };
-
-  const handlePrevious = async () => {
-    if (!soundRef.current) return;
-    try {
-      await soundRef.current.setPositionAsync(0);
-      setCurrentTime(0);
-    } catch (error) {
-      console.log("Error going to start:", error);
-    }
-  };
-
-  const handleNext = () => {
-    console.log("Next song");
-    // Implement next song logic
+  const handleAudioError = (error: string) => {
+    setAudioError(true);
+    Alert.alert(t('song.playbackError'), error);
   };
 
   const handleLike = () => {
@@ -302,9 +156,9 @@ const SongDetail = () => {
               source={{ uri: data.cover_url }}
               className="w-72 h-72 rounded-3xl shadow-2xl"
             />
-            {isAudioLoading && (
+            {audioError && (
               <View className="absolute inset-0 bg-black/50 rounded-3xl justify-center items-center">
-                <ActivityIndicator size="large" color="#f9a826" />
+                <Ionicons name="alert-circle-outline" size={48} color="#ef4444" />
               </View>
             )}
           </View>
@@ -367,100 +221,38 @@ const SongDetail = () => {
                 {formatNumber(likesCount)} {t('song.likes')}
               </Text>
             </View>
-          </View>
-        </View>
-
-        {/* slider */}
-        <View className="mb-8">
-          <View className="flex-row justify-between mb-2 gap-1">
-            <Text 
-              className="text-gray-300 text-sm"
-              style={{ 
-                fontFamily: AppFonts.semibold,
-                writingDirection: isRTL ? 'rtl' : 'ltr'
-              }}
+            
+            {/* Action Buttons */}
+            <TouchableOpacity
+              onPress={handleLike}
+              className="bg-white/10 rounded-full p-2"
             >
-              {formatTime(currentTime)}
-            </Text>
-            <Text 
-              className="text-gray-300 text-sm"
-              style={{ 
-                fontFamily: AppFonts.semibold,
-                writingDirection: isRTL ? 'rtl' : 'ltr'
-              }}
-            >
-              {duration > 0 ? formatTime(duration) : "0:00"}
-            </Text>
-          </View>
-          <Slider
-            style={{ height: 40 }}
-            minimumValue={0}
-            maximumValue={duration || 1}
-            value={currentTime}
-            onSlidingStart={() => setIsSliding(true)}
-            onValueChange={(val) => setCurrentTime(val)}
-            onSlidingComplete={handleSliderComplete}
-            thumbTintColor="#f9a826"
-            minimumTrackTintColor="#f9a826"
-            maximumTrackTintColor="rgba(255,255,255,0.3)"
-            disabled={!soundRef.current || audioError}
-          />
-        </View>
-
-        {/* controls */}
-        <View className={`flex-row gap-3 justify-center items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-          <TouchableOpacity
-            onPress={handleLike}
-            className="bg-white/10 rounded-full p-3"
-          >
-            <Ionicons
-              name={isLiked ? "heart" : "heart-outline"}
-              size={24}
-              color={isLiked ? "#f9a826" : "white"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handlePrevious}
-            className="bg-white/10 rounded-full p-3"
-            disabled={!soundRef.current || audioError}
-          >
-            <Ionicons
-              name={isRTL ? "play-skip-forward" : "play-skip-back"}
-              size={28}
-              color={!soundRef.current || audioError ? "#666" : "white"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={togglePlayback}
-            className="bg-orange-500 rounded-full p-4 shadow-lg"
-            disabled={isAudioLoading || audioError}
-            style={{ opacity: isAudioLoading || audioError ? 0.6 : 1 }}
-          >
-            {isAudioLoading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
               <Ionicons
-                name={isPlaying ? "pause" : "play"}
-                size={32}
-                color="white"
-                style={{ marginLeft: isPlaying ? 0 : 2 }}
+                name={isLiked ? "heart" : "heart-outline"}
+                size={20}
+                color={isLiked ? "#f9a826" : "white"}
               />
-            )}
-          </TouchableOpacity>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={handleNext}
-            className="bg-white/10 rounded-full p-3"
-          >
-            <Ionicons name={isRTL ? "play-skip-back" : "play-skip-forward"} size={28} color="white" />
-          </TouchableOpacity>
-
-          <TouchableOpacity className="bg-white/10 rounded-full p-3">
-            <Ionicons name="repeat" size={24} color="white" />
-          </TouchableOpacity>
+            <TouchableOpacity className="bg-white/10 rounded-full p-2">
+              <Ionicons name="repeat" size={20} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
+
+        {/* Audio Player */}
+        {data?.song_url && (
+          <EnhancedAudioPlayer
+            songUrl={data.song_url}
+            songTitle={data.title}
+            artistName={data.artist_name || data.artist}
+            coverUrl={data.cover_url}
+            onPlaybackStateChange={handlePlaybackStateChange}
+            onError={handleAudioError}
+            className="mb-8"
+          />
+        )}
+
       </View>
     </View>
   );

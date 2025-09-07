@@ -8,13 +8,13 @@ import { router } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  FlatList,
-  ImageBackground,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    ImageBackground,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
