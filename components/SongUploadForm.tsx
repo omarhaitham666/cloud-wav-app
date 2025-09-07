@@ -48,11 +48,10 @@ const songSchema = z.object({
 export type SongFormData = z.infer<typeof songSchema>;
 
 type Props = {
-  onSuccess: (data: SongFormData, file: any, artwork?: any) => Promise<void>;
   isRTL: boolean;
 };
 
-const SongUploadForm: React.FC<Props> = ({ onSuccess, isRTL }) => {
+const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
   const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [songArtwork, setSongArtwork] = useState<any>(null);
@@ -191,8 +190,6 @@ const SongUploadForm: React.FC<Props> = ({ onSuccess, isRTL }) => {
         text1: "Song Uploaded",
         text2: "Your song has been uploaded successfully",
       });
-
-      await onSuccess(data, selectedFile, songArtwork);
 
       reset();
       setSelectedFile(null);

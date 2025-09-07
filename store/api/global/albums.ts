@@ -47,9 +47,11 @@ const songApi = mainApi.injectEndpoints({
       }),
     }),
     AddAlbum: builder.mutation<Albums, { title: string; album_cover: File }>({
-      query: () => ({
+      query: (formData) => ({
         url: `/albums`,
         method: "POST",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
       }),
       invalidatesTags: [{ type: "Albums", id: "LIST" }],
     }),

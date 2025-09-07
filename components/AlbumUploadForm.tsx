@@ -28,11 +28,10 @@ const albumSchema = z.object({
 export type AlbumFormData = z.infer<typeof albumSchema>;
 
 type Props = {
-  onSuccess: (data: AlbumFormData, coverImage: any) => Promise<void>;
   isRTL: boolean;
 };
 
-const AlbumUploadForm: React.FC<Props> = ({ onSuccess, isRTL }) => {
+const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
   const { t } = useTranslation();
   const [coverImage, setCoverImage] = useState<any>(null);
   const [addAlbum, { isLoading: isAddAlbumLoading }] = useAddAlbumMutation();
@@ -101,18 +100,25 @@ const AlbumUploadForm: React.FC<Props> = ({ onSuccess, isRTL }) => {
       });
       return;
     }
-
+    const album_cover = {
+      uri: coverImage.uri,
+      type: coverImage.mimeType || "image/jpeg",
+      name: coverImage.fileName || `album_cover_${Date.now()}.jpg`,
+    };
     try {
       const formData = new FormData();
       formData.append("title", data.title);
 
-      formData.append("album_cover", {
-        uri: coverImage.uri,
-        type: coverImage.mimeType || "image/jpeg",
-        name: coverImage.fileName || "album_cover.jpg",
-      } as any);
+      formData.append("album_cover", album_cover as any);
 
-      console.log(formData);
+      console.log("FORM DATA PAYLOAD:", {
+        title: data.title,
+        album_cover: {
+          uri: coverImage.uri,
+          type: coverImage.mimeType,
+          name: coverImage.fileName,
+        },
+      });
 
       await addAlbum(formData as any).unwrap();
 
@@ -121,13 +127,11 @@ const AlbumUploadForm: React.FC<Props> = ({ onSuccess, isRTL }) => {
         text1: "Album Created",
         text2: "Your album has been created successfully",
       });
-
-      await onSuccess(data, coverImage);
-
-      // Reset form
       reset();
       setCoverImage(null);
     } catch (error: any) {
+      console.log("Upload error:", error);
+
       Toast.show({
         type: "error",
         text1: "Upload Failed",
