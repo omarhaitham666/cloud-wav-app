@@ -20,16 +20,20 @@ export interface FamousArtistRequestResponse {
 
 const famousArtistApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    createFamousArtistRequest: builder.mutation<FamousArtistRequestResponse, FamousArtistRequest>({
-      query: (body) => ({
+    createFamousArtistRequest: builder.mutation<
+      FamousArtistRequestResponse,
+      FormData
+    >({
+      query: (formData) => ({
         url: "/famous-artist-requests",
         method: "POST",
-        data: body,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
     }),
   }),
 });
 
-export const {
-  useCreateFamousArtistRequestMutation,
-} = famousArtistApi;
+export const { useCreateFamousArtistRequestMutation } = famousArtistApi;

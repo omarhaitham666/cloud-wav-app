@@ -6,13 +6,13 @@ import { router } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Modal,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -39,7 +39,7 @@ const servicesOptions = [
 
 const singOptions = [
   "services.musicDistribution.modal.singOptions.singMyself",
-  "services.musicDistribution.modal.singOptions.needSpecific"
+  "services.musicDistribution.modal.singOptions.needSpecific",
 ];
 
 type Props = {
@@ -116,7 +116,9 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               {t("services.musicDistribution.modal.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
-                              <Text className="text-xl text-gray-600">{t("services.musicDistribution.modal.close")}</Text>
+              <Text className="text-xl text-gray-600">
+                {t("services.musicDistribution.modal.close")}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -175,7 +177,9 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="whatsapp_number"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder={t("services.musicDistribution.modal.form.whatsappNumber")}
+                  placeholder={t(
+                    "services.musicDistribution.modal.form.whatsappNumber"
+                  )}
                   className="border border-gray-300 rounded p-3 mb-4"
                   keyboardType="phone-pad"
                   value={value}
@@ -189,7 +193,9 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               name="details"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  placeholder={t("services.musicDistribution.modal.form.details")}
+                  placeholder={t(
+                    "services.musicDistribution.modal.form.details"
+                  )}
                   className="border border-gray-300 rounded p-3 mb-4 h-20"
                   multiline
                   value={value}
@@ -249,7 +255,11 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
               onPress={handleSubmit(onSubmit)}
             >
               <Text className="text-white text-center font-semibold">
-                {isLoading ? <ActivityIndicator color="#fff" /> : t("services.musicDistribution.modal.form.submit")}
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  t("services.musicDistribution.modal.form.submit")
+                )}
               </Text>
             </TouchableOpacity>
           </ScrollView>
