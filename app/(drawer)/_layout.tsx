@@ -2,7 +2,7 @@ import DrawerContent from "@/components/DrawerContent";
 import { Drawer } from "expo-router/drawer";
 import { useTranslation } from "react-i18next";
 
-export default function DrawerLayout() {
+function DrawerLayout() {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   return (
@@ -52,3 +52,5 @@ export default function DrawerLayout() {
     </Drawer>
   );
 }
+
+export default DrawerLayout;

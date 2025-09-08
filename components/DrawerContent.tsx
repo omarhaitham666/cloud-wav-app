@@ -1,6 +1,7 @@
 import { useLogoutMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { useDrawerRefresh } from "@/store/drawerRefreshContext";
+import { invalidateAllQueries } from "@/store/utils";
 import AppRefreshService, { setDrawerRefreshTrigger } from "@/utils/appRefresh";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
@@ -111,6 +112,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setToken(null);
 
       await AppRefreshService.refreshAfterAuthChange("logout");
+      invalidateAllQueries();
     } catch (e: any) {
       Toast.show({
         type: "error",

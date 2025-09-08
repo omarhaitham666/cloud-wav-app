@@ -32,6 +32,9 @@ i18n
       ar: { translation: ar },
     },
     interpolation: { escapeValue: false },
+    react: {
+      useSuspense: false,
+    },
   });
 
 // Direction is locked to LTR above; no further init needed

@@ -1,5 +1,6 @@
 import { useVerifyCodeMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
+import { invalidateAllQueries } from "@/store/utils";
 import { AppFonts } from "@/utils/fonts";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -47,6 +48,7 @@ export default function OTPModal({
           type: "success",
           text1: t("otp.alerts.verificationSuccess"),
         });
+        invalidateAllQueries();
         triggerAuthRefresh();
         onVerified(res.message || res);
       })

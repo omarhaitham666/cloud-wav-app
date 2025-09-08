@@ -1,5 +1,6 @@
 import { useLoginMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
+import { invalidateAllQueries } from "@/store/utils";
 import { AppFonts } from "@/utils/fonts";
 import { saveToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,7 +31,7 @@ const schema = yup.object().shape({
   password: yup.string().min(8).required(),
 });
 
-export default function LoginScreen() {
+function LoginScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
@@ -74,6 +75,7 @@ export default function LoginScreen() {
           text2: t("auth.login.alerts.loginSuccessMessage"),
         });
 
+        invalidateAllQueries();
         triggerAuthRefresh();
         router.replace("/(drawer)/(tabs)");
       })
@@ -252,3 +254,5 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
+
+export default LoginScreen;

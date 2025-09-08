@@ -28,7 +28,7 @@ function AppContent() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) {
@@ -99,3 +99,5 @@ export default function RootLayout() {
     </StoreProvider>
   );
 }
+
+export default RootLayout;
