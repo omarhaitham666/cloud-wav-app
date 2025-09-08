@@ -6,15 +6,16 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Animated,
-    Dimensions,
-    FlatList, Platform,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Animated,
+  Dimensions,
+  FlatList,
+  Platform,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 
@@ -56,14 +57,14 @@ const Search = () => {
   }, []);
 
   const categories = [
-    { id: "all", label: t('song.categories.all'), icon: "grid" },
-    { id: "actor", label: t('song.categories.actor'), icon: "video" },
-    { id: "musician", label: t('song.categories.musician'), icon: "music" },
-    { id: "content", label: t('song.categories.content'), icon: "camera" },
-    { id: "youtuber", label: t('song.categories.youtuber'), icon: "play" },
-    { id: "athlete", label: t('song.categories.athlete'), icon: "award" },
-    { id: "public", label: t('song.categories.public'), icon: "users" },
-    { id: "tiktoker", label: t('song.categories.tiktoker'), icon: "zap" },
+    { id: "all", label: t("song.categories.all"), icon: "grid" },
+    { id: "actor", label: t("song.categories.actor"), icon: "video" },
+    { id: "musician", label: t("song.categories.musician"), icon: "music" },
+    { id: "content", label: t("song.categories.content"), icon: "camera" },
+    { id: "youtuber", label: t("song.categories.youtuber"), icon: "play" },
+    { id: "athlete", label: t("song.categories.athlete"), icon: "award" },
+    { id: "public", label: t("song.categories.public"), icon: "users" },
+    { id: "tiktoker", label: t("song.categories.tiktoker"), icon: "zap" },
   ];
 
   const handleSearch = (query: string) => {
@@ -117,23 +118,23 @@ const Search = () => {
             transform: [{ translateY: slideAnim }],
           }}
         >
-          <Text 
+          <Text
             className="text-gray-900 text-3xl mb-2"
-            style={{ 
+            style={{
               fontFamily: AppFonts.semibold,
-              textAlign: isRTL ? 'right' : 'left'
+              textAlign: isRTL ? "right" : "left",
             }}
           >
-            {t('creators.title')}
+            {t("creators.title")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-base"
-            style={{ 
+            style={{
               fontFamily: AppFonts.semibold,
-              textAlign: isRTL ? 'right' : 'left'
+              textAlign: isRTL ? "right" : "left",
             }}
           >
-            {t('creators.subtitle')}
+            {t("creators.subtitle")}
           </Text>
         </Animated.View>
 
@@ -144,17 +145,23 @@ const Search = () => {
             transform: [{ translateY: slideAnim }],
           }}
         >
-          <View className={`bg-white rounded-2xl flex-row items-center px-4 py-2 shadow-sm border border-gray-200 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <View
+            className={`bg-white rounded-2xl flex-row items-center px-4 py-2 shadow-sm border border-gray-200 ${
+              isRTL ? "flex-row-reverse" : ""
+            }`}
+          >
             <Icon name="search" size={20} color="#6B7280" />
             <TextInput
-              className={`flex-1 text-gray-900 text-base ${isRTL ? 'mr-3' : 'ml-3'}`}
-              placeholder={t('song.searchPlaceholder')}
+              className={`flex-1 text-gray-900 text-base ${
+                isRTL ? "mr-3" : "ml-3"
+              }`}
+              placeholder={t("song.searchPlaceholder")}
               placeholderTextColor="#6B7280"
               value={searchQuery}
               onChangeText={handleSearch}
               returnKeyType="search"
               onSubmitEditing={() => refetch()}
-              textAlign={isRTL ? 'right' : 'left'}
+              textAlign={isRTL ? "right" : "left"}
               style={{ fontFamily: AppFonts.semibold }}
             />
             {searchQuery.length > 0 && (
@@ -189,16 +196,21 @@ const Search = () => {
             renderItem={({ item: category }) => (
               <TouchableOpacity
                 onPress={() => handleCategoryPress(category.id)}
-                className={`flex-row items-center px-4 py-3 rounded-full ${isRTL ? 'ml-3' : 'mr-3'} ${
+                className={`flex-row items-center px-4 py-3 rounded-full ${
+                  isRTL ? "ml-3" : "mr-3"
+                } ${
                   activeCategory === category.id ? "bg-blue-500" : "bg-white"
-                } shadow-sm ${isRTL ? 'flex-row-reverse' : ''}`}
+                } shadow-sm ${isRTL ? "flex-row-reverse" : ""}`}
                 activeOpacity={0.8}
               >
                 <Icon
                   name={category.icon}
                   size={16}
                   color={activeCategory === category.id ? "#ffffff" : "#374151"}
-                  style={{ marginRight: isRTL ? 0 : 8, marginLeft: isRTL ? 8 : 0 }}
+                  style={{
+                    marginRight: isRTL ? 0 : 8,
+                    marginLeft: isRTL ? 8 : 0,
+                  }}
                 />
                 <Text
                   className={`${
@@ -223,14 +235,14 @@ const Search = () => {
       return (
         <View className="flex-1 justify-center items-center my-8">
           <ActivityIndicator size="large" color="#3B82F6" />
-          <Text 
+          <Text
             className="text-gray-600 mt-2"
-            style={{ 
+            style={{
               fontFamily: AppFonts.semibold,
-              textAlign: 'center'
+              textAlign: "center",
             }}
           >
-            {t('song.searchingCreators')}
+            {t("song.searchingCreators")}
           </Text>
         </View>
       );
@@ -242,23 +254,23 @@ const Search = () => {
           <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
             <Icon name="search" size={32} color="#9CA3AF" />
           </View>
-          <Text 
+          <Text
             className="text-gray-900 text-xl mb-2"
-            style={{ 
+            style={{
               fontFamily: AppFonts.semibold,
-              textAlign: 'center'
+              textAlign: "center",
             }}
           >
-            {t('song.noResultsFound')}
+            {t("song.noResultsFound")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-center text-base leading-6"
-            style={{ 
+            style={{
               fontFamily: AppFonts.semibold,
-              textAlign: 'center'
+              textAlign: "center",
             }}
           >
-            {t('song.noResultsMessage', { query: searchQuery })}
+            {t("song.noResultsMessage", { query: searchQuery })}
           </Text>
         </View>
       );
@@ -269,23 +281,23 @@ const Search = () => {
         <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
           <Icon name="search" size={32} color="#fff" />
         </View>
-        <Text 
+        <Text
           className="text-gray-900 text-xl mb-2"
-          style={{ 
+          style={{
             fontFamily: AppFonts.semibold,
-            textAlign: 'center'
+            textAlign: "center",
           }}
         >
-          {t('song.startSearching')}
+          {t("song.startSearching")}
         </Text>
-        <Text 
+        <Text
           className="text-gray-600 text-center text-base leading-6"
-          style={{ 
+          style={{
             fontFamily: AppFonts.semibold,
-            textAlign: 'center'
+            textAlign: "center",
           }}
         >
-          {t('song.startSearchingMessage')}
+          {t("song.startSearchingMessage")}
         </Text>
       </View>
     );
@@ -293,44 +305,48 @@ const Search = () => {
 
   const renderFooter = () => (
     <View className="px-6 mt-8 mb-20">
-      <Text 
+      <Text
         className="text-gray-900 text-xl mb-4"
-        style={{ 
+        style={{
           fontFamily: AppFonts.semibold,
-          textAlign: isRTL ? 'right' : 'left'
+          textAlign: isRTL ? "right" : "left",
         }}
       >
-        {t('song.popularCategories')}
+        {t("song.popularCategories")}
       </Text>
 
-      <View className={`flex-row mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <View className={`flex-row mb-4 ${isRTL ? "flex-row-reverse" : ""}`}>
         <TouchableOpacity
           onPress={() => handlePopularCategoryPress("actor")}
-          className={`flex-1 ${isRTL ? 'items-end ml-2' : 'items-start mr-2'} bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          className={`flex-1 ${
+            isRTL ? "items-end ml-2" : "items-start mr-2"
+          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
         >
           <Icon
             name="video"
             size={24}
             color="#3B82F6"
-            style={{ marginBottom: 8, }}
+            style={{ marginBottom: 8 }}
           />
-          <Text 
+          <Text
             className="text-gray-900"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categories.actor')}
+            {t("song.categories.actor")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-sm"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categoryDescriptions.actor')}
+            {t("song.categoryDescriptions.actor")}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => handlePopularCategoryPress("musician")}
-          className={`flex-1 ${isRTL ? 'items-end ml-2' : 'items-start mr-2'} bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          className={`flex-1 ${
+            isRTL ? "items-end ml-2" : "items-start mr-2"
+          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
         >
           <Icon
             name="music"
@@ -338,25 +354,27 @@ const Search = () => {
             color="#3B82F6"
             style={{ marginBottom: 8 }}
           />
-          <Text 
+          <Text
             className="text-gray-900"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categories.musician')}
+            {t("song.categories.musician")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-sm"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categoryDescriptions.musician')}
+            {t("song.categoryDescriptions.musician")}
           </Text>
         </TouchableOpacity>
       </View>
 
-      <View className={`flex-row ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <View className={`flex-row ${isRTL ? "flex-row-reverse" : ""}`}>
         <TouchableOpacity
           onPress={() => handlePopularCategoryPress("youtuber")}
-          className={`flex-1 ${isRTL ? 'items-end ml-2' : 'items-start mr-2'} bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          className={`flex-1 ${
+            isRTL ? "items-end ml-2" : "items-start mr-2"
+          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
         >
           <Icon
             name="play"
@@ -364,23 +382,25 @@ const Search = () => {
             color="#3B82F6"
             style={{ marginBottom: 8 }}
           />
-          <Text 
+          <Text
             className="text-gray-900"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categories.youtuber')}
+            {t("song.categories.youtuber")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-sm"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categoryDescriptions.youtuber')}
+            {t("song.categoryDescriptions.youtuber")}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => handlePopularCategoryPress("tiktoker")}
-          className={`flex-1 ${isRTL ? 'items-end ml-2' : 'items-start mr-2'} bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          className={`flex-1 ${
+            isRTL ? "items-end ml-2" : "items-start mr-2"
+          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
         >
           <Icon
             name="zap"
@@ -388,17 +408,17 @@ const Search = () => {
             color="#3B82F6"
             style={{ marginBottom: 8 }}
           />
-          <Text 
+          <Text
             className="text-gray-900"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categories.tiktoker')}
+            {t("song.categories.tiktoker")}
           </Text>
-          <Text 
+          <Text
             className="text-gray-600 text-sm"
             style={{ fontFamily: AppFonts.semibold }}
           >
-            {t('song.categoryDescriptions.tiktoker')}
+            {t("song.categoryDescriptions.tiktoker")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -432,14 +452,14 @@ const Search = () => {
       case "results-header":
         return (
           <View className="px-6 mb-4">
-            <Text 
+            <Text
               className="text-gray-900 text-xl"
-              style={{ 
+              style={{
                 fontFamily: AppFonts.semibold,
-                textAlign: isRTL ? 'right' : 'left'
+                textAlign: isRTL ? "right" : "left",
               }}
             >
-              {t('song.searchResults')} ({data?.length})
+              {t("song.searchResults")} ({data?.length})
             </Text>
           </View>
         );

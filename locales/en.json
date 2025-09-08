@@ -161,10 +161,13 @@
     },
     "validation": {
       "fullNameRequired": "Full Name is required",
+      "nameRequired": "Name is required",
       "emailRequired": "Email is required",
       "invalidEmail": "Invalid email",
+      "emailInvalid": "Invalid email address",
       "birthDateRequired": "Birth Date is required",
       "phoneRequired": "Phone Number is required",
+      "phoneInvalid": "Invalid phone number",
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "passwordMaxLength": "Password must be less than 128 characters",
@@ -172,7 +175,8 @@
       "passwordsMustMatch": "Passwords must match",
       "passwordsDoNotMatch": "Passwords do not match",
       "fullNameMinLength": "Name must be at least 2 characters",
-      "fullNameMaxLength": "Name must be less than 50 characters"
+      "fullNameMaxLength": "Name must be less than 50 characters",
+      "urlInvalid": "Invalid URL format"
     }
   },
   "services": {
@@ -434,12 +438,24 @@
     "success": "Success",
     "fillRequiredFields": "Please fill in all required fields",
     "somethingWentWrong": "Something went wrong. Please try again.",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "imagePickerError": "Failed to pick image",
+    "imageSelected": "Image Selected",
+    "ok": "OK"
   },
   "famousArtist": {
     "title": "Add artist",
     "submit": "Submit Request",
     "requestSubmitted": "Your request has been submitted successfully!",
+    "modal": {
+      "title": "Famous Artist Request",
+      "close": "✕"
+    },
+    "sections": {
+      "personalInfo": "Personal Information",
+      "professionalInfo": "Professional Information",
+      "documents": "Documents"
+    },
     "fields": {
       "name": "Full Name",
       "email": "Email Address",
@@ -456,11 +472,24 @@
       "email": "Enter your email address",
       "phone": "Enter your phone number",
       "whatsapp": "Enter your WhatsApp number",
-      "division": "e.g., Rap, Pop, Rock",
+      "division": "Select your music division",
       "socialLinks": "Enter your social media links",
       "details": "Tell us more about yourself",
       "selectIdCard": "Select ID Card Image",
       "selectProfile": "Select Profile Image"
+    },
+    "divisions": {
+      "rap": "Rap",
+      "pop": "Pop",
+      "blues": "Blues",
+      "rock": "Rock",
+      "mahraganat": "Mahraganat",
+      "jazz": "Jazz",
+      "metal": "Metal & Heavy Metal",
+      "sonata": "Sonata",
+      "symphony": "Symphony",
+      "orchestra": "Orchestra",
+      "concerto": "Concerto"
     }
   },
   "drawer": {

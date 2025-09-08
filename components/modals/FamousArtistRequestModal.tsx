@@ -20,6 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 interface FamousArtistRequestModalProps {
   visible: boolean;
@@ -30,8 +31,7 @@ export default function FamousArtistRequestModal({
   visible,
   onClose,
 }: FamousArtistRequestModalProps) {
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === "ar";
+  const { t } = useTranslation();
   const [createFamousArtistRequest, { isLoading }] =
     useCreateFamousArtistRequestMutation();
 
@@ -50,6 +50,21 @@ export default function FamousArtistRequestModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [idCardImage, setIdCardImage] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [showDivisionPicker, setShowDivisionPicker] = useState(false);
+
+  const divisions = [
+    { key: "rap", label: t("famousArtist.divisions.rap") },
+    { key: "pop", label: t("famousArtist.divisions.pop") },
+    { key: "blues", label: t("famousArtist.divisions.blues") },
+    { key: "rock", label: t("famousArtist.divisions.rock") },
+    { key: "mahraganat", label: t("famousArtist.divisions.mahraganat") },
+    { key: "jazz", label: t("famousArtist.divisions.jazz") },
+    { key: "metal", label: t("famousArtist.divisions.metal") },
+    { key: "sonata", label: t("famousArtist.divisions.sonata") },
+    { key: "symphony", label: t("famousArtist.divisions.symphony") },
+    { key: "orchestra", label: t("famousArtist.divisions.orchestra") },
+    { key: "concerto", label: t("famousArtist.divisions.concerto") },
+  ];
 
   const handleInputChange = (
     field: keyof FamousArtistRequest,
@@ -59,6 +74,14 @@ export default function FamousArtistRequestModal({
 
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const handleDivisionSelect = (division: string) => {
+    setFormData((prev) => ({ ...prev, famous_division: division }));
+    setShowDivisionPicker(false);
+    if (errors.famous_division) {
+      setErrors((prev) => ({ ...prev, famous_division: "" }));
     }
   };
 
@@ -96,7 +119,6 @@ export default function FamousArtistRequestModal({
       }
     }
 
-    // Social links validation (if provided)
     if (formData.famous_social_links.trim()) {
       const urlRegex = /^https?:\/\/[^\s]+$/;
       if (!urlRegex.test(formData.famous_social_links)) {
@@ -127,7 +149,7 @@ export default function FamousArtistRequestModal({
           setFormData((prev) => ({ ...prev, famous_profile_image: imageUri }));
         }
       }
-    } catch (error) {
+    } catch {
       Alert.alert(t("common.error"), t("common.imagePickerError"));
     }
   };
@@ -138,10 +160,8 @@ export default function FamousArtistRequestModal({
     }
 
     try {
-      // Create FormData for file upload
       const formDataToSend = new FormData();
 
-      // Add text fields
       formDataToSend.append("famous_name", formData.famous_name.trim());
       formDataToSend.append(
         "famous_email",
@@ -175,16 +195,62 @@ export default function FamousArtistRequestModal({
         } as any);
       }
 
-      await createFamousArtistRequest(formDataToSend).unwrap();
-      Alert.alert(t("common.success"), t("famousArtist.requestSubmitted"));
-      resetForm();
-      onClose();
-    } catch (error: any) {
-      console.log(error);
+      await createFamousArtistRequest(formDataToSend)
+        .unwrap()
+        .then(() => {
+          resetForm();
+          onClose();
 
+          setTimeout(() => {
+            Toast.show({
+              type: "success",
+              text1: t("common.success"),
+              text2: t("famousArtist.requestSubmitted"),
+              visibilityTime: 3000,
+              position: "top",
+              topOffset: 50,
+            });
+          }, 300);
+        })
+        .catch((e) => {
+          console.log("Famous artist request error:", e);
+          const errorMessage =
+            e?.data?.message ||
+            e?.data?.error ||
+            t("common.somethingWentWrong");
+
+          Alert.alert(t("common.error"), errorMessage, [
+            { text: t("common.ok") || "OK" },
+          ]);
+
+          Toast.show({
+            type: "error",
+            text1: t("common.error"),
+            text2: errorMessage,
+            visibilityTime: 4000,
+            position: "top",
+            topOffset: 50,
+          });
+        });
+    } catch (err: any) {
+      console.log("Famous artist request error:", err);
       const errorMessage =
-        error?.data?.message || t("common.somethingWentWrong");
-      Alert.alert(t("common.error"), errorMessage);
+        err?.data?.message ||
+        err?.data?.error ||
+        t("common.somethingWentWrong");
+
+      Alert.alert(t("common.error"), errorMessage, [
+        { text: t("common.ok") || "OK" },
+      ]);
+
+      Toast.show({
+        type: "error",
+        text1: t("common.error"),
+        text2: errorMessage,
+        visibilityTime: 4000,
+        position: "top",
+        topOffset: 50,
+      });
     }
   };
 
@@ -203,6 +269,7 @@ export default function FamousArtistRequestModal({
     setIdCardImage(null);
     setProfileImage(null);
     setErrors({});
+    setShowDivisionPicker(false);
   };
 
   const renderInput = (
@@ -248,6 +315,45 @@ export default function FamousArtistRequestModal({
           style={{ fontFamily: AppFonts.regular }}
         >
           {errors[field]}
+        </Text>
+      )}
+    </View>
+  );
+
+  const renderDivisionPicker = () => (
+    <View className="mb-5">
+      <View className="flex-row items-center mb-2">
+        <Text
+          className="text-gray-800 text-base"
+          style={{ fontFamily: AppFonts.medium }}
+        >
+          {t("famousArtist.fields.division")}
+        </Text>
+      </View>
+      <TouchableOpacity
+        onPress={() => setShowDivisionPicker(true)}
+        className={`border rounded-xl px-4 py-4 text-gray-800 bg-gray-50 ${
+          errors.famous_division ? "border-red-400" : "border-gray-200"
+        }`}
+      >
+        <Text
+          className={`text-base ${
+            formData.famous_division ? "text-gray-800" : "text-gray-400"
+          }`}
+          style={{ fontFamily: AppFonts.regular }}
+        >
+          {formData.famous_division
+            ? divisions.find((d) => d.key === formData.famous_division)
+                ?.label || formData.famous_division
+            : t("famousArtist.placeholders.division")}
+        </Text>
+      </TouchableOpacity>
+      {errors.famous_division && (
+        <Text
+          className="text-red-500 text-sm mt-1"
+          style={{ fontFamily: AppFonts.regular }}
+        >
+          {errors.famous_division}
         </Text>
       )}
     </View>
@@ -336,7 +442,7 @@ export default function FamousArtistRequestModal({
                 className="text-lg font-semibold text-gray-800 mb-4"
                 style={{ fontFamily: AppFonts.semibold }}
               >
-                {t("")}
+                {t("famousArtist.sections.personalInfo")}
               </Text>
 
               {renderInput(
@@ -368,8 +474,6 @@ export default function FamousArtistRequestModal({
                 { keyboardType: "phone-pad" }
               )}
             </View>
-
-            {/* Professional Information Section */}
             <View className="mb-6">
               <Text
                 className="text-lg font-semibold text-gray-800 mb-4"
@@ -378,11 +482,7 @@ export default function FamousArtistRequestModal({
                 {t("famousArtist.sections.professionalInfo")}
               </Text>
 
-              {renderInput(
-                "famous_division",
-                t("famousArtist.fields.division"),
-                t("famousArtist.placeholders.division")
-              )}
+              {renderDivisionPicker()}
               {renderInput(
                 "famous_social_links",
                 t("famousArtist.fields.socialLinks"),
@@ -397,7 +497,6 @@ export default function FamousArtistRequestModal({
               )}
             </View>
 
-            {/* Documents Section */}
             <View className="mb-8">
               <Text
                 className="text-lg font-semibold text-gray-800 mb-4"
@@ -423,33 +522,73 @@ export default function FamousArtistRequestModal({
             </View>
 
             <TouchableOpacity
+              className="bg-blue-600 py-3 rounded-full mb-16"
               onPress={handleSubmit}
               disabled={isLoading}
-              className={`rounded-xl py-4 items-center mb-8 "bg-gradient-to-r from-red-500 to-red-600"
-               `}
             >
-              {isLoading ? (
-                <View className="flex-row items-center">
-                  <ActivityIndicator size="small" color="black" />
-                  <Text
-                    className="text-black text-lg ml-2"
-                    style={{ fontFamily: AppFonts.semibold }}
-                  >
-                    {t("famousArtist.submit")}
-                  </Text>
-                </View>
-              ) : (
-                <Text
-                  className="text-black text-lg"
-                  style={{ fontFamily: AppFonts.semibold }}
-                >
-                  {t("famousArtist.submit")}
-                </Text>
-              )}
+              <Text className="text-white text-center font-semibold">
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  t("famousArtist.submit")
+                )}
+              </Text>
             </TouchableOpacity>
+            <Toast />
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+
+      <Modal
+        visible={showDivisionPicker}
+        transparent={true}
+        animationType="slide"
+      >
+        <View className="flex-1 justify-end bg-black bg-opacity-50">
+          <View className="bg-white rounded-t-3xl p-6">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text
+                className="text-lg font-semibold text-gray-800"
+                style={{ fontFamily: AppFonts.semibold }}
+              >
+                {t("famousArtist.fields.division")}
+              </Text>
+              <TouchableOpacity onPress={() => setShowDivisionPicker(false)}>
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {divisions.map((division) => (
+                <TouchableOpacity
+                  key={division.key}
+                  onPress={() => handleDivisionSelect(division.key)}
+                  className={`py-4 px-4 rounded-lg mb-2 ${
+                    formData.famous_division === division.key
+                      ? "bg-red-100"
+                      : "bg-gray-50"
+                  }`}
+                >
+                  <Text
+                    className={`text-base ${
+                      formData.famous_division === division.key
+                        ? "text-red-600 font-semibold"
+                        : "text-gray-800"
+                    }`}
+                    style={{
+                      fontFamily:
+                        formData.famous_division === division.key
+                          ? AppFonts.semibold
+                          : AppFonts.regular,
+                    }}
+                  >
+                    {division.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 }

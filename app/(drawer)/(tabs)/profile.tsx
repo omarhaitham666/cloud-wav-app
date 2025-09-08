@@ -46,9 +46,9 @@ const Profile = () => {
   return (
     <View className="flex-1">
       <TopLoader />
-      <ScrollView 
+      <ScrollView
         ref={scrollViewRef}
-        className="flex-1" 
+        className="flex-1"
         refreshControl={refreshControl as any}
         contentContainerStyle={{ flexGrow: 1 }}
       >
