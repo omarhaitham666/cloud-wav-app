@@ -167,8 +167,12 @@
       "phoneRequired": "Phone Number is required",
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
+      "passwordMaxLength": "Password must be less than 128 characters",
       "confirmPasswordRequired": "Confirm Password is required",
-      "passwordsMustMatch": "Passwords must match"
+      "passwordsMustMatch": "Passwords must match",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "fullNameMinLength": "Name must be at least 2 characters",
+      "fullNameMaxLength": "Name must be less than 50 characters"
     }
   },
   "services": {
@@ -528,7 +532,24 @@
       "profileUpdated": "Profile Updated Successfully",
       "userUpdated": "User Updated Successfully",
       "updateFailed": "Update Failed",
-      "somethingWentWrong": "Something went wrong"
+      "somethingWentWrong": "Something went wrong",
+      "addPhoto": "Add Photo",
+      "quickActions": "Quick Actions",
+      "updatePricing": "Update Pricing",
+      "manageSongs": "Manage Songs",
+      "profileInformation": "Profile Information",
+      "accountType": "Account Type",
+      "security": "Security",
+      "newPasswordOptional": "New Password (Optional)",
+      "confirmNewPassword": "Confirm New Password",
+      "enterNewPassword": "Enter new password",
+      "confirmYourNewPassword": "Confirm your new password",
+      "resetChanges": "Reset Changes",
+      "loading": "Loading...",
+      "retry": "Try Again",
+      "error": "Something went wrong",
+      "profileUpdatedTextOnly": "Profile Updated (Text Only)",
+      "imageUploadFailed": "Image upload failed, but text fields were updated successfully"
     },
     "dashboard": {
       "welcomeBack": "Welcome Back!",

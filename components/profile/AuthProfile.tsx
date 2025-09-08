@@ -71,7 +71,10 @@ const AuthProfile = () => {
           >
             <Text
               className="text-white text-lg"
-              style={{ fontFamily: AppFonts.bold }}
+              style={{ 
+                fontFamily: AppFonts.bold,
+                textAlign: isRTL ? "center" : "center"
+              }}
             >
               {t("profile.auth.login")}
             </Text>
@@ -83,7 +86,10 @@ const AuthProfile = () => {
           >
             <Text
               className="text-white text-lg"
-              style={{ fontFamily: AppFonts.bold }}
+              style={{ 
+                fontFamily: AppFonts.bold,
+                textAlign: isRTL ? "center" : "center"
+              }}
             >
               {t("profile.auth.register")}
             </Text>
@@ -94,7 +100,7 @@ const AuthProfile = () => {
           className="text-white/60 text-xs text-center leading-5"
           style={{
             fontFamily: AppFonts.regular,
-            textAlign: isRTL ? "right" : "left",
+            textAlign: isRTL ? "center" : "center",
           }}
         >
           {t("profile.auth.terms")}

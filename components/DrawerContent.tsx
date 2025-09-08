@@ -163,6 +163,26 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     },
   ];
 
+  // Always show LanguageSwitcher in the secondary section
+  const languageSwitcherItem = {
+    label: t("drawer.items.language"),
+    route: null,
+    iconName: "globe",
+    component: (
+      <View
+        className="flex-1"
+        style={[
+          rowDirection,
+          { alignItems: "center", justifyContent: "space-between" },
+        ]}
+      >
+        <View style={{ flex: 1 }}>
+          <LanguageSwitcher />
+        </View>
+      </View>
+    ),
+  };
+
   const secondaryItems = (token || user)
     ? [
         {
@@ -179,6 +199,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
           iconName: "log-out",
           action: handleLogout,
         },
+        languageSwitcherItem,
       ]
     : [
         {
@@ -192,24 +213,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
           route: "(auth)/register",
           iconName: "user-plus",
         },
-        {
-          label: t("drawer.items.language"),
-          route: null,
-          iconName: "globe",
-          component: (
-            <View
-              className="flex-1"
-              style={[
-                rowDirection,
-                { alignItems: "center", justifyContent: "space-between" },
-              ]}
-            >
-              <View style={{ flex: 1 }}>
-                <LanguageSwitcher />
-              </View>
-            </View>
-          ),
-        },
+        languageSwitcherItem,
       ];
 
   const navigateTo = (route: string | null, action?: () => void) => {
