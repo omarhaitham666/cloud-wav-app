@@ -9,13 +9,13 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    FlatList,
-    ImageBackground,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  ImageBackground,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -83,7 +83,7 @@ const HomePage = () => {
                 </Text>
                 <Ionicons name="play" size={18} color="red" />
               </TouchableOpacity>
-              
+
               <TouchableOpacity
                 onPress={() => setShowFamousArtistModal(true)}
                 className="bg-red-500 flex-row items-center gap-3 px-4 py-2.5 rounded-full"
@@ -138,12 +138,11 @@ const HomePage = () => {
           )}
         </View>
         <View className="h-16" />
+        <FamousArtistRequestModal
+          visible={showFamousArtistModal}
+          onClose={() => setShowFamousArtistModal(false)}
+        />
       </ScrollView>
-      
-      <FamousArtistRequestModal
-        visible={showFamousArtistModal}
-        onClose={() => setShowFamousArtistModal(false)}
-      />
     </SafeAreaView>
   );
 };

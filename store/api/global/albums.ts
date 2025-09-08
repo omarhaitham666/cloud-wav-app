@@ -51,7 +51,6 @@ const songApi = mainApi.injectEndpoints({
         url: `/albums`,
         method: "POST",
         data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
       }),
       invalidatesTags: [{ type: "Albums", id: "LIST" }],
     }),

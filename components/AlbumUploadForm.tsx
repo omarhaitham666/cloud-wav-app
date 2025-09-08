@@ -160,7 +160,6 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
           {t("upload.albumUpload.title") || "Create New Album"}
         </Text>
 
-        {/* Album Cover Section */}
         <View>
           <Text
             className="text-gray-300 mb-3"
