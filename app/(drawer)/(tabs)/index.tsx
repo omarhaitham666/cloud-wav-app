@@ -82,21 +82,6 @@ const HomePage = () => {
                 </Text>
                 <Ionicons name="play" size={18} color="red" />
               </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => setShowFamousArtistModal(true)}
-                className="bg-red-500 flex-row items-center gap-3 px-4 py-2.5 rounded-full"
-              >
-                <Text
-                  className="text-white text-sm"
-                  style={{
-                    fontFamily: AppFonts.semibold,
-                  }}
-                >
-                  {t("home.buttons.design")}
-                </Text>
-                <Ionicons name="brush" size={18} color="white" />
-              </TouchableOpacity>
             </View>
           </View>
         </ImageBackground>
