@@ -46,14 +46,24 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    AddAlbum: builder.mutation<Albums, { title: string; album_cover: File }>({
-      query: (formData) => ({
-        url: `/albums`,
-        method: "POST",
-        data: formData,
-      }),
-      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+
+    AddAlbum: builder.mutation<
+      Albums,
+      | FormData
+      | {
+          title: string;
+          album_cover: File;
+        }
+    >({
+      query: (body) => {
+        return {
+          url: "/albums",
+          method: "POST",
+          data: body,
+        };
+      },
     }),
+
     UpdateAlbum: builder.mutation<Albums, string>({
       query: (id) => ({
         url: `/album-update/${id}`,

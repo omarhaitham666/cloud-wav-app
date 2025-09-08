@@ -1,5 +1,6 @@
 import { useUploadSongMutation } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
+import { getToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Picker } from "@react-native-picker/picker";
@@ -55,7 +56,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
   const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [songArtwork, setSongArtwork] = useState<any>(null);
-  const [uploadSong, { isLoading: isUploadSong }] = useUploadSongMutation();
+  const [, { isLoading: isUploadSong }] = useUploadSongMutation();
 
   const {
     control,
@@ -116,7 +117,8 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
           text2: asset.fileName || "Audio file selected successfully",
         });
       }
-    } catch (error) {
+    } catch (err) {
+      console.log("Audio picker error:", err);
       Toast.show({
         type: "error",
         text1: "Selection Failed",
@@ -142,7 +144,8 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
           text2: "Song artwork uploaded successfully",
         });
       }
-    } catch (error) {
+    } catch (err) {
+      console.log("Image picker error:", err);
       Toast.show({
         type: "error",
         text1: "Selection Failed",
@@ -162,28 +165,53 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("artist", data.artist);
-      formData.append("genre", data.genre || "");
-      formData.append("caption", data.caption || "");
-      formData.append("duration", data.duration || "");
+      const songFormData = new FormData();
+      songFormData.append("title", data.title);
+      songFormData.append("artist", data.artist);
+      songFormData.append("genre", data.genre || "");
+      songFormData.append("caption", data.caption || "");
+      songFormData.append("duration", data.duration || "");
 
-      formData.append("song_path", {
+      const audioFile = {
         uri: selectedFile.uri,
         type: selectedFile.mimeType,
         name: selectedFile.fileName || "song.mp3",
-      } as any);
+      };
+      songFormData.append("song_path", audioFile as any);
+      console.log("Audio file:", audioFile);
 
       if (songArtwork) {
-        formData.append("cover_path", {
+        const coverFile = {
           uri: songArtwork.uri,
           type: songArtwork.mimeType || "image/jpeg",
           name: songArtwork.fileName || "cover.jpg",
-        } as any);
+        };
+        songFormData.append("cover_path", coverFile as any);
       }
 
-      await uploadSong(formData as any).unwrap();
+      console.log("FORM DATA PAYLOAD:", {
+        title: data.title,
+        artist: data.artist,
+        song_path: "audio file",
+        cover_path: songArtwork ? "cover file" : "no cover",
+      });
+
+      const token = await getToken("access_token");
+      const response = await fetch(
+        "https://api.cloudwavproduction.com/api/songs/upload",
+        {
+          method: "POST",
+          body: songFormData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
 
       Toast.show({
         type: "success",
@@ -195,13 +223,11 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
       setSelectedFile(null);
       setSongArtwork(null);
     } catch (error: any) {
+      console.log("Upload error:", error);
       Toast.show({
         type: "error",
         text1: "Upload Failed",
-        text2:
-          error?.data?.message ||
-          error?.message ||
-          "Failed to upload song. Please try again.",
+        text2: error?.message || "Failed to upload song. Please try again.",
       });
     }
   };

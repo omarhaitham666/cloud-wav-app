@@ -1,5 +1,6 @@
 import { useAddAlbumMutation } from "@/store/api/global/albums";
 import { AppFonts } from "@/utils/fonts";
+import { getToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as ImagePicker from "expo-image-picker";
@@ -34,7 +35,7 @@ type Props = {
 const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
   const { t } = useTranslation();
   const [coverImage, setCoverImage] = useState<any>(null);
-  const [addAlbum, { isLoading: isAddAlbumLoading }] = useAddAlbumMutation();
+  const [, { isLoading: isAddAlbumLoading }] = useAddAlbumMutation();
 
   const {
     control,
@@ -72,17 +73,30 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
+        base64: true,
       });
 
-      if (!result.canceled && result.assets?.[0]) {
-        setCoverImage(result.assets[0]);
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        const asset = result.assets[0];
+        const fileName = asset.fileName || `image_${Date.now()}.jpg`;
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        const imageFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+          base64: asset.base64,
+        };
+
+        setCoverImage(imageFile);
         Toast.show({
           type: "success",
           text1: "Cover Image Selected",
           text2: "Album cover uploaded successfully",
         });
       }
-    } catch (error) {
+    } catch (err) {
+      console.log("Image picker error:", err);
       Toast.show({
         type: "error",
         text1: "Selection Failed",
@@ -100,28 +114,45 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
       });
       return;
     }
-    const album_cover = {
-      uri: coverImage.uri,
-      type: coverImage.mimeType || "image/jpeg",
-      name: coverImage.fileName || `album_cover_${Date.now()}.jpg`,
-    };
+
     try {
-      const formData = new FormData();
-      formData.append("title", data.title);
+      // إنشاء FormData بنفس طريقة ProfileUser
+      const albumFormData = new FormData();
+      albumFormData.append("title", data.title);
 
-      formData.append("album_cover", album_cover as any);
-
-      console.log("FORM DATA PAYLOAD:", {
-        title: data.title,
-        album_cover: {
+      if (coverImage.base64) {
+        const base64File = {
+          uri: `data:${coverImage.type};base64,${coverImage.base64}`,
+          type: coverImage.type,
+          name: coverImage.name,
+        };
+        albumFormData.append("album_cover", base64File as any);
+        console.log("Using base64 file:", base64File);
+      } else {
+        const regularFile = {
           uri: coverImage.uri,
-          type: coverImage.mimeType,
-          name: coverImage.fileName,
-        },
-      });
+          type: coverImage.type || "image/jpeg",
+          name: coverImage.name || `album_cover_${Date.now()}.jpg`,
+        };
+        albumFormData.append("album_cover", regularFile as any);
+      }
 
-      await addAlbum(formData as any).unwrap();
+      const token = await getToken("access_token");
+      const response = await fetch(
+        "https://api.cloudwavproduction.com/api/albums",
+        {
+          method: "POST",
+          body: albumFormData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(JSON.stringify(errorData));
+      }
       Toast.show({
         type: "success",
         text1: "Album Created",
