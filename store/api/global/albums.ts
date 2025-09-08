@@ -71,19 +71,29 @@ const songApi = mainApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Albums", id: "LIST" }],
     }),
-    AddSongToAlbum: builder.mutation<Albums, string>({
-      query: (id) => ({
-        url: `/albums/${id}/songs`,
+    AddSongToAlbum: builder.mutation<Albums, { albumId: string; formData: FormData }>({
+      query: ({ albumId, formData }) => ({
+        url: `/albums/${albumId}/songs`,
         method: "POST",
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
-      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Albums", id: "LIST" },
+        { type: "Artists", id: "LIST" },
+      ],
     }),
     delteAlbum: builder.mutation<Albums, string>({
       query: (id) => ({
         url: `/albums-delete/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Albums", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Albums", id: "LIST" },
+        { type: "Artists", id: "LIST" },
+      ],
     }),
   }),
 });

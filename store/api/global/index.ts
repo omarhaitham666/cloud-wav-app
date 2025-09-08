@@ -3,7 +3,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 
 export const mainApi = createApi({
   reducerPath: "main-api",
-  tagTypes: ["Songs", "Albums"],
+  tagTypes: ["Songs", "Albums", "Artists"],
   baseQuery: axiosBaseQuery({ baseUrl: "" }),
   endpoints: () => ({}),
 });

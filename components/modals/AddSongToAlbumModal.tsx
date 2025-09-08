@@ -4,13 +4,14 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Image,
-    Modal,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 type Props = {
@@ -19,7 +20,7 @@ type Props = {
   onClose: () => void;
   onAddSongToAlbum: (albumId: string, file: any) => void;
   onDeleteAlbum: (albumId: string) => void;
-  existingAlbums: Array<{ id: string; title: string; coverImage?: string }>;
+  album: { id: string; title: string; coverImage?: string };
 };
 
 function AddSongToAlbumModal({
@@ -28,19 +29,18 @@ function AddSongToAlbumModal({
   onClose,
   onAddSongToAlbum,
   onDeleteAlbum,
-  existingAlbums,
+  album,
 }: Props) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [selectedFile, setSelectedFile] = useState<any>(null);
-  const [selectedAlbumId, setSelectedAlbumId] = useState<string>("");
+  const [selectedCoverImage, setSelectedCoverImage] = useState<any>(null);
 
-  const pickFile = async () => {
+  const pickAudioFile = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
+        allowsEditing: false,
         quality: 1,
       });
 
@@ -48,25 +48,59 @@ function AddSongToAlbumModal({
         setSelectedFile(result.assets[0]);
       }
     } catch (error) {
-      console.error("Error picking file:", error);
+      console.error("Error picking audio file:", error);
+    }
+  };
+
+  const pickCoverImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setSelectedCoverImage(result.assets[0]);
+      }
+    } catch (error) {
+      console.error("Error picking cover image:", error);
     }
   };
 
   const handleAddSongToAlbum = () => {
-    if (selectedFile && selectedAlbumId) {
-      onAddSongToAlbum(selectedAlbumId, selectedFile);
+    if (selectedFile && album.id) {
+      onAddSongToAlbum(album.id, selectedFile);
       setSelectedFile(null);
-      setSelectedAlbumId("");
+      setSelectedCoverImage(null);
     }
   };
 
-  const handleDeleteAlbum = (albumId: string) => {
-    onDeleteAlbum(albumId);
+  const handleDeleteAlbum = () => {
+    Alert.alert(
+      "Delete Album",
+      "Are you sure you want to delete this album? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            onDeleteAlbum(album.id);
+            onClose();
+          },
+        },
+      ]
+    );
   };
 
   const handleClose = () => {
     setSelectedFile(null);
-    setSelectedAlbumId("");
+    setSelectedCoverImage(null);
     onClose();
   };
 
@@ -85,7 +119,7 @@ function AddSongToAlbumModal({
                 fontFamily: AppFonts.semibold,
               }}
             >
-              {t("upload.addSongToAlbumTitle")}
+              Add Song to "{album.title}"
             </Text>
             <TouchableOpacity onPress={handleClose}>
               <Text
@@ -101,6 +135,7 @@ function AddSongToAlbumModal({
 
           <ScrollView className="flex-1 p-4">
             <View className="space-y-4">
+              {/* Album Info */}
               <View>
                 <Text
                   className="text-gray-700 mb-2"
@@ -109,64 +144,42 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  {t("upload.selectAlbum")}
+                  Album
                 </Text>
                 
-                {existingAlbums.length === 0 ? (
-                  <View className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center">
-                    <Ionicons name="albums" size={32} color="#6B7280" />
+                <View className="flex-row items-center p-3 border border-gray-300 rounded-lg mb-2">
+                  {album.coverImage ? (
+                    <Image
+                      source={{ uri: album.coverImage }}
+                      className="w-12 h-12 rounded-lg"
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View className="w-12 h-12 rounded-lg bg-gray-200 items-center justify-center">
+                      <Ionicons name="albums" size={24} color="#6B7280" />
+                    </View>
+                  )}
+                  <View className={`flex-1 ${isRTL ? "mr-3" : "ml-3"}`}>
                     <Text
-                      className="text-sm text-gray-600 mt-2 text-center"
+                      className="text-base font-semibold"
                       style={{
                         fontFamily: AppFonts.semibold,
                         textAlign: isRTL ? "right" : "left",
                       }}
                     >
-                      {t("upload.noAlbumsAvailable")}
+                      {album.title}
                     </Text>
                   </View>
-                ) : (
-                  existingAlbums.map((album) => (
-                    <TouchableOpacity
-                      key={album.id}
-                      onPress={() => setSelectedAlbumId(album.id)}
-                      className={`flex-row items-center p-3 border rounded-lg mb-2 ${
-                        selectedAlbumId === album.id ? "border-purple-500 bg-purple-50" : "border-gray-300"
-                      } ${isRTL ? "flex-row-reverse" : ""}`}
-                    >
-                      {album.coverImage ? (
-                        <Image
-                          source={{ uri: album.coverImage }}
-                          className="w-12 h-12 rounded-lg"
-                          resizeMode="cover"
-                        />
-                      ) : (
-                        <View className="w-12 h-12 rounded-lg bg-gray-200 items-center justify-center">
-                          <Ionicons name="albums" size={24} color="#6B7280" />
-                        </View>
-                      )}
-                      <View className={`flex-1 ${isRTL ? "mr-3" : "ml-3"}`}>
-                        <Text
-                          className="text-base font-semibold"
-                          style={{
-                            fontFamily: AppFonts.semibold,
-                            textAlign: isRTL ? "right" : "left",
-                          }}
-                        >
-                          {album.title}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => handleDeleteAlbum(album.id)}
-                        className="p-2"
-                      >
-                        <Ionicons name="trash" size={20} color="#EF4444" />
-                      </TouchableOpacity>
-                    </TouchableOpacity>
-                  ))
-                )}
+                  <TouchableOpacity
+                    onPress={handleDeleteAlbum}
+                    className="p-2"
+                  >
+                    <Ionicons name="trash" size={20} color="#EF4444" />
+                  </TouchableOpacity>
+                </View>
               </View>
 
+              {/* Audio File Selection */}
               <View>
                 <Text
                   className="text-gray-700 mb-2"
@@ -175,11 +188,11 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  {t("upload.selectSong")}
+                  Select Audio File
                 </Text>
                 
                 <TouchableOpacity
-                  onPress={pickFile}
+                  onPress={pickAudioFile}
                   className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center"
                 >
                   <Ionicons name="musical-notes" size={32} color="#6B7280" />
@@ -190,7 +203,7 @@ function AddSongToAlbumModal({
                       textAlign: isRTL ? "right" : "left",
                     }}
                   >
-                    {selectedFile ? selectedFile.fileName : t("upload.chooseSongFile")}
+                    {selectedFile ? selectedFile.fileName || "Audio file selected" : "Choose Audio File"}
                   </Text>
                   {selectedFile && (
                     <Text
@@ -200,17 +213,54 @@ function AddSongToAlbumModal({
                         textAlign: isRTL ? "right" : "left",
                       }}
                     >
-                      {t("upload.fileSelected")}
+                      File Selected
                     </Text>
                   )}
                 </TouchableOpacity>
               </View>
 
+              {/* Cover Image Selection */}
+              <View>
+                <Text
+                  className="text-gray-700 mb-2"
+                  style={{
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
+                  Select Cover Image (Optional)
+                </Text>
+                
+                <TouchableOpacity
+                  onPress={pickCoverImage}
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center"
+                >
+                  {selectedCoverImage ? (
+                    <Image
+                      source={{ uri: selectedCoverImage.uri }}
+                      className="w-16 h-16 rounded-lg"
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <Ionicons name="image" size={32} color="#6B7280" />
+                  )}
+                  <Text
+                    className="text-sm text-gray-600 mt-2"
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {selectedCoverImage ? "Cover image selected" : "Choose Cover Image"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               <TouchableOpacity
                 onPress={handleAddSongToAlbum}
-                disabled={!selectedFile || !selectedAlbumId || isLoading}
+                disabled={!selectedFile || isLoading}
                 className={`py-4 rounded-full ${
-                  selectedFile && selectedAlbumId && !isLoading ? "bg-purple-600" : "bg-gray-300"
+                  selectedFile && !isLoading ? "bg-blue-600" : "bg-gray-300"
                 }`}
               >
                 {isLoading ? (
@@ -222,7 +272,7 @@ function AddSongToAlbumModal({
                       fontFamily: AppFonts.semibold,
                     }}
                   >
-                    {t("upload.addSongToAlbum")}
+                    Add Song to Album
                   </Text>
                 )}
               </TouchableOpacity>

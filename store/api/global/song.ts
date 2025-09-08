@@ -14,6 +14,7 @@ export interface Songs {
   cover_image?: string;
   artist_name?: string;
   song_url?: string;
+  isOwner?: boolean;
 }
 
 const songApi = mainApi.injectEndpoints({
@@ -60,12 +61,15 @@ const songApi = mainApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "Songs", id: "LIST" }],
     }),
-    delteSong: builder.mutation<Songs, string>({
+    deleteSong: builder.mutation<Songs, string>({
       query: (id) => ({
         url: `/songs-delete/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "Songs", id: "LIST" }],
+      invalidatesTags: [
+        { type: "Songs", id: "LIST" },
+        { type: "Artists", id: "LIST" },
+      ],
     }),
   }),
 });
@@ -77,5 +81,5 @@ export const {
   useGetSongByDivisionQuery,
   useGetSongStreemQuery,
   useUploadSongMutation,
-  useDelteSongMutation,
+  useDeleteSongMutation,
 } = songApi;

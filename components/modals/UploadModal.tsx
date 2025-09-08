@@ -139,6 +139,7 @@ const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
         >
           <View className="pt-12 pb-4 px-6">
             <View
+            
               className="flex-row justify-between items-center"
               style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
             >
