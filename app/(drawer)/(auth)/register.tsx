@@ -34,7 +34,7 @@ interface FormValues {
   confirmPassword: string;
 }
 
-export default function RegisterScreen() {
+function RegisterScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
@@ -341,3 +341,5 @@ export default function RegisterScreen() {
     </SafeAreaView>
   );
 }
+
+export default RegisterScreen;
