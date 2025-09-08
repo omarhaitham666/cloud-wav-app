@@ -5,6 +5,7 @@ import "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { useAuthInit } from "../hooks/useAuthInit";
 import { AuthProvider } from "../store/auth-context";
+import { DrawerRefreshProvider } from "../store/drawerRefreshContext";
 import StoreProvider from "../store/StoreProvider";
 import "../utils/i18n";
 import "./global.css";
@@ -41,8 +42,10 @@ export default function RootLayout() {
   return (
     <StoreProvider>
       <AuthProvider>
-        <AppContent />
-        <Toast />
+        <DrawerRefreshProvider>
+          <AppContent />
+          <Toast />
+        </DrawerRefreshProvider>
       </AuthProvider>
     </StoreProvider>
   );

@@ -1,4 +1,5 @@
 import { PricingCard } from "@/components/cards/PricingCard";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { pricingPlans } from "@/utils/data";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
@@ -6,10 +7,10 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,6 +20,17 @@ export default function PricingScreen() {
 
   const [isYearly, setIsYearly] = useState(false);
   const toggleAnimation = useSharedValue(0);
+
+  // Pull to refresh functionality
+  const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
+    onRefresh: async () => {
+      // Refresh pricing data (if needed)
+      // This could trigger a re-fetch of pricing plans from API
+      console.log("Refreshing pricing data...");
+    },
+    scrollToTopOnRefresh: true,
+    showTopLoader: true,
+  });
 
   const setToMonthly = () => {
     setIsYearly(false);
@@ -44,10 +56,13 @@ export default function PricingScreen() {
         colors={["#ffffff", "#f8fafc", "#f1f5f9"]}
         className="flex-1"
       >
+        <TopLoader />
         <ScrollView
+          ref={scrollViewRef}
           className="px-6"
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
+          refreshControl={refreshControl as any}
         >
           <View className="items-center mt-6 mb-10">
             <Text

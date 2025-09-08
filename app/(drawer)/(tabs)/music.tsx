@@ -3,28 +3,29 @@ import AlbumCard from "@/components/cards/AlbumCard";
 import ArtistCard from "@/components/cards/ArtistCard";
 import { SongCard } from "@/components/cards/SongCard";
 import SectionHeader from "@/components/SectionHeader";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import {
-  Albums,
-  useGetalbumsQuery,
-  useGetTrendalbumsQuery,
+    Albums,
+    useGetalbumsQuery,
+    useGetTrendalbumsQuery,
 } from "@/store/api/global/albums";
 import { Artists, useGetArtistsQuery } from "@/store/api/global/artists";
 import {
-  Songs,
-  useGetSongByDivisionQuery,
-  useGetSongsQuery,
-  useGetTrendSongQuery,
+    Songs,
+    useGetSongByDivisionQuery,
+    useGetSongsQuery,
+    useGetTrendSongQuery,
 } from "@/store/api/global/song";
 import React, { useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    FlatList,
+    ScrollView,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 type FilterType = "home" | "tsongs" | "tAlbums" | "tAdded";
@@ -40,19 +41,36 @@ const Music = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("home");
   const [activeGenre, setActiveGenre] = useState<string>("All Genres");
 
-  const { data: songs, isLoading: isSongLoading } = useGetSongsQuery();
-  const { data: artists, isLoading: isArtistLoading } = useGetArtistsQuery();
-  const { data: albums, isLoading: isAlbumLoading } = useGetalbumsQuery();
+  const { data: songs, isLoading: isSongLoading, refetch: refetchSongs } = useGetSongsQuery();
+  const { data: artists, isLoading: isArtistLoading, refetch: refetchArtists } = useGetArtistsQuery();
+  const { data: albums, isLoading: isAlbumLoading, refetch: refetchAlbums } = useGetalbumsQuery();
 
-  const { data: trendSongs, isLoading: isLoadingTrendSongs } =
+  const { data: trendSongs, isLoading: isLoadingTrendSongs, refetch: refetchTrendSongs } =
     useGetTrendSongQuery();
-  const { data: trendAlbums, isLoading: isLoadingTrendAlbums } =
+  const { data: trendAlbums, isLoading: isLoadingTrendAlbums, refetch: refetchTrendAlbums } =
     useGetTrendalbumsQuery();
 
-  const { data: songsByDivision, isLoading: isLoadingSongsByDivision } =
+  const { data: songsByDivision, isLoading: isLoadingSongsByDivision, refetch: refetchSongsByDivision } =
     useGetSongByDivisionQuery(activeGenre === "All Genres" ? "" : activeGenre, {
       skip: activeGenre === "All Genres",
     });
+
+  // Pull to refresh functionality
+  const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
+    onRefresh: async () => {
+      // Refetch all music data
+      await Promise.all([
+        refetchSongs(),
+        refetchArtists(),
+        refetchAlbums(),
+        refetchTrendSongs(),
+        refetchTrendAlbums(),
+        refetchSongsByDivision(),
+      ]);
+    },
+    scrollToTopOnRefresh: true,
+    showTopLoader: true,
+  });
   const browseCategories: BrowseCategory[] = [
     { name: "Home", filter: "home", data: null },
     { name: "Trending songs", filter: "tsongs", data: trendSongs },
@@ -307,10 +325,13 @@ const Music = () => {
   return (
     <View className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <TopLoader />
       <ScrollView
+        ref={scrollViewRef}
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 30 }}
+        refreshControl={refreshControl as any}
       >
         <View className="mb-2">
           <BannerMusic />

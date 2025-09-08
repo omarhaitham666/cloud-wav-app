@@ -1,19 +1,20 @@
 import CreatorCard from "@/components/cards/CreatorCard";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useSearchCreatorQuery } from "@/store/api/global/search";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Animated,
-  Dimensions,
-  FlatList, Platform,
-  StatusBar,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Animated,
+    Dimensions,
+    FlatList, Platform,
+    StatusBar,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 
@@ -28,6 +29,16 @@ const Search = () => {
   const slideAnim = useRef(new Animated.Value(30)).current;
 
   const { data, refetch, isLoading } = useSearchCreatorQuery(searchQuery);
+
+  // Pull to refresh functionality
+  const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
+    onRefresh: async () => {
+      // Refetch search data
+      await refetch();
+    },
+    scrollToTopOnRefresh: true,
+    showTopLoader: true,
+  });
 
   useEffect(() => {
     Animated.parallel([
@@ -461,12 +472,15 @@ const Search = () => {
 
   return (
     <View className="flex-1">
+      <TopLoader />
       <FlatList
+        ref={scrollViewRef as any}
         data={flatListData}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={refreshControl as any}
       />
     </View>
   );

@@ -1,11 +1,12 @@
 import CustomHeader from "@/components/CustomHeader";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/cards/SongCard";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useGetTrendSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -21,12 +22,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-  const { data, isLoading } = useGetTrendSongQuery();
-  const [showFamousArtistModal, setShowFamousArtistModal] = useState(false);
+  const { data, isLoading, refetch } = useGetTrendSongQuery();
+
+  // Pull to refresh functionality
+  const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
+    onRefresh: async () => {
+      // Refetch trending songs data
+      await refetch();
+    },
+    scrollToTopOnRefresh: true,
+    showTopLoader: true,
+  });
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
+      <TopLoader />
+      <ScrollView 
+        ref={scrollViewRef}
+        refreshControl={refreshControl as any}
+      >
         <ImageBackground
           source={require("../../../assets/images/Rectangle.png")}
           resizeMode="cover"

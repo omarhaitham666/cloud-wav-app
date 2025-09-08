@@ -1,9 +1,11 @@
 import { useLogoutMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
+import { useDrawerRefresh } from "@/store/drawerRefreshContext";
+import AppRefreshService, { setDrawerRefreshTrigger } from "@/utils/appRefresh";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { RelativePathString, router, useRootNavigation } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -75,8 +77,8 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const [token, setToken] = useState<string | null>(null);
   const [logout, { isLoading }] = useLogoutMutation();
   const { user, setUser } = useAuth();
+  const { refreshKey, triggerDrawerRefresh } = useDrawerRefresh();
   const isArabic = i18n.language === "ar";
-  const navigation = useRootNavigation();
 
   const rowDirection: ViewStyle = useMemo(
     () => ({
@@ -93,7 +95,14 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setToken(storedToken);
     };
     fetchToken();
-  }, [state.index]);
+  }, [state.index, refreshKey]);
+
+  // Set up the global drawer refresh trigger
+  useEffect(() => {
+    setDrawerRefreshTrigger(triggerDrawerRefresh);
+    return () => setDrawerRefreshTrigger(null);
+  }, [triggerDrawerRefresh]);
+
 
   const handleLogout = async () => {
     try {
@@ -104,14 +113,9 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setUser(null);
       setToken(null);
       
-      Toast.show({
-        type: "success",
-        text1: "Logout Successful",
-        text2: "You have been logged out.",
-      });
+      // Use the gentle refresh service to reload the app after logout
+      await AppRefreshService.refreshAfterAuthChange('logout');
 
-      // Force refresh by replacing the entire stack
-      router.replace("/(drawer)/(auth)/login");
     } catch (e: any) {
       Toast.show({
         type: "error",
@@ -119,6 +123,11 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         text2: e?.data?.message || "Something went wrong",
       });
     }
+  };
+
+  // Enhanced login navigation
+  const handleLoginNavigation = () => {
+    router.push("/(drawer)/(auth)/login");
   };
 
   const drawerItems = [
@@ -174,8 +183,9 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     : [
         {
           label: t("drawer.items.login"),
-          route: "(auth)/login",
+          route: null, // Set to null to use custom action
           iconName: "log-in",
+          action: handleLoginNavigation,
         },
         {
           label: t("drawer.items.register"),
