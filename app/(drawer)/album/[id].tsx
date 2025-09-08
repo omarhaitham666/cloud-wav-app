@@ -1,10 +1,13 @@
 import { SongCard } from "@/components/cards/SongCard";
-import { useGetalbumQuery } from "@/store/api/global/albums";
+import AddSongToAlbumModal from "@/components/modals/AddSongToAlbumModal";
+import { useAddSongToAlbumMutation, useDelteAlbumMutation, useGetalbumQuery } from "@/store/api/global/albums";
+import { useGetUserQuery } from "@/store/api/user/user";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   Text,
@@ -15,6 +18,54 @@ import {
 export default function AlbumDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, isLoading } = useGetalbumQuery(id);
+  const { data: user } = useGetUserQuery();
+  const [deleteAlbum, { isLoading: isDeleting }] = useDelteAlbumMutation();
+  const [addSongToAlbum, { isLoading: isAddingSong }] = useAddSongToAlbumMutation();
+  const [showAddSongModal, setShowAddSongModal] = useState(false);
+  
+  // Check if the current user is the owner of this album
+  const isOwner = user && user.artist_id === data?.album.artist.id;
+
+  const handleDeleteAlbum = () => {
+    Alert.alert(
+      "Delete Album",
+      "Are you sure you want to delete this album? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            deleteAlbum(id);
+            router.back();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleAddSongToAlbum = async (albumId: string, file: any) => {
+    try {
+      const formData = new FormData();
+      formData.append('song', {
+        uri: file.uri,
+        type: file.type || 'audio/mpeg',
+        name: file.fileName || 'song.mp3',
+      } as any);
+      
+      await addSongToAlbum({ albumId, formData });
+      setShowAddSongModal(false);
+    } catch (error) {
+      console.error("Error adding song to album:", error);
+    }
+  };
+
+  const handleDeleteAlbumFromModal = (albumId: string) => {
+    deleteAlbum(albumId);
+  };
 
   if (isLoading) {
     return (
@@ -48,12 +99,38 @@ export default function AlbumDetails() {
             <Text className="text-gray-900 text-3xl font-semibold mb-2 text-center">
               {data?.album.title}
             </Text>
-            <Text className="text-gray-600 text-lg">
+            <Text className="text-gray-600 text-lg mb-6">
               {data?.album.artist.name}
             </Text>
+            
+            {isOwner && (
+              <View className="flex-row gap-4 w-full justify-center">
+                <TouchableOpacity 
+                  onPress={() => setShowAddSongModal(true)}
+                  className="flex-row items-center bg-blue-500 px-6 py-3 rounded-lg"
+                >
+                  <Ionicons name="add" size={20} color="#fff" />
+                  <Text className="text-white font-semibold ml-2">Add Songs</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={handleDeleteAlbum}
+                  disabled={isDeleting}
+                  className="flex-row items-center bg-red-500 px-6 py-3 rounded-lg"
+                >
+                  <Ionicons 
+                    name={isDeleting ? "hourglass" : "trash"} 
+                    size={18} 
+                    color="#fff" 
+                  />
+                  <Text className="text-white font-semibold ml-2">
+                    {isDeleting ? "Deleting..." : "Delete Album"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         }
-        data={data?.songs}
+        data={data?.songs && data.songs.length > 0 ? data.songs : []}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View className="mx-4 mb-2">
@@ -65,11 +142,41 @@ export default function AlbumDetails() {
               audio_url={item.song_url || ""}
               cover_url={item.cover_image || ""}
               debug_path={item.debug_path}
+              isOwner={isOwner || false}
             />
+          </View>
+        )}
+        ListEmptyComponent={() => (
+          <View className="flex items-center justify-center py-16 px-6">
+            <Ionicons name="musical-notes-outline" size={64} color="#9CA3AF" />
+            <Text className="text-gray-500 text-lg mt-4 font-semibold">
+              No Songs in This Album
+            </Text>
+            <Text className="text-gray-400 text-sm mt-2 text-center">
+              {isOwner ? "Add songs to this album to get started" : "This album doesn't have any songs yet"}
+            </Text>
+            {isOwner && (
+              <TouchableOpacity className="mt-6 bg-blue-500 px-6 py-3 rounded-lg">
+                <Text className="text-white font-semibold">Add Songs</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
+      />
+      
+      <AddSongToAlbumModal
+        visible={showAddSongModal}
+        isLoading={isAddingSong}
+        onClose={() => setShowAddSongModal(false)}
+        onAddSongToAlbum={handleAddSongToAlbum}
+        onDeleteAlbum={handleDeleteAlbumFromModal}
+        album={data?.album ? { 
+          id: data.album.id.toString(), 
+          title: data.album.title, 
+          coverImage: data.album.album_cover 
+        } : { id: "", title: "", coverImage: "" }}
       />
     </View>
   );

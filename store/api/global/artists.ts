@@ -27,12 +27,14 @@ const songApi = mainApi.injectEndpoints({
         url: `/artists`,
         method: "GET",
       }),
+      providesTags: [{ type: "Artists", id: "LIST" }],
     }),
     getArtist: builder.query<Artists, string>({
       query: (id) => ({
         url: `/Artists/${id}`,
         method: "GET",
       }),
+      providesTags: (result, error, id) => [{ type: "Artists", id }],
     }),
   }),
 });
