@@ -1,8 +1,9 @@
 import CreatorCard from "@/components/cards/CreatorCard";
 import CreatorRegister from "@/components/modals/CreatorRegisterModal";
+import FamousArtistRequestModal from "@/components/modals/FamousArtistRequestModal";
 import {
-  useTopVideoCreatorsAllQuery,
-  useTopVideoCreatorsQuery,
+    useTopVideoCreatorsAllQuery,
+    useTopVideoCreatorsQuery,
 } from "@/store/api/global/videoCreator";
 import { creatorCategories } from "@/utils/data";
 import { AppFonts } from "@/utils/fonts";
@@ -11,13 +12,14 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  FlatList, I18nManager, Image,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    FlatList,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 
 const Creators = () => {
@@ -25,6 +27,7 @@ const Creators = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [visible, setVisible] = useState(false);
+  const [famousArtistModalVisible, setFamousArtistModalVisible] = useState(false);
   const { data, isLoading: allCreatorsIsLoading } =
     useTopVideoCreatorsAllQuery();
   const { data: creatorsData, isLoading: creatorsIsLoading } =
@@ -40,6 +43,10 @@ const Creators = () => {
 
   const handleJoinPress = () => {
     setVisible(true);
+  };
+
+  const handleFamousArtistPress = () => {
+    setFamousArtistModalVisible(true);
   };
 
   const handleSearchPress = () => {
@@ -108,22 +115,44 @@ const Creators = () => {
           </ScrollView>
 
           <View className="items-center mt-10">
-            <TouchableOpacity
-              onPress={handleJoinPress}
-              className="w-20 h-20 rounded-full bg-gray-600 items-center justify-center mb-4 shadow-lg"
-            >
-              <View className="w-8 h-0.5 bg-white" />
-              <View className="w-0.5 h-8 bg-white absolute" />
-            </TouchableOpacity>
-            <Text 
-              className="text-lg text-gray-900"
-              style={{ 
-                fontFamily: AppFonts.semibold,
-                textAlign: 'center'
-              }}
-            >
-              {t('creators.joinUs')}
-            </Text>
+            <View className="flex-row gap-6 items-center">
+              <View className="items-center">
+                <TouchableOpacity
+                  onPress={handleJoinPress}
+                  className="w-20 h-20 rounded-full bg-gray-600 items-center justify-center mb-4 shadow-lg"
+                >
+                  <View className="w-8 h-0.5 bg-white" />
+                  <View className="w-0.5 h-8 bg-white absolute" />
+                </TouchableOpacity>
+                <Text 
+                  className="text-lg text-gray-900"
+                  style={{ 
+                    fontFamily: AppFonts.semibold,
+                    textAlign: 'center'
+                  }}
+                >
+                  {t('creators.joinUs')}
+                </Text>
+              </View>
+              
+              <View className="items-center">
+                <TouchableOpacity
+                  onPress={handleFamousArtistPress}
+                  className="w-20 h-20 rounded-full bg-red-500 items-center justify-center mb-4 shadow-lg"
+                >
+                  <Ionicons name="star" size={32} color="white" />
+                </TouchableOpacity>
+                <Text 
+                  className="text-lg text-gray-900"
+                  style={{ 
+                    fontFamily: AppFonts.semibold,
+                    textAlign: 'center'
+                  }}
+                >
+                  {t('famousArtist.title')}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
         <View className="my-8 px-6">
@@ -223,6 +252,10 @@ const Creators = () => {
           </View>
         </View>
         <CreatorRegister visible={visible} onClose={() => setVisible(false)} />
+        <FamousArtistRequestModal 
+          visible={famousArtistModalVisible} 
+          onClose={() => setFamousArtistModalVisible(false)} 
+        />
       </ScrollView>
     </SafeAreaView>
   );

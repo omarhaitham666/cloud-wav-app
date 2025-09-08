@@ -433,7 +433,7 @@
     "submitting": "Submitting..."
   },
   "famousArtist": {
-    "title": "Famous Artist Request",
+    "title": "Add artist",
     "submit": "Submit Request",
     "requestSubmitted": "Your request has been submitted successfully!",
     "fields": {

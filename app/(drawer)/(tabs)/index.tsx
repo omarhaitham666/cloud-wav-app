@@ -1,7 +1,6 @@
 import CustomHeader from "@/components/CustomHeader";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/cards/SongCard";
-import FamousArtistRequestModal from "@/components/modals/FamousArtistRequestModal";
 import { useGetTrendSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
@@ -138,10 +137,6 @@ const HomePage = () => {
           )}
         </View>
         <View className="h-16" />
-        <FamousArtistRequestModal
-          visible={showFamousArtistModal}
-          onClose={() => setShowFamousArtistModal(false)}
-        />
       </ScrollView>
     </SafeAreaView>
   );
