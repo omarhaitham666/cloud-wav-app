@@ -1,3 +1,5 @@
+"use client";
+
 import { useUploadSongMutation } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import { getToken } from "@/utils/secureStore";
@@ -40,7 +42,6 @@ const GENRES = [
 
 const songSchema = z.object({
   title: z.string().min(1, "Song title is required"),
-  artist: z.string().min(1, "Artist name is required"),
   genre: z.string().optional(),
   duration: z.string().optional(),
   caption: z.string().optional(),
@@ -56,7 +57,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
   const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [songArtwork, setSongArtwork] = useState<any>(null);
-  const [, { isLoading: isUploadSong }] = useUploadSongMutation();
+  const [uploadSong, { isLoading: isUploadSong }] = useUploadSongMutation();
 
   const {
     control,
@@ -67,9 +68,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
     resolver: zodResolver(songSchema),
     defaultValues: {
       title: "",
-      artist: "",
       genre: "",
-      duration: "",
       caption: "",
     },
   });
@@ -94,27 +93,34 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
   const pickAudioFile = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: [
-          "audio/mpeg",
-          "audio/wav",
-          "audio/aac",
-          "audio/mp4",
-          "audio/x-flac",
-        ],
+        type: ["audio/*"],
         copyToCacheDirectory: true,
       });
 
       if (result.canceled === false) {
-        const asset = {
-          uri: result.assets[0].uri,
-          fileName: result.assets[0].name,
-          mimeType: result.assets[0].mimeType || "audio/mpeg",
+        const asset = result.assets[0];
+        const fileName = asset.name || "song.mp3";
+
+        let mimeType = "audio/mpeg";
+        if (fileName.toLowerCase().endsWith(".wav")) {
+          mimeType = "audio/wav";
+        } else if (fileName.toLowerCase().endsWith(".ogg")) {
+          mimeType = "audio/ogg";
+        } else if (fileName.toLowerCase().endsWith(".mp3")) {
+          mimeType = "audio/mpeg";
+        }
+
+        const audioFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
         };
-        setSelectedFile(asset);
+
+        setSelectedFile(audioFile);
         Toast.show({
           type: "success",
           text1: "File Selected",
-          text2: asset.fileName || "Audio file selected successfully",
+          text2: fileName,
         });
       }
     } catch (err) {
@@ -134,10 +140,22 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
+        base64: true,
       });
 
-      if (!result.canceled && result.assets?.[0]) {
-        setSongArtwork(result.assets[0]);
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        const asset = result.assets[0];
+        const fileName = asset.fileName || `image_${Date.now()}.jpg`;
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        const imageFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+          base64: asset.base64,
+        };
+
+        setSongArtwork(imageFile);
         Toast.show({
           type: "success",
           text1: "Artwork Selected",
@@ -166,35 +184,30 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
 
     try {
       const songFormData = new FormData();
-      songFormData.append("title", data.title);
-      songFormData.append("artist", data.artist);
-      songFormData.append("genre", data.genre || "");
-      songFormData.append("caption", data.caption || "");
-      songFormData.append("duration", data.duration || "");
 
-      const audioFile = {
-        uri: selectedFile.uri,
-        type: selectedFile.mimeType,
-        name: selectedFile.fileName || "song.mp3",
-      };
-      songFormData.append("song_path", audioFile as any);
-      console.log("Audio file:", audioFile);
-
+      // إضافة cover_path فقط إذا كان هناك صورة
       if (songArtwork) {
-        const coverFile = {
-          uri: songArtwork.uri,
-          type: songArtwork.mimeType || "image/jpeg",
-          name: songArtwork.fileName || "cover.jpg",
-        };
-        songFormData.append("cover_path", coverFile as any);
+        if (songArtwork.base64) {
+          const base64File = {
+            uri: `data:${songArtwork.type};base64,${songArtwork.base64}`,
+            type: songArtwork.type,
+            name: songArtwork.name,
+          };
+          songFormData.append("cover_path", base64File as any);
+        } else {
+          const regularFile = {
+            uri: songArtwork.uri,
+            type: songArtwork.type || "image/jpeg",
+            name: songArtwork.name || `cover_path_${Date.now()}.jpg`,
+          };
+          songFormData.append("cover_path", regularFile as any);
+        }
       }
 
-      console.log("FORM DATA PAYLOAD:", {
-        title: data.title,
-        artist: data.artist,
-        song_path: "audio file",
-        cover_path: songArtwork ? "cover file" : "no cover",
-      });
+      songFormData.append("song_path", selectedFile as any);
+      songFormData.append("title", data.title);
+      songFormData.append("division", data.genre || "");
+      songFormData.append("caption", data.caption || "");
 
       const token = await getToken("access_token");
       const response = await fetch(
@@ -227,7 +240,10 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
       Toast.show({
         type: "error",
         text1: "Upload Failed",
-        text2: error?.message || "Failed to upload song. Please try again.",
+        text2:
+          error?.data?.message ||
+          error?.message ||
+          "Failed to upload song. Please try again.",
       });
     }
   };
@@ -335,7 +351,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
                     textAlign: isRTL ? "right" : "left",
                   }}
                 >
-                  {selectedFile.fileName || "Audio file selected"}
+                  {selectedFile.fileName}
                 </Text>
                 <Text className="text-gray-400 text-xs mt-1">
                   Tap to change file
@@ -365,7 +381,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
                     textAlign: isRTL ? "right" : "left",
                   }}
                 >
-                  Supported: MP3, WAV, AAC, M4A, FLAC
+                  Supported: MP3, WAV, OGG
                 </Text>
               </View>
             )}
@@ -408,46 +424,6 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
               }}
             >
               {errors.title.message}
-            </Text>
-          )}
-        </View>
-
-        <View>
-          <Text
-            className="text-gray-300 mb-2"
-            style={{
-              fontFamily: AppFonts.medium,
-              textAlign: isRTL ? "right" : "left",
-            }}
-          >
-            Artist Name *
-          </Text>
-          <Controller
-            control={control}
-            name="artist"
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder="Enter artist name"
-                value={value}
-                onChangeText={onChange}
-                className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                placeholderTextColor="#6B7280"
-                style={{
-                  textAlign: isRTL ? "right" : "left",
-                  fontFamily: AppFonts.medium,
-                }}
-              />
-            )}
-          />
-          {errors.artist && (
-            <Text
-              className="text-red-400 text-sm mt-1"
-              style={{
-                textAlign: isRTL ? "right" : "left",
-                fontFamily: AppFonts.medium,
-              }}
-            >
-              {errors.artist.message}
             </Text>
           )}
         </View>

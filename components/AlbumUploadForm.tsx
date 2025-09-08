@@ -116,7 +116,6 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
     }
 
     try {
-      // إنشاء FormData بنفس طريقة ProfileUser
       const albumFormData = new FormData();
       albumFormData.append("title", data.title);
 
@@ -127,7 +126,6 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
           name: coverImage.name,
         };
         albumFormData.append("album_cover", base64File as any);
-        console.log("Using base64 file:", base64File);
       } else {
         const regularFile = {
           uri: coverImage.uri,
