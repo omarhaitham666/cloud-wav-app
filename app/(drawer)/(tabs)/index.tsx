@@ -1,4 +1,5 @@
 import CustomHeader from "@/components/CustomHeader";
+import GlobalToast from "@/components/GlobalToast";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/cards/SongCard";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
@@ -18,7 +19,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
@@ -37,10 +37,7 @@ const HomePage = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <TopLoader />
-      <ScrollView 
-        ref={scrollViewRef}
-        refreshControl={refreshControl as any}
-      >
+      <ScrollView ref={scrollViewRef} refreshControl={refreshControl as any}>
         <ImageBackground
           source={require("../../../assets/images/Rectangle.png")}
           resizeMode="cover"

@@ -1,3 +1,4 @@
+import GlobalToast from "@/components/GlobalToast";
 import SocialServiesModal from "@/components/modals/SocialServiesModal";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,7 +21,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Service {

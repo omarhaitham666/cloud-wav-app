@@ -161,10 +161,13 @@
     },
     "validation": {
       "fullNameRequired": "الاسم الكامل مطلوب",
+      "nameRequired": "الاسم مطلوب",
       "emailRequired": "البريد الإلكتروني مطلوب",
       "invalidEmail": "بريد إلكتروني غير صالح",
+      "emailInvalid": "عنوان بريد إلكتروني غير صالح",
       "birthDateRequired": "تاريخ الميلاد مطلوب",
       "phoneRequired": "رقم الهاتف مطلوب",
+      "phoneInvalid": "رقم هاتف غير صالح",
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
       "passwordMaxLength": "كلمة المرور يجب أن تكون أقل من 128 حرف",
@@ -172,7 +175,8 @@
       "passwordsMustMatch": "كلمات المرور يجب أن تتطابق",
       "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
       "fullNameMinLength": "الاسم يجب أن يكون حرفين على الأقل",
-      "fullNameMaxLength": "الاسم يجب أن يكون أقل من 50 حرف"
+      "fullNameMaxLength": "الاسم يجب أن يكون أقل من 50 حرف",
+      "urlInvalid": "تنسيق رابط غير صالح"
     }
   },
   "services": {
@@ -434,12 +438,24 @@
     "success": "نجح",
     "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
     "somethingWentWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
-    "submitting": "جارٍ الإرسال..."
+    "submitting": "جارٍ الإرسال...",
+    "imagePickerError": "فشل في اختيار الصورة",
+    "imageSelected": "تم اختيار الصورة",
+    "ok": "موافق"
   },
   "famousArtist": {
     "title": "إضافة فنان",
     "submit": "إرسال الطلب",
     "requestSubmitted": "تم إرسال طلبك بنجاح!",
+    "modal": {
+      "title": "طلب فنان مشهور",
+      "close": "✕"
+    },
+    "sections": {
+      "personalInfo": "المعلومات الشخصية",
+      "professionalInfo": "المعلومات المهنية",
+      "documents": "المستندات"
+    },
     "fields": {
       "name": "الاسم الكامل",
       "email": "عنوان البريد الإلكتروني",
@@ -456,11 +472,24 @@
       "email": "أدخل عنوان بريدك الإلكتروني",
       "phone": "أدخل رقم هاتفك",
       "whatsapp": "أدخل رقم واتسابك",
-      "division": "مثل: راب، بوب، روك",
+      "division": "اختر قسم الموسيقى الخاص بك",
       "socialLinks": "أدخل روابط وسائل التواصل الاجتماعي",
       "details": "أخبرنا المزيد عن نفسك",
       "selectIdCard": "اختر صورة الهوية",
       "selectProfile": "اختر صورة الملف الشخصي"
+    },
+    "divisions": {
+      "rap": "راب",
+      "pop": "بوب",
+      "blues": "بلوز",
+      "rock": "روك",
+      "mahraganat": "مهرجان",
+      "jazz": "جاز",
+      "metal": "ميتال وهافي ميتال",
+      "sonata": "سوناتا",
+      "symphony": "سيمفونية",
+      "orchestra": "أوركسترا",
+      "concerto": "كونشيرتو"
     }
   },
   "drawer": {
