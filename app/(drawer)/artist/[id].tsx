@@ -26,10 +26,10 @@ const ArtistProfile = () => {
   const { data: artistData, isLoading: isFetching } = useGetArtistQuery(id);
   const { data: user } = useGetUserQuery();
   const [UploadSong, setUploadSong] = useState(false);
-  
+
   // Check if the current user is the owner of this artist profile
   const isOwner = user && user.artist_id === Number(id);
-  
+
   if (isFetching) {
     return (
       <View className="flex-1 justify-center items-center bg-black">
@@ -53,7 +53,9 @@ const ArtistProfile = () => {
 
   return (
     <FlatList
-      data={artistData?.songs && artistData.songs.length > 0 ? artistData.songs : []}
+      data={
+        artistData?.songs && artistData.songs.length > 0 ? artistData.songs : []
+      }
       keyExtractor={(item) => item.id.toString()}
       showsVerticalScrollIndicator={false}
       numColumns={2}
@@ -122,12 +124,18 @@ const ArtistProfile = () => {
             <Text className="text-xl font-bold text-gray-800">All Songs</Text>
             {(!artistData?.songs || artistData.songs.length === 0) && (
               <View className="flex items-center justify-center py-12">
-                <Ionicons name="musical-notes-outline" size={64} color="#9CA3AF" />
+                <Ionicons
+                  name="musical-notes-outline"
+                  size={64}
+                  color="#9CA3AF"
+                />
                 <Text className="text-gray-500 text-lg mt-4 font-semibold">
                   No Songs Yet
                 </Text>
                 <Text className="text-gray-400 text-sm mt-2 text-center">
-                  {isOwner ? "Upload your first song to get started" : "This artist hasn't uploaded any songs yet"}
+                  {isOwner
+                    ? "Upload your first song to get started"
+                    : "This artist hasn't uploaded any songs yet"}
                 </Text>
               </View>
             )}
@@ -143,14 +151,16 @@ const ArtistProfile = () => {
               </Text>
             </View>
 
-            {(!artistData?.albums || artistData.albums.length === 0) ? (
+            {!artistData?.albums || artistData.albums.length === 0 ? (
               <View className="flex items-center justify-center py-12">
                 <Ionicons name="albums-outline" size={64} color="#9CA3AF" />
                 <Text className="text-gray-500 text-lg mt-4 font-semibold">
                   No Albums Yet
                 </Text>
                 <Text className="text-gray-400 text-sm mt-2 text-center">
-                  {isOwner ? "Create your first album to organize your music" : "This artist hasn't created any albums yet"}
+                  {isOwner
+                    ? "Create your first album to organize your music"
+                    : "This artist hasn't created any albums yet"}
                 </Text>
               </View>
             ) : (

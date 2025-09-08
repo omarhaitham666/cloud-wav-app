@@ -1,8 +1,6 @@
-import { userApi } from "@/store/api";
 import { useLogoutMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { useDrawerRefresh } from "@/store/drawerRefreshContext";
-import store from "@/store/store";
 import AppRefreshService, { setDrawerRefreshTrigger } from "@/utils/appRefresh";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
@@ -113,7 +111,6 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setToken(null);
 
       await AppRefreshService.refreshAfterAuthChange("logout");
-      store.dispatch(userApi.util.resetApiState());
     } catch (e: any) {
       Toast.show({
         type: "error",
