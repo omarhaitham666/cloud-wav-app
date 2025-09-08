@@ -49,14 +49,14 @@ const songApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    UploadSong: builder.mutation<
-      Songs,
-      { title: string; cover_path: File; song_path: File }
-    >({
-      query: (data) => ({
+    UploadSong: builder.mutation<Songs, FormData>({
+      query: (formData) => ({
         url: `/songs/upload`,
         method: "POST",
-        data: data,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
       invalidatesTags: [{ type: "Songs", id: "LIST" }],
     }),
