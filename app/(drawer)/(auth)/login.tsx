@@ -1,5 +1,7 @@
+import { userApi } from "@/store/api";
 import { useLoginMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
+import store from "@/store/store";
 import { AppFonts } from "@/utils/fonts";
 import { saveToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -36,7 +38,7 @@ export default function LoginScreen() {
   const isRTL = i18n.language === "ar";
   const [showPassword, setShowPassword] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
-  const { setUser } = useAuth();
+  const { setUser, triggerAuthRefresh } = useAuth();
 
   const {
     control,
@@ -74,7 +76,8 @@ export default function LoginScreen() {
           text2: t("auth.login.alerts.loginSuccessMessage"),
         });
 
-        // Force refresh by replacing the entire stack
+        store.dispatch(userApi.util.resetApiState());
+        triggerAuthRefresh();
         router.replace("/(drawer)/(tabs)");
       })
       .catch((e) => {

@@ -12,6 +12,8 @@ interface User {
 interface AuthContextProps {
   user: User | null;
   setUser: (user: User | null) => void;
+  refreshTrigger: number;
+  triggerAuthRefresh: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
@@ -20,7 +22,17 @@ export const AuthProvider: FC<PropsWithChildren<{ user?: User | null }>> = (
   $
 ) => {
   const [user, setUser] = useState<null | User>($.user || null);
-  return <AuthContext value={{ user, setUser }}>{$.children}</AuthContext>;
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const triggerAuthRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  return (
+    <AuthContext value={{ user, setUser, refreshTrigger, triggerAuthRefresh }}>
+      {$.children}
+    </AuthContext>
+  );
 };
 
 export const useAuth = () => {

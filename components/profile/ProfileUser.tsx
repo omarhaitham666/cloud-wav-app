@@ -1,7 +1,7 @@
 import {
-    useGetUserQuery,
-    useUpdateProfileARTISTORCREATORUserMutation,
-    useUpdateUserMutation,
+  useGetUserQuery,
+  useUpdateProfileARTISTORCREATORUserMutation,
+  useUpdateUserMutation,
 } from "@/store/api/user/user";
 import { AppFonts } from "@/utils/fonts";
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -12,16 +12,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Platform,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -238,8 +238,12 @@ const ProfileUser: React.FC = () => {
 
               Toast.show({
                 type: "info",
-                text1: t("profile.user.profileUpdatedTextOnly") || "Profile Updated (Text Only)",
-                text2: t("profile.user.imageUploadFailed") || "Image upload failed, but text fields were updated successfully",
+                text1:
+                  t("profile.user.profileUpdatedTextOnly") ||
+                  "Profile Updated (Text Only)",
+                text2:
+                  t("profile.user.imageUploadFailed") ||
+                  "Image upload failed, but text fields were updated successfully",
               });
 
               return;
@@ -366,9 +370,9 @@ const ProfileUser: React.FC = () => {
         <ActivityIndicator size="large" color="#f9a826" />
         <Text
           className="text-white mt-2"
-          style={{ 
+          style={{
             fontFamily: AppFonts.medium,
-            textAlign: isRTL ? "right" : "left"
+            textAlign: isRTL ? "right" : "left",
           }}
         >
           {t("profile.user.loading") || "Loading..."}
@@ -382,9 +386,9 @@ const ProfileUser: React.FC = () => {
       <View className="flex-1 justify-center items-center bg-black px-6">
         <Text
           className="text-red-400 text-center mb-4"
-          style={{ 
+          style={{
             fontFamily: AppFonts.medium,
-            textAlign: isRTL ? "right" : "left"
+            textAlign: isRTL ? "right" : "left",
           }}
         >
           {t("profile.user.error") || "Something went wrong"}
@@ -393,11 +397,11 @@ const ProfileUser: React.FC = () => {
           onPress={refetch}
           className="bg-purple-600 px-6 py-3 rounded-lg"
         >
-          <Text 
-            className="text-white" 
-            style={{ 
+          <Text
+            className="text-white"
+            style={{
               fontFamily: AppFonts.medium,
-              textAlign: isRTL ? "right" : "left"
+              textAlign: isRTL ? "right" : "left",
             }}
           >
             {t("profile.user.retry") || "Try Again"}
@@ -444,9 +448,9 @@ const ProfileUser: React.FC = () => {
               </TouchableOpacity>
               <Text
                 className="text-white text-xl"
-                style={{ 
+                style={{
                   fontFamily: AppFonts.bold,
-                  textAlign: isRTL ? "right" : "left"
+                  textAlign: isRTL ? "right" : "left",
                 }}
               >
                 {t("profile.user.editProfile") || "Edit Profile"}
@@ -477,9 +481,9 @@ const ProfileUser: React.FC = () => {
                       <Ionicons name="camera" size={40} color="white" />
                       <Text
                         className="text-white text-sm mt-2"
-                        style={{ 
+                        style={{
                           fontFamily: AppFonts.medium,
-                          textAlign: isRTL ? "center" : "center"
+                          textAlign: isRTL ? "center" : "center",
                         }}
                       >
                         {t("profile.user.addPhoto") || "Add Photo"}
@@ -488,7 +492,11 @@ const ProfileUser: React.FC = () => {
                   )}
                 </View>
                 {isArtistOrCreator && (
-                  <View className={`absolute bottom-0 ${isRTL ? "-left-1" : "-right-1"} bg-purple-600 p-3 rounded-full shadow-lg`}>
+                  <View
+                    className={`absolute bottom-0 ${
+                      isRTL ? "-left-1" : "-right-1"
+                    } bg-purple-600 p-3 rounded-full shadow-lg`}
+                  >
                     <Ionicons name="camera" size={16} color="white" />
                   </View>
                 )}
@@ -511,7 +519,7 @@ const ProfileUser: React.FC = () => {
                   style={{
                     fontFamily: AppFonts.medium,
                     color: getRoleColor(userData?.role, userData?.type),
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {getRoleDisplayName(userData?.role, userData?.type)}
@@ -523,9 +531,9 @@ const ProfileUser: React.FC = () => {
               <View className="mb-6">
                 <Text
                   className="text-white text-lg mb-4"
-                  style={{ 
+                  style={{
                     fontFamily: AppFonts.bold,
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {t("profile.user.quickActions") || "Quick Actions"}
@@ -544,7 +552,7 @@ const ProfileUser: React.FC = () => {
                         className="p-4 items-center"
                         style={{
                           borderRadius: 10,
-                          }}
+                        }}
                       >
                         <MaterialIcons
                           name="attach-money"
@@ -553,9 +561,9 @@ const ProfileUser: React.FC = () => {
                         />
                         <Text
                           className="text-white text-sm mt-2 text-center"
-                          style={{ 
+                          style={{
                             fontFamily: AppFonts.bold,
-                            textAlign: isRTL ? "center" : "center"
+                            textAlign: isRTL ? "center" : "center",
                           }}
                         >
                           {t("profile.user.updatePricing") || "Update Pricing"}
@@ -583,14 +591,14 @@ const ProfileUser: React.FC = () => {
                         className="p-4 items-center"
                         style={{
                           borderRadius: 10,
-                          }}
+                        }}
                       >
                         <FontAwesome5 name="music" size={24} color="white" />
                         <Text
                           className="text-white text-sm mt-2 text-center"
-                          style={{ 
+                          style={{
                             fontFamily: AppFonts.bold,
-                            textAlign: isRTL ? "center" : "center"
+                            textAlign: isRTL ? "center" : "center",
                           }}
                         >
                           {t("profile.user.manageSongs") || "Manage Songs"}
@@ -606,9 +614,9 @@ const ProfileUser: React.FC = () => {
           <View className="px-6">
             <Text
               className="text-white text-lg mb-6"
-              style={{ 
+              style={{
                 fontFamily: AppFonts.bold,
-                textAlign: isRTL ? "right" : "left"
+                textAlign: isRTL ? "right" : "left",
               }}
             >
               {t("profile.user.profileInformation") || "Profile Information"}
@@ -617,9 +625,9 @@ const ProfileUser: React.FC = () => {
             <View className="mb-4">
               <Text
                 className="text-gray-300 text-sm mb-2"
-                style={{ 
+                style={{
                   fontFamily: AppFonts.medium,
-                  textAlign: isRTL ? "right" : "left"
+                  textAlign: isRTL ? "right" : "left",
                 }}
               >
                 {t("profile.user.fullName") || "Full Name"}
@@ -629,7 +637,8 @@ const ProfileUser: React.FC = () => {
                 name="fullName"
                 rules={{
                   required:
-                    t("auth.validation.fullNameRequired") || "Full name is required",
+                    t("auth.validation.fullNameRequired") ||
+                    "Full name is required",
                   minLength: {
                     value: 2,
                     message:
@@ -653,14 +662,18 @@ const ProfileUser: React.FC = () => {
                       value={value}
                       onChangeText={onChange}
                       className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                      style={{ 
+                      style={{
                         fontFamily: AppFonts.medium,
-                        textAlign: isRTL ? "right" : "left"
+                        textAlign: isRTL ? "right" : "left",
                       }}
                       autoCapitalize="words"
                       returnKeyType="next"
                     />
-                    <View className={`absolute ${isRTL ? "left-4" : "right-4"} top-4`}>
+                    <View
+                      className={`absolute ${
+                        isRTL ? "left-4" : "right-4"
+                      } top-4`}
+                    >
                       <Ionicons
                         name="person-outline"
                         size={20}
@@ -673,9 +686,9 @@ const ProfileUser: React.FC = () => {
               {errors.fullName && (
                 <Text
                   className="text-red-400 text-sm mt-2 ml-2"
-                  style={{ 
+                  style={{
                     fontFamily: AppFonts.medium,
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {errors.fullName.message}
@@ -685,9 +698,9 @@ const ProfileUser: React.FC = () => {
             <View className="mb-4">
               <Text
                 className="text-gray-300 text-sm mb-2"
-                style={{ 
+                style={{
                   fontFamily: AppFonts.medium,
-                  textAlign: isRTL ? "right" : "left"
+                  textAlign: isRTL ? "right" : "left",
                 }}
               >
                 {t("profile.user.email") || "Email Address"}
@@ -701,7 +714,8 @@ const ProfileUser: React.FC = () => {
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message:
-                      t("auth.validation.invalidEmail") || "Invalid email address",
+                      t("auth.validation.invalidEmail") ||
+                      "Invalid email address",
                   },
                 }}
                 render={({ field: { onChange, value } }) => (
@@ -717,13 +731,17 @@ const ProfileUser: React.FC = () => {
                       value={value}
                       onChangeText={onChange}
                       className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                      style={{ 
+                      style={{
                         fontFamily: AppFonts.medium,
-                        textAlign: isRTL ? "right" : "left"
+                        textAlign: isRTL ? "right" : "left",
                       }}
                       returnKeyType="next"
                     />
-                    <View className={`absolute ${isRTL ? "left-4" : "right-4"} top-4`}>
+                    <View
+                      className={`absolute ${
+                        isRTL ? "left-4" : "right-4"
+                      } top-4`}
+                    >
                       <Ionicons name="mail-outline" size={20} color="#6B7280" />
                     </View>
                   </View>
@@ -732,9 +750,9 @@ const ProfileUser: React.FC = () => {
               {errors.email && (
                 <Text
                   className="text-red-400 text-sm mt-2 ml-2"
-                  style={{ 
+                  style={{
                     fontFamily: AppFonts.medium,
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {errors.email.message}
@@ -745,9 +763,9 @@ const ProfileUser: React.FC = () => {
             <View className="mb-4">
               <Text
                 className="text-gray-300 text-sm mb-2"
-                style={{ 
+                style={{
                   fontFamily: AppFonts.medium,
-                  textAlign: isRTL ? "right" : "left"
+                  textAlign: isRTL ? "right" : "left",
                 }}
               >
                 {t("profile.user.accountType") || "Account Type"}
@@ -755,9 +773,9 @@ const ProfileUser: React.FC = () => {
               <View className="bg-white/5 rounded-xl px-4 py-4 border border-white/10 flex-row items-center justify-between">
                 <Text
                   className="text-white text-base"
-                  style={{ 
+                  style={{
                     fontFamily: AppFonts.medium,
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {getRoleDisplayName(userData?.role, userData?.type)}
@@ -775,9 +793,9 @@ const ProfileUser: React.FC = () => {
 
             <Text
               className="text-white text-lg mb-4 mt-6"
-              style={{ 
+              style={{
                 fontFamily: AppFonts.bold,
-                textAlign: isRTL ? "right" : "left"
+                textAlign: isRTL ? "right" : "left",
               }}
             >
               {t("profile.user.security") || "Security"}
@@ -786,12 +804,13 @@ const ProfileUser: React.FC = () => {
             <View className="mb-4">
               <Text
                 className="text-gray-300 text-sm mb-2"
-                style={{ 
+                style={{
                   fontFamily: AppFonts.medium,
-                  textAlign: isRTL ? "right" : "left"
+                  textAlign: isRTL ? "right" : "left",
                 }}
               >
-                {t("profile.user.newPasswordOptional") || "New Password (Optional)"}
+                {t("profile.user.newPasswordOptional") ||
+                  "New Password (Optional)"}
               </Text>
               <Controller
                 control={control}
@@ -813,20 +832,27 @@ const ProfileUser: React.FC = () => {
                 render={({ field: { onChange, value } }) => (
                   <View className="relative">
                     <TextInput
-                      placeholder={t("profile.user.enterNewPassword") || "Enter new password"}
+                      placeholder={
+                        t("profile.user.enterNewPassword") ||
+                        "Enter new password"
+                      }
                       placeholderTextColor="#6B7280"
                       secureTextEntry
                       autoComplete="new-password"
                       value={value}
                       onChangeText={onChange}
                       className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                      style={{ 
+                      style={{
                         fontFamily: AppFonts.medium,
-                        textAlign: isRTL ? "right" : "left"
+                        textAlign: isRTL ? "right" : "left",
                       }}
                       returnKeyType="next"
                     />
-                    <View className={`absolute ${isRTL ? "left-4" : "right-4"} top-4`}>
+                    <View
+                      className={`absolute ${
+                        isRTL ? "left-4" : "right-4"
+                      } top-4`}
+                    >
                       <Ionicons
                         name="lock-closed-outline"
                         size={20}
@@ -839,9 +865,9 @@ const ProfileUser: React.FC = () => {
               {errors.password && (
                 <Text
                   className="text-red-400 text-sm mt-2 ml-2"
-                  style={{ 
+                  style={{
                     fontFamily: AppFonts.medium,
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {errors.password.message}
@@ -852,9 +878,9 @@ const ProfileUser: React.FC = () => {
             <View className="mb-8">
               <Text
                 className="text-gray-300 text-sm mb-2"
-                style={{ 
+                style={{
                   fontFamily: AppFonts.medium,
-                  textAlign: isRTL ? "right" : "left"
+                  textAlign: isRTL ? "right" : "left",
                 }}
               >
                 {t("profile.user.confirmNewPassword") || "Confirm New Password"}
@@ -882,21 +908,28 @@ const ProfileUser: React.FC = () => {
                 render={({ field: { onChange, value } }) => (
                   <View className="relative">
                     <TextInput
-                      placeholder={t("profile.user.confirmYourNewPassword") || "Confirm your new password"}
+                      placeholder={
+                        t("profile.user.confirmYourNewPassword") ||
+                        "Confirm your new password"
+                      }
                       placeholderTextColor="#6B7280"
                       secureTextEntry
                       autoComplete="new-password"
                       value={value}
                       onChangeText={onChange}
                       className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                      style={{ 
+                      style={{
                         fontFamily: AppFonts.medium,
-                        textAlign: isRTL ? "right" : "left"
+                        textAlign: isRTL ? "right" : "left",
                       }}
                       returnKeyType="done"
                       onSubmitEditing={handleSubmit(onSubmit)}
                     />
-                    <View className={`absolute ${isRTL ? "left-4" : "right-4"} top-4`}>
+                    <View
+                      className={`absolute ${
+                        isRTL ? "left-4" : "right-4"
+                      } top-4`}
+                    >
                       <Ionicons
                         name="lock-closed-outline"
                         size={20}
@@ -909,9 +942,9 @@ const ProfileUser: React.FC = () => {
               {errors.confirmPassword && (
                 <Text
                   className="text-red-400 text-sm mt-2 ml-2"
-                  style={{ 
+                  style={{
                     fontFamily: AppFonts.medium,
-                    textAlign: isRTL ? "right" : "left"
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
                   {errors.confirmPassword.message}
@@ -925,8 +958,8 @@ const ProfileUser: React.FC = () => {
                 disabled={isUpdating || !isDirty}
               >
                 <LinearGradient
-                style={{
-                  borderRadius: 10,
+                  style={{
+                    borderRadius: 10,
                   }}
                   colors={
                     isUpdating || !isDirty
@@ -944,9 +977,9 @@ const ProfileUser: React.FC = () => {
                       <Ionicons name="save-outline" size={20} color="white" />
                       <Text
                         className="text-white text-lg ml-2"
-                        style={{ 
+                        style={{
                           fontFamily: AppFonts.bold,
-                          textAlign: isRTL ? "right" : "left"
+                          textAlign: isRTL ? "right" : "left",
                         }}
                       >
                         {t("profile.user.saveChanges") || "Save Changes"}
@@ -967,9 +1000,9 @@ const ProfileUser: React.FC = () => {
                     <Ionicons name="refresh-outline" size={18} color="white" />
                     <Text
                       className="text-white text-base ml-2"
-                      style={{ 
+                      style={{
                         fontFamily: AppFonts.medium,
-                        textAlign: isRTL ? "right" : "left"
+                        textAlign: isRTL ? "right" : "left",
                       }}
                     >
                       {t("profile.user.resetChanges") || "Reset Changes"}

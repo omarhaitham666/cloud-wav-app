@@ -43,7 +43,7 @@ export default function RegisterScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [register, { isLoading }] = useRegisterMutation();
-  const { setUser } = useAuth();
+  const { setUser, triggerAuthRefresh } = useAuth();
 
   const schema = yup.object().shape({
     fullName: yup.string().required(t("auth.validation.fullNameRequired")),
@@ -317,7 +317,7 @@ export default function RegisterScreen() {
             password={watch("password")}
             onVerified={(userData) => {
               setOtpVisible(false);
-              
+
               // Update auth context with basic data
               // Note: User data will be fetched separately after verification
               setUser({
@@ -328,7 +328,10 @@ export default function RegisterScreen() {
                 role: "",
                 token: "",
               });
-              
+
+              // Trigger refresh across the app
+              triggerAuthRefresh();
+
               // Force refresh by replacing the entire stack
               router.replace("/(drawer)/(tabs)");
             }}

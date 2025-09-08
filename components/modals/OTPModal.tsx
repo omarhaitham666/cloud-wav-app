@@ -1,4 +1,7 @@
+import { userApi } from "@/store/api";
 import { useVerifyCodeMutation } from "@/store/api/user/user";
+import { useAuth } from "@/store/auth-context";
+import store from "@/store/store";
 import { AppFonts } from "@/utils/fonts";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,6 +32,7 @@ export default function OTPModal({
   const { t, i18n } = useTranslation();
   const [otp, setOtp] = useState("");
   const [verifyCode, { isLoading }] = useVerifyCodeMutation();
+  const { triggerAuthRefresh } = useAuth();
   const isArabic = i18n.language === "ar";
 
   const handleVerifyOTP = async () => {
@@ -45,6 +49,8 @@ export default function OTPModal({
           type: "success",
           text1: t("otp.alerts.verificationSuccess"),
         });
+        store.dispatch(userApi.util.resetApiState());
+        triggerAuthRefresh();
         onVerified(res.message || res);
       })
       .catch((e) => {

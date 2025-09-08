@@ -1,6 +1,8 @@
 import AuthProfile from "@/components/profile/AuthProfile";
 import ProfileUser from "@/components/profile/ProfileUser";
+import { useAuthRefresh } from "@/hooks/useAuthRefresh";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { useAuth } from "@/store/auth-context";
 import { getToken } from "@/utils/secureStore";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
@@ -8,11 +10,10 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 const Profile = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Pull to refresh functionality
   const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
     onRefresh: async () => {
-      // Recheck authentication status
       await checkAuthToken();
     },
     scrollToTopOnRefresh: true,
@@ -22,6 +23,15 @@ const Profile = () => {
   useEffect(() => {
     checkAuthToken();
   }, []);
+
+  useAuthRefresh(() => {
+    if (user) {
+      setIsAuthenticated(true);
+      setIsLoading(false);
+    } else {
+      checkAuthToken();
+    }
+  });
 
   const checkAuthToken = async () => {
     try {

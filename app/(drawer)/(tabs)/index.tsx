@@ -1,7 +1,7 @@
 import CustomHeader from "@/components/CustomHeader";
-import GlobalToast from "@/components/GlobalToast";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/cards/SongCard";
+import { useAuthRefresh } from "@/hooks/useAuthRefresh";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useGetTrendSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
@@ -24,10 +24,12 @@ const HomePage = () => {
   const isRTL = i18n.language === "ar";
   const { data, isLoading, refetch } = useGetTrendSongQuery();
 
-  // Pull to refresh functionality
+  useAuthRefresh(() => {
+    refetch();
+  });
+
   const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
     onRefresh: async () => {
-      // Refetch trending songs data
       await refetch();
     },
     scrollToTopOnRefresh: true,

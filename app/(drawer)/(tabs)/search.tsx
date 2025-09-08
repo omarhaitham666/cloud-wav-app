@@ -1,4 +1,5 @@
 import CreatorCard from "@/components/cards/CreatorCard";
+import { useAuthRefresh } from "@/hooks/useAuthRefresh";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useSearchCreatorQuery } from "@/store/api/global/search";
 import { AppFonts } from "@/utils/fonts";
@@ -31,10 +32,12 @@ const Search = () => {
 
   const { data, refetch, isLoading } = useSearchCreatorQuery(searchQuery);
 
-  // Pull to refresh functionality
+  useAuthRefresh(() => {
+    refetch();
+  });
+
   const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
     onRefresh: async () => {
-      // Refetch search data
       await refetch();
     },
     scrollToTopOnRefresh: true,
@@ -54,7 +57,7 @@ const Search = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, slideAnim]);
 
   const categories = [
     { id: "all", label: t("song.categories.all"), icon: "grid" },

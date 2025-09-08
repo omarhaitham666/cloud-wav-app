@@ -1,6 +1,8 @@
+import { userApi } from "@/store/api";
 import { useLogoutMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { useDrawerRefresh } from "@/store/drawerRefreshContext";
+import store from "@/store/store";
 import AppRefreshService, { setDrawerRefreshTrigger } from "@/utils/appRefresh";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
@@ -97,25 +99,21 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     fetchToken();
   }, [state.index, refreshKey]);
 
-  // Set up the global drawer refresh trigger
   useEffect(() => {
     setDrawerRefreshTrigger(triggerDrawerRefresh);
     return () => setDrawerRefreshTrigger(null);
   }, [triggerDrawerRefresh]);
 
-
   const handleLogout = async () => {
     try {
       await deleteToken("access_token");
       await logout().unwrap();
-      
-      // Clear auth context
+
       setUser(null);
       setToken(null);
-      
-      // Use the gentle refresh service to reload the app after logout
-      await AppRefreshService.refreshAfterAuthChange('logout');
 
+      await AppRefreshService.refreshAfterAuthChange("logout");
+      store.dispatch(userApi.util.resetApiState());
     } catch (e: any) {
       Toast.show({
         type: "error",
@@ -125,7 +123,6 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     }
   };
 
-  // Enhanced login navigation
   const handleLoginNavigation = () => {
     router.push("/(drawer)/(auth)/login");
   };
@@ -183,38 +180,39 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     ),
   };
 
-  const secondaryItems = (token || user)
-    ? [
-        {
-          label: t("drawer.items.profile"),
-          route: null,
-          iconName: "user",
-          action: () => Alert.alert("Profile", "Profile screen coming soon!"),
-        },
-        {
-          label: isLoading
-            ? t("drawer.items.loggingOut")
-            : t("drawer.items.logout"),
-          route: null,
-          iconName: "log-out",
-          action: handleLogout,
-        },
-        languageSwitcherItem,
-      ]
-    : [
-        {
-          label: t("drawer.items.login"),
-          route: null, // Set to null to use custom action
-          iconName: "log-in",
-          action: handleLoginNavigation,
-        },
-        {
-          label: t("drawer.items.register"),
-          route: "(auth)/register",
-          iconName: "user-plus",
-        },
-        languageSwitcherItem,
-      ];
+  const secondaryItems =
+    token || user
+      ? [
+          {
+            label: t("drawer.items.profile"),
+            route: null,
+            iconName: "user",
+            action: () => Alert.alert("Profile", "Profile screen coming soon!"),
+          },
+          {
+            label: isLoading
+              ? t("drawer.items.loggingOut")
+              : t("drawer.items.logout"),
+            route: null,
+            iconName: "log-out",
+            action: handleLogout,
+          },
+          languageSwitcherItem,
+        ]
+      : [
+          {
+            label: t("drawer.items.login"),
+            route: null,
+            iconName: "log-in",
+            action: handleLoginNavigation,
+          },
+          {
+            label: t("drawer.items.register"),
+            route: "(auth)/register",
+            iconName: "user-plus",
+          },
+          languageSwitcherItem,
+        ];
 
   const navigateTo = (route: string | null, action?: () => void) => {
     if (action) {
