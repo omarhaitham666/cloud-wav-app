@@ -165,6 +165,7 @@ const ProfileUser: React.FC = () => {
                 name: imageFile.name,
               };
               base64FormData.append("profile_image", base64File as any);
+
               await updateProfileARTISTORCREATORUser(base64FormData)
                 .unwrap()
                 .then(() => {
@@ -176,10 +177,12 @@ const ProfileUser: React.FC = () => {
                   });
                 })
                 .catch((e) => {
+                  console.log("error", e);
+
                   Toast.show({
                     type: "error",
                     text1: t("profile.user.updateFailed") || "Update Failed",
-                    text2: e.data.message,
+                    text2: e.data.message || e.data.error,
                   });
                 });
               setValue("password", "");
