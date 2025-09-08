@@ -1,5 +1,4 @@
 import CustomHeader from "@/components/CustomHeader";
-import GlobalToast from "@/components/GlobalToast";
 import ServicesSection from "@/components/ServicesSection";
 import { SongCard } from "@/components/cards/SongCard";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
