@@ -160,15 +160,19 @@
       }
     },
     "validation": {
-      "fullNameRequired": "الاسم مطلوب",
+      "fullNameRequired": "الاسم الكامل مطلوب",
       "emailRequired": "البريد الإلكتروني مطلوب",
       "invalidEmail": "بريد إلكتروني غير صالح",
       "birthDateRequired": "تاريخ الميلاد مطلوب",
       "phoneRequired": "رقم الهاتف مطلوب",
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+      "passwordMaxLength": "كلمة المرور يجب أن تكون أقل من 128 حرف",
       "confirmPasswordRequired": "تأكيد كلمة المرور مطلوب",
-      "passwordsMustMatch": "كلمات المرور يجب أن تتطابق"
+      "passwordsMustMatch": "كلمات المرور يجب أن تتطابق",
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+      "fullNameMinLength": "الاسم يجب أن يكون حرفين على الأقل",
+      "fullNameMaxLength": "الاسم يجب أن يكون أقل من 50 حرف"
     }
   },
   "services": {
@@ -506,12 +510,12 @@
     },
     "user": {
       "editProfile": "تعديل الملف الشخصي",
-      "fullName": "اسمك",
-      "email": "بريدك الإلكتروني",
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
       "password": "كلمة المرور",
       "confirmPassword": "تأكيد كلمة المرور",
       "saveChanges": "حفظ التغييرات",
-      "fullNameRequired": "الاسم مطلوب",
+      "fullNameRequired": "الاسم الكامل مطلوب",
       "emailRequired": "البريد الإلكتروني مطلوب",
       "invalidEmail": "عنوان بريد إلكتروني غير صحيح",
       "passwordRequired": "كلمة المرور مطلوبة",
@@ -528,7 +532,24 @@
       "profileUpdated": "تم تحديث الملف الشخصي بنجاح",
       "userUpdated": "تم تحديث المستخدم بنجاح",
       "updateFailed": "فشل التحديث",
-      "somethingWentWrong": "حدث خطأ ما"
+      "somethingWentWrong": "حدث خطأ ما",
+      "addPhoto": "إضافة صورة",
+      "quickActions": "إجراءات سريعة",
+      "updatePricing": "تحديث الأسعار",
+      "manageSongs": "إدارة الأغاني",
+      "profileInformation": "معلومات الملف الشخصي",
+      "accountType": "نوع الحساب",
+      "security": "الأمان",
+      "newPasswordOptional": "كلمة مرور جديدة (اختياري)",
+      "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+      "enterNewPassword": "أدخل كلمة مرور جديدة",
+      "confirmYourNewPassword": "أكد كلمة المرور الجديدة",
+      "resetChanges": "إعادة تعيين التغييرات",
+      "loading": "جارٍ التحميل...",
+      "retry": "حاول مرة أخرى",
+      "error": "حدث خطأ ما",
+      "profileUpdatedTextOnly": "تم تحديث الملف الشخصي (النص فقط)",
+      "imageUploadFailed": "فشل رفع الصورة، لكن تم تحديث الحقول النصية بنجاح"
     },
     "dashboard": {
       "welcomeBack": "مرحباً بعودتك!",

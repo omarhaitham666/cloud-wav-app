@@ -15,7 +15,7 @@ const AuthLayout = () => {
         <Stack
           screenOptions={{
             headerShown: false,
-            header: () => <CustomHeader showLanguageSwitcher />,
+            header: () => <CustomHeader />,
           }}
         >
           <Stack.Screen name="login" />
