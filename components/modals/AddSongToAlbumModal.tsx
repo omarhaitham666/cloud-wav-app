@@ -1,5 +1,7 @@
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -10,15 +12,31 @@ import {
   Modal,
   ScrollView,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
+
+const GENRES = [
+  "Rap",
+  "Pop",
+  "Blues",
+  "Rock",
+  "Mahraganat",
+  "Jazz",
+  "Metal & Heavy Metal",
+  "Sonata",
+  "Symphony",
+  "Orchestra",
+  "Concerto",
+];
 
 type Props = {
   visible: boolean;
   isLoading: boolean;
   onClose: () => void;
-  onAddSongToAlbum: (albumId: string, file: any) => void;
+  onAddSongToAlbum: (albumId: string, songData: { title: string; division: string; file: any; coverImage?: any }) => void;
   onDeleteAlbum: (albumId: string) => void;
   album: { id: string; title: string; coverImage?: string };
 };
@@ -35,20 +53,49 @@ function AddSongToAlbumModal({
   const isRTL = i18n.language === "ar";
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [selectedCoverImage, setSelectedCoverImage] = useState<any>(null);
+  const [songTitle, setSongTitle] = useState<string>("");
+  const [division, setDivision] = useState<string>("");
 
   const pickAudioFile = async () => {
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: false,
-        quality: 1,
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ["audio/*"],
+        copyToCacheDirectory: true,
       });
 
-      if (!result.canceled && result.assets[0]) {
-        setSelectedFile(result.assets[0]);
+      if (result.canceled === false) {
+        const asset = result.assets[0];
+        const fileName = asset.name || "song.mp3";
+
+        let mimeType = "audio/mpeg";
+        if (fileName.toLowerCase().endsWith(".wav")) {
+          mimeType = "audio/wav";
+        } else if (fileName.toLowerCase().endsWith(".ogg")) {
+          mimeType = "audio/ogg";
+        } else if (fileName.toLowerCase().endsWith(".mp3")) {
+          mimeType = "audio/mpeg";
+        }
+
+        const audioFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+        };
+
+        setSelectedFile(audioFile);
+        Toast.show({
+          type: "success",
+          text1: "File Selected",
+          text2: fileName,
+        });
       }
-    } catch (error) {
-      console.error("Error picking audio file:", error);
+    } catch (err) {
+      console.log("Audio picker error:", err);
+      Toast.show({
+        type: "error",
+        text1: "Selection Failed",
+        text2: "Unable to select audio file. Please try again.",
+      });
     }
   };
 
@@ -70,11 +117,41 @@ function AddSongToAlbumModal({
   };
 
   const handleAddSongToAlbum = () => {
-    if (selectedFile && album.id) {
-      onAddSongToAlbum(album.id, selectedFile);
-      setSelectedFile(null);
-      setSelectedCoverImage(null);
+    if (!selectedFile || !album.id) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Information",
+        text2: "Please select an audio file",
+      });
+      return;
     }
+
+    if (!songTitle.trim()) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Information",
+        text2: "Please enter a song title",
+      });
+      return;
+    }
+
+    if (!division) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Information",
+        text2: "Please select a genre/division",
+      });
+      return;
+    }
+
+    const songData = {
+      title: songTitle.trim(),
+      division: division,
+      file: selectedFile,
+      coverImage: selectedCoverImage,
+    };
+
+    onAddSongToAlbum(album.id, songData);
   };
 
   const handleDeleteAlbum = () => {
@@ -99,15 +176,26 @@ function AddSongToAlbumModal({
   };
 
   const handleClose = () => {
+    if (isLoading) {
+      Toast.show({
+        type: "info",
+        text1: "Upload in Progress",
+        text2: "Please wait for the upload to complete",
+      });
+      return;
+    }
+    
     setSelectedFile(null);
     setSelectedCoverImage(null);
+    setSongTitle("");
+    setDivision("");
     onClose();
   };
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
       <View className="flex-1 bg-black/40 justify-center items-center px-4">
-        <View className="bg-white rounded-2xl w-full max-h-[90%]">
+        <View className="bg-white rounded-2xl w-full h-[90%] overflow-y-auto">
           <View
             className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
             style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
@@ -182,41 +270,158 @@ function AddSongToAlbumModal({
               {/* Audio File Selection */}
               <View>
                 <Text
-                  className="text-gray-700 mb-2"
                   style={{
+                    color: '#374151',
+                    fontSize: 16,
+                    marginBottom: 12,
                     textAlign: isRTL ? "right" : "left",
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  Select Audio File
+                  Audio File *
                 </Text>
                 
                 <TouchableOpacity
                   onPress={pickAudioFile}
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center"
+                  style={{
+                    borderWidth: 2,
+                    borderStyle: 'dashed',
+                    borderColor: '#8B5CF6',
+                    borderRadius: 12,
+                    padding: 24,
+                    alignItems: 'center',
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  }}
                 >
-                  <Ionicons name="musical-notes" size={32} color="#6B7280" />
-                  <Text
-                    className="text-sm text-gray-600 mt-2"
-                    style={{
-                      fontFamily: AppFonts.semibold,
-                      textAlign: isRTL ? "right" : "left",
-                    }}
-                  >
-                    {selectedFile ? selectedFile.fileName || "Audio file selected" : "Choose Audio File"}
-                  </Text>
-                  {selectedFile && (
-                    <Text
-                      className="text-xs text-green-600 mt-1"
-                      style={{
-                        fontFamily: AppFonts.semibold,
-                        textAlign: isRTL ? "right" : "left",
-                      }}
-                    >
-                      File Selected
-                    </Text>
+                  {selectedFile ? (
+                    <View style={{ alignItems: 'center' }}>
+                      <View style={{
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        padding: 12,
+                        borderRadius: 50,
+                        marginBottom: 12,
+                      }}>
+                        <Ionicons name="musical-notes" size={32} color="#10B981" />
+                      </View>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: '#10B981',
+                          fontFamily: AppFonts.semibold,
+                          textAlign: isRTL ? "right" : "left",
+                        }}
+                      >
+                        {selectedFile.name}
+                      </Text>
+                      <Text style={{
+                        fontSize: 12,
+                        color: '#6B7280',
+                        marginTop: 4,
+                        fontFamily: AppFonts.medium,
+                      }}>
+                        Tap to change file
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={{ alignItems: 'center' }}>
+                      <Ionicons
+                        name="cloud-upload-outline"
+                        size={48}
+                        color="#8B5CF6"
+                      />
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          color: '#8B5CF6',
+                          marginTop: 12,
+                          fontFamily: AppFonts.semibold,
+                          textAlign: isRTL ? "right" : "left",
+                        }}
+                      >
+                        Tap to select audio file
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: '#6B7280',
+                          marginTop: 8,
+                          fontFamily: AppFonts.medium,
+                          textAlign: isRTL ? "right" : "left",
+                        }}
+                      >
+                        Supported: MP3, WAV, OGG
+                      </Text>
+                    </View>
                   )}
                 </TouchableOpacity>
+              </View>
+
+              {/* Song Title */}
+              <View>
+                <Text
+                  style={{
+                    color: '#374151',
+                    fontSize: 16,
+                    marginBottom: 8,
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
+                  Song Title *
+                </Text>
+                <TextInput
+                  placeholder="Enter song title"
+                  value={songTitle}
+                  onChangeText={setSongTitle}
+                  style={{
+                    backgroundColor: '#F9FAFB',
+                    borderWidth: 1,
+                    borderColor: '#D1D5DB',
+                    borderRadius: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    fontSize: 16,
+                    color: '#1F2937',
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.medium,
+                  }}
+                  placeholderTextColor="#6B7280"
+                />
+              </View>
+
+              {/* Division/Genre */}
+              <View>
+                <Text
+                  style={{
+                    color: '#374151',
+                    fontSize: 16,
+                    marginBottom: 8,
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
+                  Genre/Division *
+                </Text>
+                <View style={{
+                  backgroundColor: '#F9FAFB',
+                  borderWidth: 1,
+                  borderColor: '#D1D5DB',
+                  borderRadius: 8,
+                }}>
+                  <Picker
+                    selectedValue={division}
+                    onValueChange={setDivision}
+                    style={{
+                      color: '#1F2937',
+                      fontFamily: AppFonts.medium,
+                    }}
+                  >
+                    <Picker.Item label="Select Genre" value="" />
+                    {GENRES.map((genre) => (
+                      <Picker.Item key={genre} label={genre} value={genre} />
+                    ))}
+                  </Picker>
+                </View>
               </View>
 
               {/* Cover Image Selection */}
@@ -258,10 +463,16 @@ function AddSongToAlbumModal({
 
               <TouchableOpacity
                 onPress={handleAddSongToAlbum}
-                disabled={!selectedFile || isLoading}
-                className={`py-4 rounded-full ${
-                  selectedFile && !isLoading ? "bg-blue-600" : "bg-gray-300"
-                }`}
+                disabled={!selectedFile || !songTitle.trim() || !division || isLoading}
+                style={{
+                  paddingVertical: 16,
+                  borderRadius: 25,
+                  backgroundColor: selectedFile && songTitle.trim() && division && !isLoading ? '#2563EB' : '#D1D5DB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 16,
+                  marginBottom: 22,
+                }}
               >
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />

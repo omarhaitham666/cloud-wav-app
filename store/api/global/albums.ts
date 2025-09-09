@@ -72,14 +72,34 @@ const songApi = mainApi.injectEndpoints({
       invalidatesTags: [{ type: "Albums", id: "LIST" }],
     }),
     AddSongToAlbum: builder.mutation<Albums, { albumId: string; formData: FormData }>({
-      query: ({ albumId, formData }) => ({
-        url: `/albums/${albumId}/songs`,
-        method: "POST",
-        data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }),
+      query: ({ albumId, formData }) => {
+        console.log('=== DEBUG: API Mutation - AddSongToAlbum ===');
+        console.log('Album ID:', albumId);
+        console.log('FormData entries:');
+        // Log FormData entries (Note: FormData.entries() might not work in all environments)
+        try {
+          if (typeof (formData as any).entries === 'function') {
+            for (const [key, value] of (formData as any).entries()) {
+              console.log(`  ${key}:`, value);
+            }
+          } else {
+            console.log('FormData.entries() not available in this environment');
+          }
+        } catch (e) {
+          console.log('Could not iterate FormData entries:', e);
+        }
+        console.log('Full FormData object:', formData);
+        
+        return {
+          url: `/albums/${albumId}/songs`,
+          method: "POST",
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Accept": "application/json",
+          },
+        };
+      },
       invalidatesTags: [
         { type: "Albums", id: "LIST" },
         { type: "Artists", id: "LIST" },

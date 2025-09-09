@@ -1,7 +1,8 @@
 import { SongCard } from "@/components/cards/SongCard";
 import AddSongToAlbumModal from "@/components/modals/AddSongToAlbumModal";
-import { useAddSongToAlbumMutation, useDelteAlbumMutation, useGetalbumQuery } from "@/store/api/global/albums";
+import { useDelteAlbumMutation, useGetalbumQuery } from "@/store/api/global/albums";
 import { useGetUserQuery } from "@/store/api/user/user";
+import { getToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -14,13 +15,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function AlbumDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data, isLoading } = useGetalbumQuery(id);
   const { data: user } = useGetUserQuery();
   const [deleteAlbum, { isLoading: isDeleting }] = useDelteAlbumMutation();
-  const [addSongToAlbum, { isLoading: isAddingSong }] = useAddSongToAlbumMutation();
+  const [isAddingSong, setIsAddingSong] = useState(false);
   const [showAddSongModal, setShowAddSongModal] = useState(false);
   
   // Check if the current user is the owner of this album
@@ -47,19 +49,106 @@ export default function AlbumDetails() {
     );
   };
 
-  const handleAddSongToAlbum = async (albumId: string, file: any) => {
+  const handleAddSongToAlbum = async (albumId: string, songData: { title: string; division: string; file: any; coverImage?: any }) => {
     try {
+      console.log('=== DEBUG: Starting song upload ===');
+      console.log('Album ID:', albumId);
+      console.log('Song Data:', {
+        title: songData.title,
+        division: songData.division,
+        file: {
+          uri: songData.file.uri,
+          name: songData.file.name,
+          type: songData.file.type,
+        },
+        coverImage: songData.coverImage ? {
+          uri: songData.coverImage.uri,
+          fileName: songData.coverImage.fileName,
+          type: songData.coverImage.type,
+        } : null
+      });
+
+      setIsAddingSong(true);
       const formData = new FormData();
-      formData.append('song', {
-        uri: file.uri,
-        type: file.type || 'audio/mpeg',
-        name: file.fileName || 'song.mp3',
-      } as any);
       
-      await addSongToAlbum({ albumId, formData });
+      // Add the audio file - use song_path like in SongUploadForm
+      formData.append('song_path', songData.file as any);
+      console.log('Added audio file to FormData as song_path:', songData.file);
+      
+      // Add the cover image if provided - use cover_path like in SongUploadForm
+      if (songData.coverImage) {
+        formData.append('cover_path', songData.coverImage as any);
+        console.log('Added cover image to FormData as cover_path:', songData.coverImage);
+      }
+      
+      // Add text fields
+      formData.append('title', songData.title);
+      formData.append('division', songData.division);
+      formData.append('album_id', albumId);
+      console.log('Added text fields - title:', songData.title, 'division:', songData.division, 'album_id:', albumId);
+      
+      console.log('=== DEBUG: Making direct fetch call ===');
+      const token = await getToken("access_token");
+      console.log('=== DEBUG: Token ===', token ? 'Token exists' : 'No token');
+      console.log('=== DEBUG: URL ===', `https://api.cloudwavproduction.com/api/songs/upload`);
+      
+      // Try using the same endpoint as SongUploadForm but add album_id to associate with album
+      const response = await fetch(
+        `https://api.cloudwavproduction.com/api/songs/upload`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log('=== DEBUG: Response status ===', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log('=== DEBUG: Error response ===', errorData);
+        throw new Error(JSON.stringify(errorData));
+      }
+      
+      const result = await response.json();
+      console.log('=== DEBUG: Success response ===', result);
+      
+      Toast.show({
+        type: "success",
+        text1: "Song Added Successfully",
+        text2: `${songData.title} has been added to the album`,
+      });
       setShowAddSongModal(false);
-    } catch (error) {
-      console.error("Error adding song to album:", error);
+    } catch (error: any) {
+      console.error("=== DEBUG: Error adding song to album ===", error);
+      console.error("Error type:", typeof error);
+      console.error("Error message:", error?.message);
+      console.error("Error stack:", error?.stack);
+      console.error("Full error object:", JSON.stringify(error, null, 2));
+      
+      let errorMessage = "Failed to add song to album. Please try again.";
+      
+      if (error?.message === "Network request failed") {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+      } else if (error?.message) {
+        try {
+          const errorData = JSON.parse(error.message);
+          errorMessage = errorData.message || errorData.error || error.message;
+        } catch {
+          errorMessage = error.message;
+        }
+      }
+      
+      Toast.show({
+        type: "error",
+        text1: "Upload Failed",
+        text2: errorMessage,
+      });
+      // Don't close modal on error, let user try again
+    } finally {
+      setIsAddingSong(false);
     }
   };
 
@@ -178,6 +267,7 @@ export default function AlbumDetails() {
           coverImage: data.album.album_cover 
         } : { id: "", title: "", coverImage: "" }}
       />
+      <Toast />
     </View>
   );
 }
