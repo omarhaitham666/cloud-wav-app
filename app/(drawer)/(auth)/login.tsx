@@ -1,3 +1,4 @@
+import GoogleLoginButton from "@/components/GoogleLoginButton";
 import { useLoginMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { invalidateAllQueries } from "@/store/utils";
@@ -221,23 +222,7 @@ function LoginScreen() {
         >
           {t("auth.login.orSignInWith")}
         </Text>
-        <TouchableOpacity
-          className={`flex-row items-center border border-gray-300 rounded-md bg-white px-4 py-3 shadow-sm justify-center mb-6 ${
-            isRTL ? "flex-row-reverse" : ""
-          }`}
-        >
-          <Ionicons name="logo-google" size={20} color="#DB4437" />
-          <Text
-            className={`text-base text-gray-800 ${isRTL ? "mr-3" : "ml-3"}`}
-            style={{
-              textAlign: isRTL ? "right" : "left",
-              fontFamily: AppFonts.semibold,
-            }}
-          >
-            {t("auth.login.continueWithGoogle")}
-          </Text>
-        </TouchableOpacity>
-
+        <GoogleLoginButton />
         <TouchableOpacity
           onPress={() => router.push("/(drawer)/(auth)/register")}
         >
