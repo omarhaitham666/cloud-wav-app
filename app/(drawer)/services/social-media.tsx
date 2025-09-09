@@ -14,7 +14,7 @@ import {
 import ServiceRequestModal, {
   FormData,
 } from "@/components/modals/ServiceRequestModal";
-import { useServicesMutation } from "@/store/api/global/services";
+import { ServiceType, useServicesMutation } from "@/store/api/global/services";
 import { AppFonts } from "@/utils/fonts";
 import { Lightbulb, Megaphone, ShieldCheck } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
@@ -22,7 +22,7 @@ import Toast from "react-native-toast-message";
 
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
-  const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceType>("verify social media accounts");
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -36,7 +36,7 @@ const SocialMedia = () => {
       ),
       price: t("services.socialMedia.services.creatingPlatforms.price"),
       icon: <Lightbulb size={26} color="#6D28D9" />,
-      type: t("services.socialMedia.services.creatingPlatforms.type"),
+      type: "verify social media accounts",
     },
     {
       title: t("services.socialMedia.services.recoverAccounts.title"),
@@ -45,46 +45,54 @@ const SocialMedia = () => {
       ),
       price: t("services.socialMedia.services.recoverAccounts.price"),
       icon: <ShieldCheck size={26} color="#6D28D9" />,
-      type: t("services.socialMedia.services.recoverAccounts.type"),
+      type: "recover social media account",
     },
     {
       title: t("services.socialMedia.services.sponsoredAds.title"),
       description: t("services.socialMedia.services.sponsoredAds.description"),
       price: t("services.socialMedia.services.sponsoredAds.price"),
       icon: <Megaphone size={26} color="#6D28D9" />,
-      type: t("services.socialMedia.services.sponsoredAds.type"),
+      type: "Sponsored ads",
     },
   ];
 
-  const handleFormSubmit = async (data: FormData) => {
+  const handleFormSubmit = async (data: FormData): Promise<void> => {
     if (!selectedService) return;
 
-    await Services({
+    // Clean phone numbers by removing + prefix and any non-numeric characters except digits
+    const cleanPhoneNumber = (phone: string) => {
+      return phone.replace(/^\+/, '').replace(/\D/g, '');
+    };
+
+    const requestData = {
       type: selectedService,
       data: {
         name: data.name,
         email: data.email,
-        phone: data.phone,
-        whatsapp_number: data.whatsapp || "",
+        phone: cleanPhoneNumber(data.phone),
+        whatsapp_number: cleanPhoneNumber(data.whatsapp || ""),
         platform: data.platform || "",
         social_media_account: data.social || "",
         details: data.details || "",
       },
-    })
+    };
+
+    return Services(requestData)
       .unwrap()
-      .then(() => {
+      .then((response) => {
         Toast.show({
           type: "success",
           text1: "Service Request Sent Successfully",
         });
         setVisible(false);
       })
-      .catch((e) => {
+      .catch((error) => {
         Toast.show({
           type: "error",
           text1: "Service Request Failed",
-          text2: e?.data?.message || "Something went wrong",
+          text2: error?.data?.message || "Something went wrong",
         });
+        throw error; // Re-throw the error so the modal doesn't close
       });
   };
 
@@ -143,7 +151,7 @@ const SocialMedia = () => {
           >
             <TouchableOpacity
               onPress={() => {
-                setSelectedService("account_creation");
+                setSelectedService("verify social media accounts");
                 setVisible(true);
               }}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
@@ -244,7 +252,7 @@ const SocialMedia = () => {
                       isRTL ? "self-end" : "self-start"
                     }`}
                     onPress={() => {
-                      setSelectedService(service.type);
+                      setSelectedService(service.type as ServiceType);
                       setVisible(true);
                     }}
                   >

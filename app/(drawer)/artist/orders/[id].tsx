@@ -4,20 +4,21 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import CreatorOrderModal from "@/components/modals/CreatorOrderModal";
 import {
-  useGetVedioCreatersQuery,
-  useGetVediosQuery,
+    useGetVedioCreatersQuery,
+    useGetVediosQuery,
 } from "@/store/api/global/videoCreator";
+import { useGetUserQuery } from "@/store/api/user/user";
 
 const ArtistProfile = () => {
   const router = useRouter();
@@ -26,6 +27,10 @@ const ArtistProfile = () => {
 
   const { data, isLoading: isFetching } = useGetVedioCreatersQuery(id);
   const { data: vedios, isLoading } = useGetVediosQuery(id);
+  const { data: user } = useGetUserQuery();
+
+  // Check if the current user is trying to order from themselves
+  const isOwnProfile = user?.video_creator_id && user.video_creator_id === Number(id);
 
   if (isFetching) {
     return (
@@ -68,12 +73,22 @@ const ArtistProfile = () => {
           </Text>
           <Text className="text-sm text-white/90">{data?.division}</Text>
 
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            className="bg-green-500 rounded-full px-5 py-3 mt-3 shadow-md"
-          >
-            <Text className="text-white font-semibold">Order Now →</Text>
-          </TouchableOpacity>
+          {!isOwnProfile && (
+            <TouchableOpacity
+              onPress={() => setModalVisible(true)}
+              className="bg-green-500 rounded-full px-5 py-3 mt-3 shadow-md"
+            >
+              <Text className="text-white font-semibold">Order Now →</Text>
+            </TouchableOpacity>
+          )}
+
+          {isOwnProfile && (
+            <View className="bg-gray-500 rounded-full px-5 py-3 mt-3 shadow-md">
+              <Text className="text-white font-semibold text-center">
+                This is your own profile
+              </Text>
+            </View>
+          )}
         </View>
       </LinearGradient>
 
@@ -110,14 +125,16 @@ const ArtistProfile = () => {
         }
       />
 
-      <CreatorOrderModal
-        visible={modalVisible}
-        id={id}
-        name={data?.name ?? ""}
-        private_price={String(data?.private_price) ?? "0"}
-        bussiness_price={String(data?.bussiness_price) ?? "0"}
-        onClose={() => setModalVisible(false)}
-      />
+      {!isOwnProfile && (
+        <CreatorOrderModal
+          visible={modalVisible}
+          id={id}
+          name={data?.name ?? ""}
+          private_price={String(data?.private_price) ?? "0"}
+          bussiness_price={String(data?.bussiness_price) ?? "0"}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
     </View>
   );
 };

@@ -1,18 +1,18 @@
 "use client";
 
-import { useServicesMutation } from "@/store/api/global/services";
+import { ServiceType, useServicesMutation } from "@/store/api/global/services";
 import { getToken } from "@/utils/secureStore";
 import { router } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -73,7 +73,7 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
     }
 
     await Services({
-      type: "artist_service",
+      type: "artist_service" as ServiceType,
       data: {
         name: data.name,
         email: data.email,

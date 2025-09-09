@@ -46,7 +46,9 @@ const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
           <LinearGradient
             colors={["#3B82F6", "#1D4ED8"]}
             className="flex-row items-center p-6 rounded-xl"
-            style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+            style={{ flexDirection: isRTL ? "row-reverse" : "row",
+              borderRadius: 10,
+             }}
           >
             <View className="bg-white/20 p-3 rounded-full">
               <Ionicons name="musical-notes" size={28} color="white" />
@@ -82,7 +84,9 @@ const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
           <LinearGradient
             colors={["#10B981", "#059669"]}
             className="flex-row items-center p-6 rounded-xl"
-            style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+            style={{ flexDirection: isRTL ? "row-reverse" : "row",
+              borderRadius: 10,
+             }}
           >
             <View className="bg-white/20 p-3 rounded-full">
               <Ionicons name="albums" size={28} color="white" />

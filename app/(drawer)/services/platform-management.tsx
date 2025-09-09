@@ -1,27 +1,27 @@
 import ServiceRequestModal, {
-  FormData,
+    FormData,
 } from "@/components/modals/ServiceRequestModal";
-import { useServicesMutation } from "@/store/api/global/services";
+import { ServiceType, useServicesMutation } from "@/store/api/global/services";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-  Briefcase,
-  Download,
-  ShieldCheck,
-  TrendingUp,
-  User,
+    Briefcase,
+    Download,
+    ShieldCheck,
+    TrendingUp,
+    User,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -70,22 +70,27 @@ const PlatformManagement = () => {
   ];
 
   const handleFormSubmit = async (data: FormData) => {
-    await Services({
-      type: "platform management",
+    // Clean phone numbers by removing + prefix and any non-numeric characters except digits
+    const cleanPhoneNumber = (phone: string) => {
+      return phone.replace(/^\+/, '').replace(/\D/g, '');
+    };
+
+    const requestData = {
+      type: "platform management" as ServiceType,
       data: {
         name: data.name,
         email: data.email,
-        phone: data.phone,
-        whatsapp_number: data.whatsapp || "",
+        phone: cleanPhoneNumber(data.phone),
+        whatsapp_number: cleanPhoneNumber(data.whatsapp || ""),
         platform: data.platform || "",
         social_media_account: data.social || "",
         details: data.details || "",
       },
-    })
+    };
+
+    await Services(requestData)
       .unwrap()
       .then(async (res) => {
-        console.log(res);
-
         Toast.show({
           type: "success",
           text1: "Service Request Sent Successfully",

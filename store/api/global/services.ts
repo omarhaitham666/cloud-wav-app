@@ -1,8 +1,16 @@
 import { mainApi } from ".";
 
+// Service type enum values
+export type ServiceType = 
+  | "verify social media accounts"
+  | "recover social media account"
+  | "Sponsored ads"
+  | "platform management"
+  | "artist_service";
+
 export interface Services {
   id?: number;
-  type: string;
+  type: ServiceType;
   data: {
     name: string;
     email: string;
@@ -18,13 +26,16 @@ export interface Services {
 const songApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
     Services: builder.mutation<Services[], Services>({
-      query: (body) => ({
-        url: `/services`,
-        method: "GET",
-        data: body,
-      }),
+      query: (body) => {
+        return {
+          url: `/services`,
+          method: "POST",
+          data: body,
+        };
+      },
     }),
   }),
+  overrideExisting: true,
 });
 
 export const { useServicesMutation } = songApi;

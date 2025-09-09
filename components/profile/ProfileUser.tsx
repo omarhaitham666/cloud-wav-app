@@ -539,9 +539,44 @@ const ProfileUser: React.FC = () => {
                   {t("profile.user.quickActions") || "Quick Actions"}
                 </Text>
                 <View className="flex-row justify-between gap-3">
+                  {/* Show video creator profile button only if user has both video_creator_id and artist_id */}
+                  {data?.video_creator_id && data?.artist_id && (
+                    <TouchableOpacity
+                      onPress={() =>
+                        data?.video_creator_id &&
+                        router.push({
+                          pathname: "/(drawer)/artist/orders/[id]",
+                          params: { id: data.video_creator_id },
+                        })
+                      }
+                      className="flex-1"
+                      activeOpacity={0.8}
+                    >
+                      <LinearGradient
+                        colors={["#8B5CF6", "#7C3AED"]}
+                        className="p-4 items-center"
+                        style={{
+                          borderRadius: 10,
+                        }}
+                      >
+                        <Ionicons name="videocam" size={24} color="white" />
+                        <Text
+                          className="text-white text-sm mt-2 text-center"
+                          style={{
+                            fontFamily: AppFonts.bold,
+                            textAlign: isRTL ? "center" : "center",
+                          }}
+                        >
+                          {t("profile.user.videoCreatorProfile") || "Video Creator Profile"}
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  )}
+
+                  {/* Show update pricing button for video creators (but not if they have both roles) */}
                   {(userData?.role === "videoCreator" ||
-                    userData?.role === "user,videoCreator" ||
-                    userData?.role === "artist,videoCreator") && (
+                    userData?.role === "user,videoCreator") && 
+                    !data?.artist_id && (
                     <TouchableOpacity
                       onPress={() => setUpdatePrice(true)}
                       className="flex-1"
@@ -572,9 +607,10 @@ const ProfileUser: React.FC = () => {
                     </TouchableOpacity>
                   )}
 
+                  {/* Show manage songs button for artists (but not if they have both roles) */}
                   {(userData?.role === "artist" ||
-                    userData?.role === "user,artist" ||
-                    userData?.role === "artist,videoCreator") && (
+                    userData?.role === "user,artist") && 
+                    !data?.video_creator_id && (
                     <TouchableOpacity
                       onPress={() =>
                         data?.artist_id &&

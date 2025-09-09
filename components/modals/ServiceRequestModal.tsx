@@ -1,3 +1,4 @@
+import { AppFonts } from "@/utils/fonts";
 import { getToken } from "@/utils/secureStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
@@ -14,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { z } from "zod";
-import { AppFonts } from "@/utils/fonts";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -78,8 +78,13 @@ export default function ServiceRequestModal({
       return;
     }
 
-    onSubmitForm(data);
-    reset();
+    try {
+      await onSubmitForm(data);
+      reset();
+    } catch (error) {
+      // Error is handled by the parent component
+      console.error("Form submission error:", error);
+    }
   };
 
   const fields = [
@@ -151,9 +156,9 @@ export default function ServiceRequestModal({
             >
               {t("services.platformManagement.modal.title")}
             </Text>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={onClose} disabled={isLoading}>
               <Text
-                className="text-xl text-gray-600"
+                className={`text-xl ${isLoading ? "text-gray-400" : "text-gray-600"}`}
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}
@@ -175,7 +180,10 @@ export default function ServiceRequestModal({
                       value={value}
                       onChangeText={onChange}
                       multiline={field.multiline || false}
-                      className="border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800"
+                      editable={!isLoading}
+                      className={`border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800 ${
+                        isLoading ? "bg-gray-100" : ""
+                      }`}
                       placeholderTextColor="#9CA3AF"
                       style={{
                         textAlign: isRTL ? "right" : "left",
@@ -201,20 +209,33 @@ export default function ServiceRequestModal({
 
             <TouchableOpacity
               onPress={handleSubmit(onSubmit)}
-              className="bg-indigo-600 py-4 rounded-full mt-4"
+              disabled={isLoading}
+              className={`py-4 rounded-full mt-4 ${
+                isLoading ? "bg-indigo-400" : "bg-indigo-600"
+              }`}
             >
-              <Text
-                className="text-white text-center text-base"
-                style={{
-                  fontFamily: AppFonts.semibold,
-                }}
-              >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  t("services.platformManagement.modal.submit")
-                )}
-              </Text>
+              {isLoading ? (
+                <View className="flex-row items-center justify-center">
+                  <ActivityIndicator color="#fff" size="small" />
+                  <Text
+                    className="text-white text-center text-base ml-2"
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                    }}
+                  >
+                    {t("services.platformManagement.modal.sending") || "Sending..."}
+                  </Text>
+                </View>
+              ) : (
+                <Text
+                  className="text-white text-center text-base"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
+                  {t("services.platformManagement.modal.submit")}
+                </Text>
+              )}
             </TouchableOpacity>
           </ScrollView>
         </View>
