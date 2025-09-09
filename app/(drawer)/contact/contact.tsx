@@ -2,7 +2,7 @@ import CreativeBanner from "@/components/CreativeBanner";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -171,7 +171,7 @@ const Contact = () => {
     </TouchableOpacity>
   );
 
-  const InputField = ({
+  const InputField = useCallback(({
     placeholder,
     value,
     onChangeText,
@@ -211,7 +211,7 @@ const Contact = () => {
         }}
       />
     </View>
-  );
+  ), [focusedField, isRTL]);
 
   return (
     <SafeAreaView className="flex-1 pt-12 bg-gray-50">
