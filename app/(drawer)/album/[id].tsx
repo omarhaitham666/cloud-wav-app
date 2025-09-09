@@ -1,8 +1,10 @@
 import { SongCard } from "@/components/cards/SongCard";
 import AddSongToAlbumModal from "@/components/modals/AddSongToAlbumModal";
-import { useDelteAlbumMutation, useGetalbumQuery } from "@/store/api/global/albums";
+import {
+  useDelteAlbumMutation,
+  useGetalbumQuery,
+} from "@/store/api/global/albums";
 import { useGetUserQuery } from "@/store/api/user/user";
-import { getToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -19,13 +21,12 @@ import Toast from "react-native-toast-message";
 
 export default function AlbumDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, isLoading } = useGetalbumQuery(id);
+  const { data, isLoading, refetch } = useGetalbumQuery(id);
   const { data: user } = useGetUserQuery();
   const [deleteAlbum, { isLoading: isDeleting }] = useDelteAlbumMutation();
-  const [isAddingSong, setIsAddingSong] = useState(false);
+  const [isAddingSong] = useState(false);
   const [showAddSongModal, setShowAddSongModal] = useState(false);
-  
-  // Check if the current user is the owner of this album
+
   const isOwner = user && user.artist_id === data?.album.artist.id;
 
   const handleDeleteAlbum = () => {
@@ -40,120 +41,53 @@ export default function AlbumDetails() {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => {
-            deleteAlbum(id);
-            router.back();
+          onPress: async () => {
+            try {
+              await deleteAlbum(id).unwrap();
+              Toast.show({
+                type: "success",
+                text1: "Album Deleted",
+                text2: "The album has been deleted successfully",
+              });
+              router.back();
+            } catch {
+              Toast.show({
+                type: "error",
+                text1: "Delete Failed",
+                text2: "Failed to delete the album. Please try again.",
+              });
+            }
           },
         },
       ]
     );
   };
 
-  const handleAddSongToAlbum = async (albumId: string, songData: { title: string; division: string; file: any; coverImage?: any }) => {
+  const handleDeleteAlbumFromModal = async (albumId: string) => {
     try {
-      console.log('=== DEBUG: Starting song upload ===');
-      console.log('Album ID:', albumId);
-      console.log('Song Data:', {
-        title: songData.title,
-        division: songData.division,
-        file: {
-          uri: songData.file.uri,
-          name: songData.file.name,
-          type: songData.file.type,
-        },
-        coverImage: songData.coverImage ? {
-          uri: songData.coverImage.uri,
-          fileName: songData.coverImage.fileName,
-          type: songData.coverImage.type,
-        } : null
-      });
-
-      setIsAddingSong(true);
-      const formData = new FormData();
-      
-      // Add the audio file - use song_path like in SongUploadForm
-      formData.append('song_path', songData.file as any);
-      console.log('Added audio file to FormData as song_path:', songData.file);
-      
-      // Add the cover image if provided - use cover_path like in SongUploadForm
-      if (songData.coverImage) {
-        formData.append('cover_path', songData.coverImage as any);
-        console.log('Added cover image to FormData as cover_path:', songData.coverImage);
-      }
-      
-      // Add text fields
-      formData.append('title', songData.title);
-      formData.append('division', songData.division);
-      formData.append('album_id', albumId);
-      console.log('Added text fields - title:', songData.title, 'division:', songData.division, 'album_id:', albumId);
-      
-      console.log('=== DEBUG: Making direct fetch call ===');
-      const token = await getToken("access_token");
-      console.log('=== DEBUG: Token ===', token ? 'Token exists' : 'No token');
-      console.log('=== DEBUG: URL ===', `https://api.cloudwavproduction.com/api/songs/upload`);
-      
-      // Try using the same endpoint as SongUploadForm but add album_id to associate with album
-      const response = await fetch(
-        `https://api.cloudwavproduction.com/api/songs/upload`,
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      console.log('=== DEBUG: Response status ===', response.status);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.log('=== DEBUG: Error response ===', errorData);
-        throw new Error(JSON.stringify(errorData));
-      }
-      
-      const result = await response.json();
-      console.log('=== DEBUG: Success response ===', result);
-      
+      await deleteAlbum(albumId).unwrap();
       Toast.show({
         type: "success",
-        text1: "Song Added Successfully",
-        text2: `${songData.title} has been added to the album`,
+        text1: "Album Deleted",
+        text2: "The album has been deleted successfully",
       });
-      setShowAddSongModal(false);
-    } catch (error: any) {
-      console.error("=== DEBUG: Error adding song to album ===", error);
-      console.error("Error type:", typeof error);
-      console.error("Error message:", error?.message);
-      console.error("Error stack:", error?.stack);
-      console.error("Full error object:", JSON.stringify(error, null, 2));
-      
-      let errorMessage = "Failed to add song to album. Please try again.";
-      
-      if (error?.message === "Network request failed") {
-        errorMessage = "Network error. Please check your internet connection and try again.";
-      } else if (error?.message) {
-        try {
-          const errorData = JSON.parse(error.message);
-          errorMessage = errorData.message || errorData.error || error.message;
-        } catch {
-          errorMessage = error.message;
-        }
-      }
-      
+      router.back();
+    } catch {
       Toast.show({
         type: "error",
-        text1: "Upload Failed",
-        text2: errorMessage,
+        text1: "Delete Failed",
+        text2: "Failed to delete the album. Please try again.",
       });
-      // Don't close modal on error, let user try again
-    } finally {
-      setIsAddingSong(false);
     }
   };
 
-  const handleDeleteAlbumFromModal = (albumId: string) => {
-    deleteAlbum(albumId);
+  const handleSongAdded = async () => {
+    await refetch();
+    Toast.show({
+      type: "success",
+      text1: "Song Added",
+      text2: "The song has been added to the album successfully",
+    });
   };
 
   if (isLoading) {
@@ -191,25 +125,27 @@ export default function AlbumDetails() {
             <Text className="text-gray-600 text-lg mb-6">
               {data?.album.artist.name}
             </Text>
-            
+
             {isOwner && (
               <View className="flex-row gap-4 w-full justify-center">
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => setShowAddSongModal(true)}
                   className="flex-row items-center bg-blue-500 px-6 py-3 rounded-lg"
                 >
                   <Ionicons name="add" size={20} color="#fff" />
-                  <Text className="text-white font-semibold ml-2">Add Songs</Text>
+                  <Text className="text-white font-semibold ml-2">
+                    Add Songs
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={handleDeleteAlbum}
                   disabled={isDeleting}
                   className="flex-row items-center bg-red-500 px-6 py-3 rounded-lg"
                 >
-                  <Ionicons 
-                    name={isDeleting ? "hourglass" : "trash"} 
-                    size={18} 
-                    color="#fff" 
+                  <Ionicons
+                    name={isDeleting ? "hourglass" : "trash"}
+                    size={18}
+                    color="#fff"
                   />
                   <Text className="text-white font-semibold ml-2">
                     {isDeleting ? "Deleting..." : "Delete Album"}
@@ -242,7 +178,9 @@ export default function AlbumDetails() {
               No Songs in This Album
             </Text>
             <Text className="text-gray-400 text-sm mt-2 text-center">
-              {isOwner ? "Add songs to this album to get started" : "This album doesn't have any songs yet"}
+              {isOwner
+                ? "Add songs to this album to get started"
+                : "This album doesn't have any songs yet"}
             </Text>
             {isOwner && (
               <TouchableOpacity className="mt-6 bg-blue-500 px-6 py-3 rounded-lg">
@@ -254,18 +192,22 @@ export default function AlbumDetails() {
         contentContainerStyle={{ paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
       />
-      
+
       <AddSongToAlbumModal
         visible={showAddSongModal}
         isLoading={isAddingSong}
         onClose={() => setShowAddSongModal(false)}
-        onAddSongToAlbum={handleAddSongToAlbum}
         onDeleteAlbum={handleDeleteAlbumFromModal}
-        album={data?.album ? { 
-          id: data.album.id.toString(), 
-          title: data.album.title, 
-          coverImage: data.album.album_cover 
-        } : { id: "", title: "", coverImage: "" }}
+        onSongAdded={handleSongAdded}
+        album={
+          data?.album
+            ? {
+                id: data.album.id.toString(),
+                title: data.album.title,
+                coverImage: data.album.album_cover,
+              }
+            : { id: "", title: "", coverImage: "" }
+        }
       />
       <Toast />
     </View>

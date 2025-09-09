@@ -27,7 +27,6 @@ const ArtistProfile = () => {
   const { data: user } = useGetUserQuery();
   const [UploadSong, setUploadSong] = useState(false);
 
-  // Check if the current user is the owner of this artist profile
   const isOwner = user && user.artist_id === Number(id);
 
   if (isFetching) {

@@ -1,4 +1,5 @@
 import { AppFonts } from "@/utils/fonts";
+import { getToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import * as DocumentPicker from "expo-document-picker";
@@ -36,25 +37,26 @@ type Props = {
   visible: boolean;
   isLoading: boolean;
   onClose: () => void;
-  onAddSongToAlbum: (albumId: string, songData: { title: string; division: string; file: any; coverImage?: any }) => void;
   onDeleteAlbum: (albumId: string) => void;
   album: { id: string; title: string; coverImage?: string };
+  onSongAdded?: () => void;
 };
 
 function AddSongToAlbumModal({
   visible,
   isLoading,
   onClose,
-  onAddSongToAlbum,
   onDeleteAlbum,
   album,
+  onSongAdded,
 }: Props) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [selectedCoverImage, setSelectedCoverImage] = useState<any>(null);
   const [songTitle, setSongTitle] = useState<string>("");
   const [division, setDivision] = useState<string>("");
+  const [isAddingSong, setIsAddingSong] = useState<boolean>(false);
 
   const pickAudioFile = async () => {
     try {
@@ -105,18 +107,40 @@ function AddSongToAlbumModal({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 1,
+        quality: 0.8,
+        base64: true,
       });
 
-      if (!result.canceled && result.assets[0]) {
-        setSelectedCoverImage(result.assets[0]);
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        const asset = result.assets[0];
+        const fileName = asset.fileName || `image_${Date.now()}.jpg`;
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        const imageFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+          base64: asset.base64,
+        };
+
+        setSelectedCoverImage(imageFile);
+        Toast.show({
+          type: "success",
+          text1: "Cover Image Selected",
+          text2: "Cover image uploaded successfully",
+        });
       }
     } catch (error) {
       console.error("Error picking cover image:", error);
+      Toast.show({
+        type: "error",
+        text1: "Selection Failed",
+        text2: "Unable to select cover image. Please try again.",
+      });
     }
   };
 
-  const handleAddSongToAlbum = () => {
+  const handleAddSongToAlbum = async () => {
     if (!selectedFile || !album.id) {
       Toast.show({
         type: "error",
@@ -144,14 +168,124 @@ function AddSongToAlbumModal({
       return;
     }
 
-    const songData = {
-      title: songTitle.trim(),
-      division: division,
-      file: selectedFile,
-      coverImage: selectedCoverImage,
-    };
+    try {
+      console.log("=== DEBUG: Starting song upload to album ===");
+      console.log("Album ID:", album.id);
+      console.log("Selected File:", selectedFile);
+      console.log("Selected Cover Image:", selectedCoverImage);
 
-    onAddSongToAlbum(album.id, songData);
+      setIsAddingSong(true);
+      const formData = new FormData();
+
+      // Add cover image if provided - use cover_image like SongUploadForm
+      if (selectedCoverImage) {
+        if (selectedCoverImage.base64) {
+          const base64File = {
+            uri: `data:${selectedCoverImage.type};base64,${selectedCoverImage.base64}`,
+            type: selectedCoverImage.type,
+            name: selectedCoverImage.name,
+          };
+          formData.append("cover_image", base64File as any);
+        } else {
+          const regularFile = {
+            uri: selectedCoverImage.uri,
+            type: selectedCoverImage.type || "image/jpeg",
+            name: selectedCoverImage.name || `cover_image_${Date.now()}.jpg`,
+          };
+          formData.append("cover_image", regularFile as any);
+        }
+        console.log("Added cover_image to FormData:", selectedCoverImage);
+      }
+
+      formData.append("file", selectedFile as any);
+
+      formData.append("title", songTitle.trim());
+      formData.append("division", division);
+
+      const token = await getToken("access_token");
+      const response = await fetch(
+        `https://api.cloudwavproduction.com/api/albums/${album.id}/songs`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("=== DEBUG: Response status ===", response.status);
+
+      if (!response.ok) {
+        let errorData;
+        try {
+          errorData = await response.json();
+          console.log("=== DEBUG: Error response (JSON) ===", errorData);
+        } catch {
+          const errorText = await response.text();
+          console.log("=== DEBUG: Error response (Text) ===", errorText);
+          errorData = { message: errorText || "Unknown error occurred" };
+        }
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      // Check if response has content and is JSON
+      const contentType = response.headers.get("content-type");
+      console.log("=== DEBUG: Content-Type ===", contentType);
+
+      let result;
+      if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+        console.log("=== DEBUG: Success response (JSON) ===", result);
+      } else {
+        // If not JSON, get text response
+        const textResponse = await response.text();
+        console.log("=== DEBUG: Success response (Text) ===", textResponse);
+        result = { success: true, message: "Song added successfully" };
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Song Added Successfully",
+        text2: `${songTitle.trim()} has been added to the album`,
+      });
+
+      // Reset form
+      setSelectedFile(null);
+      setSelectedCoverImage(null);
+      setSongTitle("");
+      setDivision("");
+
+      // Call callback if provided
+      if (onSongAdded) {
+        onSongAdded();
+      }
+
+      onClose();
+    } catch (error: any) {
+      console.error("=== DEBUG: Error adding song to album ===", error);
+      console.error("Error type:", typeof error);
+      console.error("Error message:", error?.message);
+
+      let errorMessage = "Failed to add song to album. Please try again.";
+
+      if (error?.message) {
+        try {
+          const errorData = JSON.parse(error.message);
+          errorMessage = errorData.message || errorData.error || error.message;
+        } catch {
+          errorMessage = error.message;
+        }
+      }
+
+      Toast.show({
+        type: "error",
+        text1: "Upload Failed",
+        text2: errorMessage,
+      });
+    } finally {
+      setIsAddingSong(false);
+    }
   };
 
   const handleDeleteAlbum = () => {
@@ -176,7 +310,7 @@ function AddSongToAlbumModal({
   };
 
   const handleClose = () => {
-    if (isLoading) {
+    if (isLoading || isAddingSong) {
       Toast.show({
         type: "info",
         text1: "Upload in Progress",
@@ -184,7 +318,7 @@ function AddSongToAlbumModal({
       });
       return;
     }
-    
+
     setSelectedFile(null);
     setSelectedCoverImage(null);
     setSongTitle("");
@@ -207,7 +341,7 @@ function AddSongToAlbumModal({
                 fontFamily: AppFonts.semibold,
               }}
             >
-              Add Song to "{album.title}"
+              Add Song to &quot;{album.title}&quot;
             </Text>
             <TouchableOpacity onPress={handleClose}>
               <Text
@@ -234,7 +368,7 @@ function AddSongToAlbumModal({
                 >
                   Album
                 </Text>
-                
+
                 <View className="flex-row items-center p-3 border border-gray-300 rounded-lg mb-2">
                   {album.coverImage ? (
                     <Image
@@ -258,10 +392,7 @@ function AddSongToAlbumModal({
                       {album.title}
                     </Text>
                   </View>
-                  <TouchableOpacity
-                    onPress={handleDeleteAlbum}
-                    className="p-2"
-                  >
+                  <TouchableOpacity onPress={handleDeleteAlbum} className="p-2">
                     <Ionicons name="trash" size={20} color="#EF4444" />
                   </TouchableOpacity>
                 </View>
@@ -271,7 +402,7 @@ function AddSongToAlbumModal({
               <View>
                 <Text
                   style={{
-                    color: '#374151',
+                    color: "#374151",
                     fontSize: 16,
                     marginBottom: 12,
                     textAlign: isRTL ? "right" : "left",
@@ -280,50 +411,58 @@ function AddSongToAlbumModal({
                 >
                   Audio File *
                 </Text>
-                
+
                 <TouchableOpacity
                   onPress={pickAudioFile}
                   style={{
                     borderWidth: 2,
-                    borderStyle: 'dashed',
-                    borderColor: '#8B5CF6',
+                    borderStyle: "dashed",
+                    borderColor: "#8B5CF6",
                     borderRadius: 12,
                     padding: 24,
-                    alignItems: 'center',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    alignItems: "center",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
                   }}
                 >
                   {selectedFile ? (
-                    <View style={{ alignItems: 'center' }}>
-                      <View style={{
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                        padding: 12,
-                        borderRadius: 50,
-                        marginBottom: 12,
-                      }}>
-                        <Ionicons name="musical-notes" size={32} color="#10B981" />
+                    <View style={{ alignItems: "center" }}>
+                      <View
+                        style={{
+                          backgroundColor: "rgba(16, 185, 129, 0.2)",
+                          padding: 12,
+                          borderRadius: 50,
+                          marginBottom: 12,
+                        }}
+                      >
+                        <Ionicons
+                          name="musical-notes"
+                          size={32}
+                          color="#10B981"
+                        />
                       </View>
                       <Text
                         style={{
                           fontSize: 14,
-                          color: '#10B981',
+                          color: "#10B981",
                           fontFamily: AppFonts.semibold,
                           textAlign: isRTL ? "right" : "left",
                         }}
                       >
                         {selectedFile.name}
                       </Text>
-                      <Text style={{
-                        fontSize: 12,
-                        color: '#6B7280',
-                        marginTop: 4,
-                        fontFamily: AppFonts.medium,
-                      }}>
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: "#6B7280",
+                          marginTop: 4,
+                          fontFamily: AppFonts.medium,
+                        }}
+                      >
                         Tap to change file
                       </Text>
                     </View>
                   ) : (
-                    <View style={{ alignItems: 'center' }}>
+                    <View style={{ alignItems: "center" }}>
                       <Ionicons
                         name="cloud-upload-outline"
                         size={48}
@@ -332,7 +471,7 @@ function AddSongToAlbumModal({
                       <Text
                         style={{
                           fontSize: 16,
-                          color: '#8B5CF6',
+                          color: "#8B5CF6",
                           marginTop: 12,
                           fontFamily: AppFonts.semibold,
                           textAlign: isRTL ? "right" : "left",
@@ -343,7 +482,7 @@ function AddSongToAlbumModal({
                       <Text
                         style={{
                           fontSize: 12,
-                          color: '#6B7280',
+                          color: "#6B7280",
                           marginTop: 8,
                           fontFamily: AppFonts.medium,
                           textAlign: isRTL ? "right" : "left",
@@ -360,7 +499,7 @@ function AddSongToAlbumModal({
               <View>
                 <Text
                   style={{
-                    color: '#374151',
+                    color: "#374151",
                     fontSize: 16,
                     marginBottom: 8,
                     textAlign: isRTL ? "right" : "left",
@@ -374,14 +513,14 @@ function AddSongToAlbumModal({
                   value={songTitle}
                   onChangeText={setSongTitle}
                   style={{
-                    backgroundColor: '#F9FAFB',
+                    backgroundColor: "#F9FAFB",
                     borderWidth: 1,
-                    borderColor: '#D1D5DB',
+                    borderColor: "#D1D5DB",
                     borderRadius: 8,
                     paddingHorizontal: 12,
                     paddingVertical: 12,
                     fontSize: 16,
-                    color: '#1F2937',
+                    color: "#1F2937",
                     textAlign: isRTL ? "right" : "left",
                     fontFamily: AppFonts.medium,
                   }}
@@ -393,7 +532,7 @@ function AddSongToAlbumModal({
               <View>
                 <Text
                   style={{
-                    color: '#374151',
+                    color: "#374151",
                     fontSize: 16,
                     marginBottom: 8,
                     textAlign: isRTL ? "right" : "left",
@@ -402,17 +541,19 @@ function AddSongToAlbumModal({
                 >
                   Genre/Division *
                 </Text>
-                <View style={{
-                  backgroundColor: '#F9FAFB',
-                  borderWidth: 1,
-                  borderColor: '#D1D5DB',
-                  borderRadius: 8,
-                }}>
+                <View
+                  style={{
+                    backgroundColor: "#F9FAFB",
+                    borderWidth: 1,
+                    borderColor: "#D1D5DB",
+                    borderRadius: 8,
+                  }}
+                >
                   <Picker
                     selectedValue={division}
                     onValueChange={setDivision}
                     style={{
-                      color: '#1F2937',
+                      color: "#1F2937",
                       fontFamily: AppFonts.medium,
                     }}
                   >
@@ -435,7 +576,7 @@ function AddSongToAlbumModal({
                 >
                   Select Cover Image (Optional)
                 </Text>
-                
+
                 <TouchableOpacity
                   onPress={pickCoverImage}
                   className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center"
@@ -456,25 +597,40 @@ function AddSongToAlbumModal({
                       textAlign: isRTL ? "right" : "left",
                     }}
                   >
-                    {selectedCoverImage ? "Cover image selected" : "Choose Cover Image"}
+                    {selectedCoverImage
+                      ? "Cover image selected"
+                      : "Choose Cover Image"}
                   </Text>
                 </TouchableOpacity>
               </View>
 
               <TouchableOpacity
                 onPress={handleAddSongToAlbum}
-                disabled={!selectedFile || !songTitle.trim() || !division || isLoading}
+                disabled={
+                  !selectedFile ||
+                  !songTitle.trim() ||
+                  !division ||
+                  isLoading ||
+                  isAddingSong
+                }
                 style={{
                   paddingVertical: 16,
                   borderRadius: 25,
-                  backgroundColor: selectedFile && songTitle.trim() && division && !isLoading ? '#2563EB' : '#D1D5DB',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  backgroundColor:
+                    selectedFile &&
+                    songTitle.trim() &&
+                    division &&
+                    !isLoading &&
+                    !isAddingSong
+                      ? "#2563EB"
+                      : "#D1D5DB",
+                  alignItems: "center",
+                  justifyContent: "center",
                   marginTop: 16,
                   marginBottom: 22,
                 }}
               >
-                {isLoading ? (
+                {isLoading || isAddingSong ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text
