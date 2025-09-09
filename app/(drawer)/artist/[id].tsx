@@ -14,6 +14,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  RefreshControl,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -23,11 +24,21 @@ import {
 const ArtistProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: artistData, isLoading: isFetching } = useGetArtistQuery(id);
+  const { data: artistData, isLoading: isFetching, refetch } = useGetArtistQuery(id);
   const { data: user } = useGetUserQuery();
   const [UploadSong, setUploadSong] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const isOwner = user && user.artist_id === Number(id);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   if (isFetching) {
     return (
@@ -61,6 +72,14 @@ const ArtistProfile = () => {
       columnWrapperStyle={{ justifyContent: "space-between" }}
       contentContainerStyle={{ paddingBottom: 40 }}
       renderItem={renderSong}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          tintColor="#f9a826"
+          colors={["#f9a826"]}
+        />
+      }
       ListHeaderComponent={
         <>
           <LinearGradient

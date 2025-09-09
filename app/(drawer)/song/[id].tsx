@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Alert, Image,
   ImageBackground,
+  RefreshControl,
+  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -34,8 +36,9 @@ const SongDetail = () => {
   const [likesCount, setLikesCount] = useState(0);
   const [playsCount, setPlaysCount] = useState(0);
   const [audioError, setAudioError] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data, isLoading: isFetching } = useGetSongQuery(id, {
+  const { data, isLoading: isFetching, refetch } = useGetSongQuery(id, {
     skip: !id,
   });
 
@@ -62,6 +65,15 @@ const SongDetail = () => {
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   if (isFetching) {
@@ -127,6 +139,19 @@ const SongDetail = () => {
         />
         <View className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-70" />
       </View>
+
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor="#2f00ac"
+            colors={["#2f00ac"]}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
 
       {/* header */}
       <View className={`flex-row justify-between items-center pt-12 pb-4 px-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -253,7 +278,8 @@ const SongDetail = () => {
           />
         )}
 
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };

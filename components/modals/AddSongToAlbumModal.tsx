@@ -92,7 +92,6 @@ function AddSongToAlbumModal({
         });
       }
     } catch (err) {
-      console.log("Audio picker error:", err);
       Toast.show({
         type: "error",
         text1: "Selection Failed",
@@ -169,15 +168,10 @@ function AddSongToAlbumModal({
     }
 
     try {
-      console.log("=== DEBUG: Starting song upload to album ===");
-      console.log("Album ID:", album.id);
-      console.log("Selected File:", selectedFile);
-      console.log("Selected Cover Image:", selectedCoverImage);
-
       setIsAddingSong(true);
       const formData = new FormData();
 
-      // Add cover image if provided - use cover_image like SongUploadForm
+      // Add cover image if provided
       if (selectedCoverImage) {
         if (selectedCoverImage.base64) {
           const base64File = {
@@ -194,7 +188,6 @@ function AddSongToAlbumModal({
           };
           formData.append("cover_image", regularFile as any);
         }
-        console.log("Added cover_image to FormData:", selectedCoverImage);
       }
 
       formData.append("file", selectedFile as any);
@@ -214,33 +207,25 @@ function AddSongToAlbumModal({
         }
       );
 
-      console.log("=== DEBUG: Response status ===", response.status);
 
       if (!response.ok) {
         let errorData;
         try {
           errorData = await response.json();
-          console.log("=== DEBUG: Error response (JSON) ===", errorData);
         } catch {
           const errorText = await response.text();
-          console.log("=== DEBUG: Error response (Text) ===", errorText);
           errorData = { message: errorText || "Unknown error occurred" };
         }
         throw new Error(JSON.stringify(errorData));
       }
 
-      // Check if response has content and is JSON
       const contentType = response.headers.get("content-type");
-      console.log("=== DEBUG: Content-Type ===", contentType);
 
       let result;
       if (contentType && contentType.includes("application/json")) {
         result = await response.json();
-        console.log("=== DEBUG: Success response (JSON) ===", result);
       } else {
-        // If not JSON, get text response
         const textResponse = await response.text();
-        console.log("=== DEBUG: Success response (Text) ===", textResponse);
         result = { success: true, message: "Song added successfully" };
       }
 
@@ -263,7 +248,6 @@ function AddSongToAlbumModal({
 
       onClose();
     } catch (error: any) {
-      console.error("=== DEBUG: Error adding song to album ===", error);
       console.error("Error type:", typeof error);
       console.error("Error message:", error?.message);
 

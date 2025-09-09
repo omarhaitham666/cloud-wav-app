@@ -13,6 +13,7 @@ import {
   Alert,
   FlatList,
   Image,
+  RefreshControl,
   Text,
   TouchableOpacity,
   View,
@@ -26,6 +27,7 @@ export default function AlbumDetails() {
   const [deleteAlbum, { isLoading: isDeleting }] = useDelteAlbumMutation();
   const [isAddingSong] = useState(false);
   const [showAddSongModal, setShowAddSongModal] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const isOwner = user && user.artist_id === data?.album.artist.id;
 
@@ -90,6 +92,15 @@ export default function AlbumDetails() {
     });
   };
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center bg-gray-50">
@@ -101,6 +112,14 @@ export default function AlbumDetails() {
   return (
     <View className="flex-1 bg-gray-50">
       <FlatList
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor="#374151"
+            colors={["#374151"]}
+          />
+        }
         ListHeaderComponent={
           <View className="items-center w-full mb-7 px-6 pt-12 pb-8 bg-white">
             <View className="flex-row w-full justify-between items-center mb-8">
