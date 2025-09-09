@@ -165,9 +165,8 @@ const Creators = () => {
                 data={data}
                 keyExtractor={(item) => item.id?.toString() ?? ""}
                 horizontal
-                pagingEnabled
-                inverted={isRTL}
                 showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 4 }}
                 ItemSeparatorComponent={() => <View className="w-4" />}
                 renderItem={({ item }) => (
                   <CreatorCard
@@ -212,9 +211,8 @@ const Creators = () => {
                 data={creatorsData}
                 keyExtractor={(item) => item.id?.toString() ?? ""}
                 horizontal
-                pagingEnabled
-                inverted={isRTL}
                 showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 4 }}
                 ItemSeparatorComponent={() => <View className="w-4" />}
                 renderItem={({ item }) => (
                   <CreatorCard

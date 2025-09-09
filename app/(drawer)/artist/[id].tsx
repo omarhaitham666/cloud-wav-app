@@ -113,7 +113,7 @@ const ArtistProfile = () => {
                     className="text-white text-base ml-2"
                     style={{ fontFamily: AppFonts.medium }}
                   >
-                    Upload Song
+                    Upload
                   </Text>
                 </View>
               </TouchableOpacity>
