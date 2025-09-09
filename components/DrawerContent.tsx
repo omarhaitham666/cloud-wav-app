@@ -159,7 +159,6 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     },
   ];
 
-  // Always show LanguageSwitcher in the secondary section
   const languageSwitcherItem = {
     label: t("drawer.items.language"),
     route: null,
@@ -186,7 +185,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
             label: t("drawer.items.profile"),
             route: null,
             iconName: "user",
-            action: () => Alert.alert("Profile", "Profile screen coming soon!"),
+            action: () => router.push("/(drawer)/(tabs)/profile"),
           },
           {
             label: isLoading

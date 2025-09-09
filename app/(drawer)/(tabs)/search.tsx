@@ -4,6 +4,7 @@ import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useSearchCreatorQuery } from "@/store/api/global/search";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -25,6 +26,7 @@ const { width: screenWidth } = Dimensions.get("window");
 const Search = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
+  const { category } = useLocalSearchParams<{ category?: string }>();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -58,6 +60,13 @@ const Search = () => {
       }),
     ]).start();
   }, [fadeAnim, slideAnim]);
+
+  useEffect(() => {
+    if (category) {
+      setActiveCategory(category);
+      setSearchQuery(category);
+    }
+  }, [category]);
 
   const categories = [
     { id: "all", label: t("song.categories.all"), icon: "grid" },

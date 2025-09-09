@@ -38,6 +38,23 @@ const Creators = () => {
     image: string;
   }) => {
     console.log("Selected category:", category.title);
+
+    const categoryMap: { [key: string]: string } = {
+      Actors: "actor",
+      Musicians: "musician",
+      "Content Creators": "content",
+      Youtubers: "youtuber",
+      Athlete: "athlete",
+      "Public Figure": "public",
+      Tiktokers: "tiktoker",
+    };
+
+    const searchCategory = categoryMap[category.title] || "all";
+
+    router.push({
+      pathname: "/search",
+      params: { category: searchCategory },
+    });
   };
 
   const handleJoinPress = () => {

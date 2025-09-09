@@ -114,25 +114,25 @@ export const creatorCategories = [
     id: 1,
     title: "Actors",
     image:
-      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 2,
     title: "Musicians",
     image:
-      "https://images.unsplash.com/photo-1511376777868-611b54f68947?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 3,
     title: "Content Creators",
     image:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 4,
     title: "Youtubers",
     image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=150&h=150&fit=crop&crop=face",
   },
   {
     id: 5,
@@ -150,6 +150,6 @@ export const creatorCategories = [
     id: 7,
     title: "Tiktokers",
     image:
-      "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&h=150&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=150&h=150&fit=crop&crop=face",
   },
 ];
