@@ -1,5 +1,5 @@
 import EnhancedAudioPlayer from "@/components/EnhancedAudioPlayer";
-import { useGetSongQuery } from "@/store/api/global/song";
+import { useGetSongQuery, useLikeSongMutation } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -32,14 +32,13 @@ const SongDetail = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const { id } = useLocalSearchParams<{ id: string }>();
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [playsCount, setPlaysCount] = useState(0);
   const [audioError, setAudioError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [playCountIncremented, setPlayCountIncremented] = useState(false);
-
+  const [likeSong, { isLoading: isLiking }] = useLikeSongMutation();
   const {
     data,
     isLoading: isFetching,
@@ -61,7 +60,6 @@ const SongDetail = () => {
 
   useEffect(() => {
     if (id) {
-      setIsPlaying(false);
       setAudioError(null);
       setPlayCountIncremented(false);
     }
@@ -69,8 +67,6 @@ const SongDetail = () => {
 
   const handlePlaybackStateChange = useCallback(
     (playing: boolean) => {
-      setIsPlaying(playing);
-
       if (playing && !playCountIncremented && data) {
         setPlaysCount((prev) => prev + 1);
         setPlayCountIncremented(true);
@@ -83,7 +79,6 @@ const SongDetail = () => {
     (error: string) => {
       console.error("Audio playback error:", error);
       setAudioError(error);
-      setIsPlaying(false);
 
       Alert.alert(
         t("song.playbackError") || "Playback Error",
@@ -99,10 +94,22 @@ const SongDetail = () => {
     [t]
   );
 
-  const handleLike = useCallback(() => {
-    setIsLiked(!isLiked);
-    setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
-  }, [isLiked]);
+  const handleLike = useCallback(async () => {
+    if (!id || isLiking) return;
+
+    try {
+      const newLikedState = !isLiked;
+      setIsLiked(newLikedState);
+      setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+
+      await likeSong(id).unwrap();
+    } catch (err) {
+      // Revert on error
+      setIsLiked(isLiked);
+      setLikesCount((prev) => (isLiked ? prev + 1 : prev - 1));
+      console.error("Error toggling like:", err);
+    }
+  }, [id, isLiked, isLiking, likeSong]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -117,7 +124,6 @@ const SongDetail = () => {
   }, [refetch]);
 
   const handleGoBack = useCallback(() => {
-    setIsPlaying(false);
     router.back();
   }, []);
 
@@ -338,14 +344,19 @@ const SongDetail = () => {
 
               <TouchableOpacity
                 onPress={handleLike}
+                disabled={isLiking}
                 className="bg-white/10 rounded-full p-2"
                 activeOpacity={0.7}
               >
-                <Ionicons
-                  name={isLiked ? "heart" : "heart-outline"}
-                  size={20}
-                  color={isLiked ? "#f9a826" : "white"}
-                />
+                {isLiking ? (
+                  <ActivityIndicator size="small" color="#f9a826" />
+                ) : (
+                  <Ionicons
+                    name={isLiked ? "heart" : "heart-outline"}
+                    size={20}
+                    color={isLiked ? "#f9a826" : "white"}
+                  />
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity

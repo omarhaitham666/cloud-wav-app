@@ -44,6 +44,12 @@ const songApi = mainApi.injectEndpoints({
         responseType: "blob",
       }),
     }),
+    LikeSong: builder.mutation<Songs, string>({
+      query: (id) => ({
+        url: `/songs/${id}/like`,
+        method: "POST",
+      }),
+    }),
     getSongByDivision: builder.query<Songs, string>({
       query: (name) => ({
         url: `/songs/division/${name}`,
@@ -79,6 +85,7 @@ export const {
   useGetSongsQuery,
   useGetSongQuery,
   useGetSongByDivisionQuery,
+  useLikeSongMutation,
   useGetSongStreemQuery,
   useUploadSongMutation,
   useDeleteSongMutation,
