@@ -3,7 +3,7 @@ import { useGetSongQuery } from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -36,13 +36,15 @@ const SongDetail = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [playsCount, setPlaysCount] = useState(0);
-  const [audioError, setAudioError] = useState(false);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [playCountIncremented, setPlayCountIncremented] = useState(false);
 
   const {
     data,
     isLoading: isFetching,
     refetch,
+    error,
   } = useGetSongQuery(id, {
     skip: !id,
   });
@@ -52,36 +54,74 @@ const SongDetail = () => {
       setIsLiked(data.isLiked || false);
       setLikesCount(data.likes_count || 0);
       setPlaysCount(data.plays || 0);
+      setAudioError(null);
+      setPlayCountIncremented(false);
     }
   }, [data]);
 
-  const handlePlaybackStateChange = (playing: boolean) => {
-    setIsPlaying(playing);
-    if (playing && playsCount === 0) {
-      setPlaysCount((prev) => prev + 1);
+  useEffect(() => {
+    if (id) {
+      setIsPlaying(false);
+      setAudioError(null);
+      setPlayCountIncremented(false);
     }
-  };
+  }, [id]);
 
-  const handleAudioError = (error: string) => {
-    setAudioError(true);
-    Alert.alert(t("song.playbackError"), error);
-  };
+  const handlePlaybackStateChange = useCallback(
+    (playing: boolean) => {
+      setIsPlaying(playing);
 
-  const handleLike = () => {
+      if (playing && !playCountIncremented && data) {
+        setPlaysCount((prev) => prev + 1);
+        setPlayCountIncremented(true);
+      }
+    },
+    [playCountIncremented, data]
+  );
+
+  const handleAudioError = useCallback(
+    (error: string) => {
+      console.error("Audio playback error:", error);
+      setAudioError(error);
+      setIsPlaying(false);
+
+      Alert.alert(
+        t("song.playbackError") || "Playback Error",
+        error || "An error occurred while playing the audio",
+        [
+          {
+            text: t("common.ok") || "OK",
+            onPress: () => setAudioError(null),
+          },
+        ]
+      );
+    },
+    [t]
+  );
+
+  const handleLike = useCallback(() => {
     setIsLiked(!isLiked);
     setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
-  };
+  }, [isLiked]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
       await refetch();
+      setAudioError(null);
+    } catch (err) {
+      console.error("Error refreshing song data:", err);
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [refetch]);
 
-  if (isFetching) {
+  const handleGoBack = useCallback(() => {
+    setIsPlaying(false);
+    router.back();
+  }, []);
+
+  if (isFetching && !data) {
     return (
       <View className="flex-1 justify-center items-center bg-black">
         <ActivityIndicator size="large" color="#2f00ac" />
@@ -93,13 +133,13 @@ const SongDetail = () => {
             writingDirection: isRTL ? "rtl" : "ltr",
           }}
         >
-          {t("song.loading")}
+          {t("song.loading") || "Loading..."}
         </Text>
       </View>
     );
   }
 
-  if (!data) {
+  if (error || (!data && !isFetching)) {
     return (
       <View className="flex-1 justify-center items-center bg-black">
         <Ionicons name="musical-notes-outline" size={64} color="#666" />
@@ -111,10 +151,10 @@ const SongDetail = () => {
             writingDirection: isRTL ? "rtl" : "ltr",
           }}
         >
-          {t("song.songNotFound")}
+          {t("song.songNotFound") || "Song not found"}
         </Text>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleGoBack}
           className="mt-4 bg-orange-500 px-6 py-3 rounded-full"
         >
           <Text
@@ -124,11 +164,15 @@ const SongDetail = () => {
               writingDirection: isRTL ? "rtl" : "ltr",
             }}
           >
-            {t("song.goBack")}
+            {t("song.goBack") || "Go Back"}
           </Text>
         </TouchableOpacity>
       </View>
     );
+  }
+
+  if (!data) {
+    return null;
   }
 
   return (
@@ -138,7 +182,6 @@ const SongDetail = () => {
     >
       <StatusBar barStyle="light-content" backgroundColor="black" />
 
-      {/* cover background */}
       <View className="absolute top-0 left-0 right-0 h-1/2">
         <ImageBackground
           source={{ uri: data.cover_url }}
@@ -160,18 +203,17 @@ const SongDetail = () => {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* header */}
         <View
           className={`flex-row justify-between items-center pt-12 pb-4 px-6 ${
             isRTL ? "flex-row-reverse" : ""
           }`}
         >
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={handleGoBack}
             className="bg-black/20 rounded-full p-2"
           >
             <Ionicons
-              name={isRTL ? "chevron-back" : "chevron-forward"}
+              name={isRTL ? "chevron-forward" : "chevron-back"}
               size={24}
               color="white"
             />
@@ -195,14 +237,16 @@ const SongDetail = () => {
           </View>
         </View>
 
-        {/* content */}
         <View className="flex-1 justify-end px-6 pb-8">
-          {/* song info */}
           <View className="items-center mb-8">
             <View className="relative">
               <Image
-                source={{ uri: data.cover_url }}
+                source={{
+                  uri: data.cover_url,
+                  cache: "force-cache",
+                }}
                 className="w-72 h-72 rounded-3xl shadow-2xl"
+                onError={() => console.log("Cover image failed to load")}
               />
               {audioError && (
                 <View className="absolute inset-0 bg-black/50 rounded-3xl justify-center items-center">
@@ -211,38 +255,44 @@ const SongDetail = () => {
                     size={48}
                     color="#ef4444"
                   />
+                  <Text className="text-red-400 text-xs mt-2 text-center px-4">
+                    {audioError}
+                  </Text>
                 </View>
               )}
             </View>
 
             <Text
-              className="text-2xl text-white mt-6 text-center"
+              className="text-2xl text-white mt-6 text-center px-4"
               style={{
                 fontFamily: AppFonts.semibold,
                 textAlign: "center",
                 writingDirection: isRTL ? "rtl" : "ltr",
               }}
+              numberOfLines={2}
             >
               {data.title}
             </Text>
             <Text
-              className="text-orange-400 text-lg mt-1 text-center"
+              className="text-orange-400 text-lg mt-1 text-center px-4"
               style={{
                 fontFamily: AppFonts.semibold,
                 textAlign: "center",
                 writingDirection: isRTL ? "rtl" : "ltr",
               }}
+              numberOfLines={1}
             >
-              {data.artist_name}
+              {data.artist_name || data.artist || "Unknown Artist"}
             </Text>
             {data.division && (
               <Text
-                className="text-gray-400 text-sm mt-1 text-center"
+                className="text-gray-400 text-sm mt-1 text-center px-4"
                 style={{
                   fontFamily: AppFonts.semibold,
                   textAlign: "center",
                   writingDirection: isRTL ? "rtl" : "ltr",
                 }}
+                numberOfLines={1}
               >
                 {data.division}
               </Text>
@@ -266,7 +316,7 @@ const SongDetail = () => {
                     writingDirection: isRTL ? "rtl" : "ltr",
                   }}
                 >
-                  {formatNumber(playsCount)} {t("song.plays")}
+                  {formatNumber(playsCount)} {t("song.plays") || "plays"}
                 </Text>
               </View>
               <View
@@ -282,14 +332,14 @@ const SongDetail = () => {
                     writingDirection: isRTL ? "rtl" : "ltr",
                   }}
                 >
-                  {formatNumber(likesCount)} {t("song.likes")}
+                  {formatNumber(likesCount)} {t("song.likes") || "likes"}
                 </Text>
               </View>
 
-              {/* Action Buttons */}
               <TouchableOpacity
                 onPress={handleLike}
                 className="bg-white/10 rounded-full p-2"
+                activeOpacity={0.7}
               >
                 <Ionicons
                   name={isLiked ? "heart" : "heart-outline"}
@@ -298,23 +348,54 @@ const SongDetail = () => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity className="bg-white/10 rounded-full p-2">
+              <TouchableOpacity
+                className="bg-white/10 rounded-full p-2"
+                activeOpacity={0.7}
+              >
                 <Ionicons name="repeat" size={20} color="white" />
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Audio Player */}
-          {data?.song_url && (
+          {data?.song_url && !audioError ? (
             <EnhancedAudioPlayer
+              key={`${id}-${data.song_url}`}
               songUrl={data.song_url}
               songTitle={data.title}
-              artistName={data.artist_name || data.artist}
+              artistName={data.artist_name || data.artist || "Unknown Artist"}
               coverUrl={data.cover_url}
               onPlaybackStateChange={handlePlaybackStateChange}
               onError={handleAudioError}
               className="mb-8"
+              isRTL={isRTL}
             />
+          ) : data?.song_url && audioError ? (
+            <View className="mb-8 bg-red-900/20 rounded-2xl p-4 border border-red-500/20">
+              <View className="flex-row items-center justify-center gap-2">
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={20}
+                  color="#ef4444"
+                />
+                <Text className="text-red-400 text-center flex-1">
+                  {audioError}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setAudioError(null)}
+                className="mt-3 bg-red-500 py-2 px-4 rounded-lg self-center"
+              >
+                <Text className="text-white text-sm">
+                  {t("common.retry") || "Retry"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View className="mb-8 bg-gray-800/50 rounded-2xl p-4">
+              <Text className="text-gray-400 text-center">
+                {t("song.noAudioAvailable") || "No audio available"}
+              </Text>
+            </View>
           )}
         </View>
       </ScrollView>
