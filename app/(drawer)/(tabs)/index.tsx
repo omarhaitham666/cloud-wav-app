@@ -118,7 +118,6 @@ const HomePage = () => {
               data={data}
               keyExtractor={(item) => item.id.toString()}
               horizontal
-              pagingEnabled
               showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
                 <SongCard
