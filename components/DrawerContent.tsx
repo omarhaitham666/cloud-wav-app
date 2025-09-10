@@ -5,6 +5,7 @@ import { invalidateAllQueries } from "@/store/utils";
 import AppRefreshService, { setDrawerRefreshTrigger } from "@/utils/appRefresh";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { RelativePathString, router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -77,7 +78,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const currentRoute = state.routes[state.index]?.name;
   const [token, setToken] = useState<string | null>(null);
   const [logout, { isLoading }] = useLogoutMutation();
-  const { user, setUser } = useAuth();
+  const { user, setUser, triggerAuthRefresh } = useAuth();
   const { refreshKey, triggerDrawerRefresh } = useDrawerRefresh();
   const isArabic = i18n.language === "ar";
 
@@ -96,7 +97,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setToken(storedToken);
     };
     fetchToken();
-  }, [state.index, refreshKey]);
+  }, [state.index, refreshKey, user]);
 
   useEffect(() => {
     setDrawerRefreshTrigger(triggerDrawerRefresh);
@@ -105,15 +106,42 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
 
   const handleLogout = async () => {
     try {
+      // Clear all tokens from SecureStore
       await deleteToken("access_token");
+      await deleteToken("refresh_token");
+      
+      // Clear all data from AsyncStorage
+      await AsyncStorage.clear();
+      
+      // Call logout API
       await logout().unwrap();
 
+      // Clear user state and token state
       setUser(null);
       setToken(null);
 
+      // Trigger auth refresh to update all auth-related components
+      triggerAuthRefresh();
+
+      // Trigger drawer refresh to update the UI
+      triggerDrawerRefresh();
+
+      // Refresh app state
       await AppRefreshService.refreshAfterAuthChange("logout");
       invalidateAllQueries();
+
+      Toast.show({
+        type: "success",
+        text1: "Logged Out",
+        text2: "You have been successfully logged out",
+      });
     } catch (e: any) {
+      // Even if API call fails, clear local state
+      setUser(null);
+      setToken(null);
+      triggerAuthRefresh();
+      triggerDrawerRefresh();
+      
       Toast.show({
         type: "error",
         text1: "Logout Failed",
