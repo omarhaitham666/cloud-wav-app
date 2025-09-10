@@ -1,8 +1,9 @@
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
+import * as AuthSession from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -19,44 +20,116 @@ export default function GoogleLoginButton() {
   const isRTL = i18n.language === "ar";
   const [isLoading, setIsLoading] = useState(false);
 
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: "com.cloudwavapp",
+    path: "auth",
+  });
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId:
-      "927517909310-cehf72jvic47kl42moi8o4bcv82ef0fm.apps.googleusercontent.com",
-    redirectUri: "https://api.cloudwavproduction.com/auth/google/redirect",
-    scopes: ["profile", "email"],
+      "877091254165-tjq8qbr8ck4hamvnkdneen0a2s537tjl.apps.googleusercontent.com",
+    redirectUri,
+    scopes: ["openid", "profile", "email"],
+    extraParams: {
+      access_type: "offline",
+      prompt: "consent",
+    },
   });
+
+  const handleGoogleAuthSuccess = useCallback(
+    async (authentication: any) => {
+      try {
+        const response = await fetch(
+          "https://api.cloudwavproduction.com/auth/google",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              accessToken: authentication.accessToken,
+              idToken: authentication.idToken,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          await response.json();
+
+          Alert.alert(
+            t("auth.success") || (isRTL ? "نجح" : "Success"),
+            t("auth.googleLoginSuccess") ||
+              (isRTL
+                ? "تم تسجيل الدخول بجوجل بنجاح!"
+                : "Google login successful!")
+          );
+        } else {
+          throw new Error("Server authentication failed");
+        }
+      } catch (error) {
+        console.error("Google auth error:", error);
+        Alert.alert(
+          t("auth.error") || (isRTL ? "خطأ" : "Error"),
+          t("auth.googleLoginError") ||
+            (isRTL
+              ? "فشل تسجيل الدخول بجوجل. يرجى المحاولة مرة أخرى."
+              : "Google login failed. Please try again.")
+        );
+      }
+    },
+    [t, isRTL]
+  );
 
   useEffect(() => {
     if (response?.type === "success") {
       const { authentication } = response;
       setIsLoading(false);
-
-      Alert.alert(
-        t("auth.success") || (isRTL ? "نجح" : "Success"),
-        t("auth.googleLoginSuccess") ||
-          (isRTL ? "تم تسجيل الدخول بجوجل بنجاح!" : "Google login successful!")
-      );
+      if (authentication) handleGoogleAuthSuccess(authentication);
     } else if (response?.type === "error") {
       setIsLoading(false);
+      console.error("Google auth error:", response.error);
+
+      let errorMessage =
+        t("auth.googleLoginError") ||
+        (isRTL
+          ? "فشل تسجيل الدخول بجوجل. يرجى المحاولة مرة أخرى."
+          : "Google login failed. Please try again.");
+
+      if (response.error?.message?.includes("access_denied")) {
+        errorMessage = isRTL
+          ? "تم رفض الوصول. يرجى التأكد من إعدادات التطبيق في Google Console."
+          : "Access denied. Please check app settings in Google Console.";
+      } else if (response.error?.message?.includes("invalid_client")) {
+        errorMessage = isRTL
+          ? "معرف العميل غير صحيح. يرجى التحقق من إعدادات التطبيق."
+          : "Invalid client ID. Please check app configuration.";
+      } else if (response.error?.message?.includes("unauthorized_client")) {
+        errorMessage = isRTL
+          ? "التطبيق غير مصرح له. يرجى إضافة التطبيق في Google Console."
+          : "App not authorized. Please add the app in Google Console.";
+      }
 
       Alert.alert(
         t("auth.error") || (isRTL ? "خطأ" : "Error"),
-        t("auth.googleLoginError") ||
-          (isRTL
-            ? "فشل تسجيل الدخول بجوجل. يرجى المحاولة مرة أخرى."
-            : "Google login failed. Please try again.")
+        response.error?.message || errorMessage
       );
     } else if (response?.type === "cancel") {
       setIsLoading(false);
     }
-  }, [response, t]);
+  }, [response, t, isRTL, handleGoogleAuthSuccess]);
 
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
+
+      if (!request) {
+        throw new Error("Google auth request not ready");
+      }
+
       await promptAsync();
     } catch (error) {
       setIsLoading(false);
+      console.error("Google login error:", error);
+
       Alert.alert(
         t("auth.error") || (isRTL ? "خطأ" : "Error"),
         t("auth.loginInitError") ||
@@ -113,10 +186,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginBottom: 24,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,

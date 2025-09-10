@@ -5,11 +5,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
-    "scheme": "cloudwav",
+    "scheme": "com.cloudwavapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cloudwavapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,11 +18,12 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.omar666.cloudwav"
+      "package": "com.cloudwavapp"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
+
       "favicon": "./assets/images/logo.png"
     },
     "plugins": [
@@ -37,7 +39,13 @@
       ],
       "expo-localization",
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-auth-session",
+        {
+          "schemes": ["com.cloudwavapp"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
