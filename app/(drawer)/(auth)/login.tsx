@@ -1,4 +1,4 @@
-import GoogleLoginButton from "@/components/GoogleLoginButton";
+import ExpoGoogleLoginButton from "@/components/ExpoGoogleLoginButton";
 import { useLoginMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { invalidateAllQueries } from "@/store/utils";
@@ -222,7 +222,7 @@ function LoginScreen() {
         >
           {t("auth.login.orSignInWith")}
         </Text>
-        <GoogleLoginButton />
+        <ExpoGoogleLoginButton />
         <TouchableOpacity
           onPress={() => router.push("/(drawer)/(auth)/register")}
         >
