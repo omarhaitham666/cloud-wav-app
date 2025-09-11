@@ -10,8 +10,9 @@ import Toast from "react-native-toast-message";
 // Configure WebBrowser for better UX
 WebBrowser.maybeCompleteAuthSession();
 
-// Google OAuth configuration
-const clientId = "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com";
+// Google OAuth configuration - using web client for Expo
+const clientId  = "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com";
+
 
 // Google Icon SVG
 const GoogleIcon = () => (
@@ -34,10 +35,8 @@ const redirectUri = makeRedirectUri({
   path: "auth",
 });
 
-// Fallback to Expo auth proxy for development
-const finalRedirectUri = redirectUri.startsWith("exp://") 
-  ? "https://auth.expo.io/@omar666/cloud-wav" 
-  : redirectUri;
+// For Expo web OAuth, use the Expo auth proxy
+const finalRedirectUri = "https://auth.expo.io/@omar666/cloud-wav";
 
 const discovery = {
   authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
