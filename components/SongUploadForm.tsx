@@ -13,15 +13,15 @@ import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
@@ -51,9 +51,11 @@ export type SongFormData = z.infer<typeof songSchema>;
 
 type Props = {
   isRTL: boolean;
+  onUploadStart?: () => void;
+  onUploadComplete?: () => void;
 };
 
-const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
+const SongUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComplete }) => {
   const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [songArtwork, setSongArtwork] = useState<any>(null);
@@ -183,6 +185,9 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
     }
 
     try {
+      if (onUploadStart) {
+        onUploadStart();
+      }
       const songFormData = new FormData();
 
       // إضافة cover_path فقط إذا كان هناك صورة
@@ -235,6 +240,10 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
       reset();
       setSelectedFile(null);
       setSongArtwork(null);
+      
+      if (onUploadComplete) {
+        onUploadComplete();
+      }
     } catch (error: any) {
       console.log("Upload error:", error);
       Toast.show({
@@ -245,6 +254,11 @@ const SongUploadForm: React.FC<Props> = ({ isRTL }) => {
           error?.message ||
           "Failed to upload song. Please try again.",
       });
+      
+      // Reset upload state on error
+      if (onUploadComplete) {
+        onUploadComplete();
+      }
     }
   };
 

@@ -11,14 +11,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetUserQuery } from "@/store/api/user/user";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  RefreshControl,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    RefreshControl,
+    StatusBar,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 const ArtistProfile = () => {
@@ -204,6 +204,7 @@ const ArtistProfile = () => {
             visible={UploadSong}
             onClose={() => setUploadSong(false)}
             artist_id={Number(id)}
+            onUploadComplete={handleRefresh}
           />
         </>
       }

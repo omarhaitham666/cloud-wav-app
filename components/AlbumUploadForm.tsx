@@ -9,15 +9,15 @@ import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
@@ -30,9 +30,11 @@ export type AlbumFormData = z.infer<typeof albumSchema>;
 
 type Props = {
   isRTL: boolean;
+  onUploadStart?: () => void;
+  onUploadComplete?: () => void;
 };
 
-const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
+const AlbumUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComplete }) => {
   const { t } = useTranslation();
   const [coverImage, setCoverImage] = useState<any>(null);
   const [, { isLoading: isAddAlbumLoading }] = useAddAlbumMutation();
@@ -116,6 +118,9 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
     }
 
     try {
+      if (onUploadStart) {
+        onUploadStart();
+      }
       const albumFormData = new FormData();
       albumFormData.append("title", data.title);
 
@@ -158,6 +163,10 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
       });
       reset();
       setCoverImage(null);
+      
+      if (onUploadComplete) {
+        onUploadComplete();
+      }
     } catch (error: any) {
       console.log("Upload error:", error);
 
@@ -169,6 +178,11 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL }) => {
           error?.message ||
           "Failed to create album. Please try again.",
       });
+      
+      // Reset upload state on error
+      if (onUploadComplete) {
+        onUploadComplete();
+      }
     }
   };
 

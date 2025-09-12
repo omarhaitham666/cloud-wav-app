@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import AlbumUploadForm from "../AlbumUploadForm";
 import SongUploadForm from "../SongUploadForm";
@@ -14,15 +14,35 @@ type Props = {
   visible: boolean;
   artist_id?: number;
   onClose: () => void;
+  onUploadComplete?: () => void;
 };
 
-const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
+const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [uploadType, setUploadType] = useState<UploadType>("choose");
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleClose = () => {
+    if (isUploading) {
+      Toast.show({
+        type: "info",
+        text1: "Upload in Progress",
+        text2: "Please wait for the upload to complete",
+      });
+      return;
+    }
     setUploadType("choose");
+    setIsUploading(false);
+    onClose();
+  };
+
+  const handleUploadComplete = () => {
+    setIsUploading(false);
+    setUploadType("choose");
+    if (onUploadComplete) {
+      onUploadComplete();
+    }
     onClose();
   };
 
@@ -121,9 +141,21 @@ const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
   const renderContent = () => {
     switch (uploadType) {
       case "song":
-        return <SongUploadForm isRTL={isRTL} />;
+        return (
+          <SongUploadForm 
+            isRTL={isRTL} 
+            onUploadStart={() => setIsUploading(true)}
+            onUploadComplete={handleUploadComplete}
+          />
+        );
       case "album":
-        return <AlbumUploadForm isRTL={isRTL} />;
+        return (
+          <AlbumUploadForm 
+            isRTL={isRTL} 
+            onUploadStart={() => setIsUploading(true)}
+            onUploadComplete={handleUploadComplete}
+          />
+        );
       default:
         return renderChooseType();
     }
@@ -162,19 +194,26 @@ const UploadModal: React.FC<Props> = ({ visible, onClose }) => {
                     <Ionicons name="arrow-back" size={24} color="white" />
                   </TouchableOpacity>
                 )}
-                <Text
-                  className="text-white text-xl"
-                  style={{
-                    fontFamily: AppFonts.bold,
-                    textAlign: isRTL ? "right" : "left",
-                  }}
-                >
-                  {uploadType === "song"
-                    ? "Upload Song"
-                    : uploadType === "album"
-                    ? "Create Album"
-                    : t("upload.title") || "Upload Content"}
-                </Text>
+                <View className="flex-row items-center">
+                  <Text
+                    className="text-white text-xl"
+                    style={{
+                      fontFamily: AppFonts.bold,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {uploadType === "song"
+                      ? "Upload Song"
+                      : uploadType === "album"
+                      ? "Create Album"
+                      : t("upload.title") || "Upload Content"}
+                  </Text>
+                  {isUploading && (
+                    <View className="ml-2">
+                      <ActivityIndicator size="small" color="#fff" />
+                    </View>
+                  )}
+                </View>
               </View>
               <TouchableOpacity onPress={handleClose} className="p-2">
                 <Ionicons name="close" size={24} color="white" />
