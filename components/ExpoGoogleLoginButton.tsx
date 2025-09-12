@@ -119,6 +119,8 @@ export default function ExpoGoogleLoginButton() {
         scopes: request.scopes,
         responseType: request.responseType,
         environment: googleConfig.environment,
+        isExpoGo: googleConfig.environment === 'expo',
+        isStandalone: googleConfig.environment === 'standalone',
       });
       promptAsync();
     }
