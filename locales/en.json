@@ -447,7 +447,8 @@
     "submitting": "Submitting...",
     "imagePickerError": "Failed to pick image",
     "imageSelected": "Image Selected",
-    "ok": "OK"
+    "ok": "OK",
+    "retry": "Retry"
   },
   "famousArtist": {
     "title": "Add artist",
@@ -684,6 +685,9 @@
     "loading": "Loading...",
     "plays": "Plays",
     "likes": "Likes",
+    "noAudioAvailable": "No audio available",
+    "likeError": "Error Toggling Like",
+    "likeErrorMessage": "Please Login and try again.",
     "categories": {
       "all": "All",
       "actor": "Actors",

@@ -447,7 +447,8 @@
     "submitting": "جارٍ الإرسال...",
     "imagePickerError": "فشل في اختيار الصورة",
     "imageSelected": "تم اختيار الصورة",
-    "ok": "موافق"
+    "ok": "موافق",
+    "retry": "حاول مرة أخرى"
   },
   "famousArtist": {
     "title": "إضافة فنان",
@@ -684,6 +685,9 @@
     "loading": "جارٍ التحميل...",
     "plays": "المشاهدات",
     "likes": "الإعجابات",
+    "noAudioAvailable": "لا يوجد صوت متاح",
+    "likeError": "خطأ في تبديل الإعجاب",
+    "likeErrorMessage": "يرجى تسجيل الدخول والمحاولة مرة أخرى.",
     "categories": {
       "all": "الكل",
       "actor": "الممثلون",

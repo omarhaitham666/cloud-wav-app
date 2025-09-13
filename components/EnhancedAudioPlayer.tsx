@@ -315,6 +315,9 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     return (
       <View
         className={`bg-red-900/20 rounded-2xl p-4 border border-red-500/20 ${className}`}
+        style={{
+          direction: "ltr",
+        }}
       >
         <View className="flex-row items-center justify-center gap-2">
           <Ionicons name="alert-circle-outline" size={20} color="#ef4444" />
@@ -341,7 +344,12 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   }
 
   return (
-    <View className={`bg-gray-800/50 rounded-2xl p-4 ${className}`}>
+    <View
+      className={`bg-gray-800/50 rounded-2xl p-4 ${className}`}
+      style={{
+        direction: "ltr",
+      }}
+    >
       <View className="mb-4">
         <Slider
           style={{ height: 40 }}

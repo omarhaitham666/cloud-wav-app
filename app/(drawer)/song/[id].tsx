@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 const formatNumber = (num: number) => {
   if (num >= 1000000) {
@@ -103,11 +104,17 @@ const SongDetail = () => {
       setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
 
       await likeSong(id).unwrap();
-    } catch (err) {
+    } catch (err: any) {
       // Revert on error
       setIsLiked(isLiked);
       setLikesCount((prev) => (isLiked ? prev + 1 : prev - 1));
-      console.error("Error toggling like:", err);
+      if ((err.status as unknown as number) === 401) {
+        Toast.show({
+          type: "error",
+          text1: t("song.likeError") || "Error Toggling Like",
+          text2: t("song.likeErrorMessage") || "Please Login and try again.",
+        });
+      }
     }
   }, [id, isLiked, isLiking, likeSong]);
 
@@ -244,7 +251,12 @@ const SongDetail = () => {
         </View>
 
         <View className="flex-1 justify-end px-6 pb-8">
-          <View className="items-center mb-8">
+          <View
+            className="items-center mb-8"
+            style={{
+              direction: "ltr",
+            }}
+          >
             <View className="relative">
               <Image
                 source={{
