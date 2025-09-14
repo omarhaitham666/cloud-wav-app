@@ -8,7 +8,10 @@ import en from "../locales/en.json";
 
 // detect device language using Expo Localization
 const locales = getLocales();
-const lng = (locales.length > 0 && locales[0].languageCode) ? locales[0].languageCode : "en";
+const lng =
+  locales.length > 0 && locales[0].languageCode
+    ? locales[0].languageCode
+    : "en";
 
 // Force the UI direction to always be LTR regardless of language
 I18nManager.allowRTL(false);
@@ -22,20 +25,18 @@ export const changeLanguage = (languageCode: string) => {
   i18n.changeLanguage(languageCode);
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    lng,
-    fallbackLng: "en",
-    resources: {
-      en: { translation: en },
-      ar: { translation: ar },
-    },
-    interpolation: { escapeValue: false },
-    react: {
-      useSuspense: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  lng,
+  fallbackLng: "en",
+  resources: {
+    en: { translation: en },
+    ar: { translation: ar },
+  },
+  interpolation: { escapeValue: false },
+  react: {
+    useSuspense: false,
+  },
+});
 
 // Direction is locked to LTR above; no further init needed
 

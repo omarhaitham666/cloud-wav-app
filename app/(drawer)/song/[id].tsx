@@ -8,8 +8,10 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
   Image,
   ImageBackground,
+  Platform,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -18,6 +20,10 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
+
+const { width: screenWidth } = Dimensions.get("window");
+const isSmallDevice = screenWidth < 375;
+const isLargeDevice = screenWidth > 414;
 
 const formatNumber = (num: number) => {
   if (num >= 1000000) {
@@ -128,7 +134,7 @@ const SongDetail = () => {
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetch]);
+  }, [refetch, t]);
 
   const handleGoBack = useCallback(() => {
     router.back();
@@ -217,44 +223,76 @@ const SongDetail = () => {
         showsVerticalScrollIndicator={false}
       >
         <View
-          className={`flex-row justify-between items-center pt-12 pb-4 px-6 ${
+          className={`flex-row justify-between items-center ${
             isRTL ? "flex-row-reverse" : ""
           }`}
+          style={{
+            paddingTop: Platform.OS === "ios" ? 50 : 40,
+            paddingBottom: 16,
+            paddingHorizontal: 20,
+          }}
         >
           <TouchableOpacity
             onPress={handleGoBack}
-            className="bg-black/20 rounded-full p-2"
+            className="bg-black/20 rounded-full"
+            style={{
+              padding: isSmallDevice ? 8 : 10,
+            }}
           >
             <Ionicons
               name={isRTL ? "chevron-forward" : "chevron-back"}
-              size={24}
+              size={isSmallDevice ? 20 : 24}
               color="white"
             />
           </TouchableOpacity>
 
           <View
-            className={`flex-row items-center gap-1 ${
+            className={`flex-row items-center ${
               isRTL ? "flex-row-reverse" : ""
             }`}
+            style={{
+              gap: 8,
+            }}
           >
             <TouchableOpacity
-              className={`bg-black/20 rounded-full p-2 ${
-                isRTL ? "ml-3" : "mr-3"
-              }`}
+              className="bg-black/20 rounded-full"
+              style={{
+                padding: isSmallDevice ? 8 : 10,
+              }}
             >
-              <Ionicons name="share-outline" size={20} color="white" />
+              <Ionicons
+                name="share-outline"
+                size={isSmallDevice ? 18 : 20}
+                color="white"
+              />
             </TouchableOpacity>
-            <TouchableOpacity className="bg-black/20 rounded-full p-2">
-              <Ionicons name="ellipsis-vertical" size={20} color="white" />
+            <TouchableOpacity
+              className="bg-black/20 rounded-full"
+              style={{
+                padding: isSmallDevice ? 8 : 10,
+              }}
+            >
+              <Ionicons
+                name="ellipsis-vertical"
+                size={isSmallDevice ? 18 : 20}
+                color="white"
+              />
             </TouchableOpacity>
           </View>
         </View>
 
-        <View className="flex-1 justify-end px-6 pb-8">
+        <View
+          className="flex-1 justify-end"
+          style={{
+            paddingHorizontal: isSmallDevice ? 16 : 20,
+            paddingBottom: isSmallDevice ? 20 : 32,
+          }}
+        >
           <View
-            className="items-center mb-8"
+            className="items-center"
             style={{
               direction: "ltr",
+              marginBottom: isSmallDevice ? 20 : 32,
             }}
           >
             <View className="relative">
@@ -263,7 +301,26 @@ const SongDetail = () => {
                   uri: data.cover_url,
                   cache: "force-cache",
                 }}
-                className="w-72 h-72 rounded-3xl shadow-2xl"
+                style={{
+                  width: isSmallDevice
+                    ? screenWidth * 0.65
+                    : isLargeDevice
+                    ? 320
+                    : screenWidth * 0.7,
+                  height: isSmallDevice
+                    ? screenWidth * 0.65
+                    : isLargeDevice
+                    ? 320
+                    : screenWidth * 0.7,
+                  borderRadius: 24,
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 8,
+                  },
+                  shadowOpacity: 0.44,
+                  shadowRadius: 10.32,
+                }}
                 onError={() => console.log("Cover image failed to load")}
               />
               {audioError && (
@@ -281,22 +338,26 @@ const SongDetail = () => {
             </View>
 
             <Text
-              className="text-2xl text-white mt-6 text-center px-4"
+              className="text-white mt-6 text-center px-4"
               style={{
+                fontSize: isSmallDevice ? 20 : isLargeDevice ? 28 : 24,
                 fontFamily: AppFonts.semibold,
                 textAlign: "center",
                 writingDirection: isRTL ? "rtl" : "ltr",
+                lineHeight: isSmallDevice ? 26 : isLargeDevice ? 36 : 32,
               }}
               numberOfLines={2}
             >
               {data.title}
             </Text>
             <Text
-              className="text-orange-400 text-lg mt-1 text-center px-4"
+              className="text-orange-400 mt-1 text-center px-4"
               style={{
+                fontSize: isSmallDevice ? 16 : isLargeDevice ? 20 : 18,
                 fontFamily: AppFonts.semibold,
                 textAlign: "center",
                 writingDirection: isRTL ? "rtl" : "ltr",
+                lineHeight: isSmallDevice ? 22 : isLargeDevice ? 28 : 24,
               }}
               numberOfLines={1}
             >
@@ -317,37 +378,61 @@ const SongDetail = () => {
             )}
 
             <View
-              className={`flex-row gap-3 items-center mt-4 ${
+              className={`flex-row items-center mt-4 ${
                 isRTL ? "flex-row-reverse" : ""
               }`}
+              style={{
+                gap: isSmallDevice ? 12 : 16,
+                justifyContent: "center",
+              }}
             >
               <View
-                className={`flex-row items-center gap-1 ${
+                className={`flex-row items-center ${
                   isRTL ? "flex-row-reverse" : ""
                 }`}
+                style={{
+                  gap: 4,
+                }}
               >
-                <Ionicons name="play-outline" size={16} color="#9CA3AF" />
+                <Ionicons
+                  name="play-outline"
+                  size={isSmallDevice ? 14 : 16}
+                  color="#9CA3AF"
+                />
                 <Text
-                  className={`text-gray-400 text-sm ${isRTL ? "mr-1" : "ml-1"}`}
+                  className="text-gray-400"
                   style={{
+                    fontSize: isSmallDevice ? 12 : 14,
                     fontFamily: AppFonts.semibold,
                     writingDirection: isRTL ? "rtl" : "ltr",
+                    marginLeft: isRTL ? 0 : 2,
+                    marginRight: isRTL ? 2 : 0,
                   }}
                 >
                   {formatNumber(playsCount)} {t("song.plays") || "plays"}
                 </Text>
               </View>
               <View
-                className={`flex-row items-center gap-1 ${
+                className={`flex-row items-center ${
                   isRTL ? "flex-row-reverse" : ""
                 }`}
+                style={{
+                  gap: 4,
+                }}
               >
-                <Ionicons name="heart-outline" size={16} color="#9CA3AF" />
+                <Ionicons
+                  name="heart-outline"
+                  size={isSmallDevice ? 14 : 16}
+                  color="#9CA3AF"
+                />
                 <Text
-                  className={`text-gray-400 text-sm ${isRTL ? "mr-1" : "ml-1"}`}
+                  className="text-gray-400"
                   style={{
+                    fontSize: isSmallDevice ? 12 : 14,
                     fontFamily: AppFonts.semibold,
                     writingDirection: isRTL ? "rtl" : "ltr",
+                    marginLeft: isRTL ? 0 : 2,
+                    marginRight: isRTL ? 2 : 0,
                   }}
                 >
                   {formatNumber(likesCount)} {t("song.likes") || "likes"}
@@ -357,7 +442,12 @@ const SongDetail = () => {
               <TouchableOpacity
                 onPress={handleLike}
                 disabled={isLiking}
-                className="bg-white/10 rounded-full p-2"
+                className="bg-white/10 rounded-full"
+                style={{
+                  padding: isSmallDevice ? 8 : 10,
+                  marginLeft: isRTL ? 0 : 8,
+                  marginRight: isRTL ? 8 : 0,
+                }}
                 activeOpacity={0.7}
               >
                 {isLiking ? (
@@ -365,17 +455,24 @@ const SongDetail = () => {
                 ) : (
                   <Ionicons
                     name={isLiked ? "heart" : "heart-outline"}
-                    size={20}
+                    size={isSmallDevice ? 18 : 20}
                     color={isLiked ? "#f9a826" : "white"}
                   />
                 )}
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="bg-white/10 rounded-full p-2"
+                className="bg-white/10 rounded-full"
+                style={{
+                  padding: isSmallDevice ? 8 : 10,
+                }}
                 activeOpacity={0.7}
               >
-                <Ionicons name="repeat" size={20} color="white" />
+                <Ionicons
+                  name="repeat"
+                  size={isSmallDevice ? 18 : 20}
+                  color="white"
+                />
               </TouchableOpacity>
             </View>
           </View>

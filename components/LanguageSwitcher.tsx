@@ -1,12 +1,7 @@
 import { AppFonts } from "@/utils/fonts";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Animated,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Pressable, Text, View } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 
 export default function LanguageSwitcher() {
@@ -63,7 +58,12 @@ export default function LanguageSwitcher() {
           justifyContent: "space-between",
         }}
       >
-        <View style={{ flexDirection: isArabic ? "row-reverse" : "row", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: isArabic ? "row-reverse" : "row",
+            alignItems: "center",
+          }}
+        >
           <Feather
             name="globe"
             size={20}
@@ -82,7 +82,6 @@ export default function LanguageSwitcher() {
             >
               {isArabic ? "العربية" : "English"}
             </Text>
-
           </View>
         </View>
       </Pressable>

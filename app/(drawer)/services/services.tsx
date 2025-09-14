@@ -1,4 +1,3 @@
-import GlobalToast from "@/components/GlobalToast";
 import SocialServiesModal from "@/components/modals/SocialServiesModal";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";

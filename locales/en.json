@@ -448,7 +448,14 @@
     "imagePickerError": "Failed to pick image",
     "imageSelected": "Image Selected",
     "ok": "OK",
-    "retry": "Retry"
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "retrying": "Retrying...",
+    "attempt": "Attempt",
+    "audioFocusError": "Unable to acquire audio focus",
+    "audioFocusErrorMessage": "Unable to acquire audio focus. Another app might be using audio. Please close other audio apps and try again.",
+    "audioFocusRetryMessage": "Retrying to acquire audio focus...",
+    "audioFocusSuccessMessage": "Audio focus acquired successfully"
   },
   "famousArtist": {
     "title": "Add artist",

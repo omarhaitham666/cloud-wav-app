@@ -109,10 +109,10 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       // Clear all tokens from SecureStore
       await deleteToken("access_token");
       await deleteToken("refresh_token");
-      
+
       // Clear all data from AsyncStorage
       await AsyncStorage.clear();
-      
+
       // Call logout API
       await logout().unwrap();
 
@@ -141,7 +141,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       setToken(null);
       triggerAuthRefresh();
       triggerDrawerRefresh();
-      
+
       Toast.show({
         type: "error",
         text1: "Logout Failed",
