@@ -567,7 +567,8 @@ const ProfileUser: React.FC = () => {
                             textAlign: isRTL ? "center" : "center",
                           }}
                         >
-                          {t("profile.user.videoCreatorProfile") || "Video Creator Profile"}
+                          {t("profile.user.videoCreatorProfile") ||
+                            "Video Creator Profile"}
                         </Text>
                       </LinearGradient>
                     </TouchableOpacity>
@@ -575,73 +576,74 @@ const ProfileUser: React.FC = () => {
 
                   {/* Show update pricing button for video creators (but not if they have both roles) */}
                   {(userData?.role === "videoCreator" ||
-                    userData?.role === "user,videoCreator") && 
+                    userData?.role === "user,videoCreator") &&
                     !data?.artist_id && (
-                    <TouchableOpacity
-                      onPress={() => setUpdatePrice(true)}
-                      className="flex-1"
-                      activeOpacity={0.8}
-                    >
-                      <LinearGradient
-                        colors={["#F59E0B", "#D97706"]}
-                        className="p-4 items-center"
-                        style={{
-                          borderRadius: 10,
-                        }}
+                      <TouchableOpacity
+                        onPress={() => setUpdatePrice(true)}
+                        className="flex-1"
+                        activeOpacity={0.8}
                       >
-                        <MaterialIcons
-                          name="attach-money"
-                          size={28}
-                          color="white"
-                        />
-                        <Text
-                          className="text-white text-sm mt-2 text-center"
+                        <LinearGradient
+                          colors={["#F59E0B", "#D97706"]}
+                          className="p-4 items-center"
                           style={{
-                            fontFamily: AppFonts.bold,
-                            textAlign: isRTL ? "center" : "center",
+                            borderRadius: 10,
                           }}
                         >
-                          {t("profile.user.updatePricing") || "Update Pricing"}
-                        </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  )}
+                          <MaterialIcons
+                            name="attach-money"
+                            size={28}
+                            color="white"
+                          />
+                          <Text
+                            className="text-white text-sm mt-2 text-center"
+                            style={{
+                              fontFamily: AppFonts.bold,
+                              textAlign: isRTL ? "center" : "center",
+                            }}
+                          >
+                            {t("profile.user.updatePricing") ||
+                              "Update Pricing"}
+                          </Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
 
                   {/* Show manage songs button for artists (but not if they have both roles) */}
                   {(userData?.role === "artist" ||
-                    userData?.role === "user,artist") && 
+                    userData?.role === "user,artist") &&
                     !data?.video_creator_id && (
-                    <TouchableOpacity
-                      onPress={() =>
-                        data?.artist_id &&
-                        router.push({
-                          pathname: "/(drawer)/artist/[id]",
-                          params: { id: data.artist_id },
-                        })
-                      }
-                      className="flex-1"
-                      activeOpacity={0.8}
-                    >
-                      <LinearGradient
-                        colors={["#10B981", "#059669"]}
-                        className="p-4 items-center"
-                        style={{
-                          borderRadius: 10,
-                        }}
+                      <TouchableOpacity
+                        onPress={() =>
+                          data?.artist_id &&
+                          router.push({
+                            pathname: "/(drawer)/artist/[id]",
+                            params: { id: data.artist_id },
+                          })
+                        }
+                        className="flex-1"
+                        activeOpacity={0.8}
                       >
-                        <FontAwesome5 name="music" size={24} color="white" />
-                        <Text
-                          className="text-white text-sm mt-2 text-center"
+                        <LinearGradient
+                          colors={["#10B981", "#059669"]}
+                          className="p-4 items-center"
                           style={{
-                            fontFamily: AppFonts.bold,
-                            textAlign: isRTL ? "center" : "center",
+                            borderRadius: 10,
                           }}
                         >
-                          {t("profile.user.manageSongs") || "Manage Songs"}
-                        </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  )}
+                          <FontAwesome5 name="music" size={24} color="white" />
+                          <Text
+                            className="text-white text-sm mt-2 text-center"
+                            style={{
+                              fontFamily: AppFonts.bold,
+                              textAlign: isRTL ? "center" : "center",
+                            }}
+                          >
+                            {t("profile.user.manageSongs") || "Manage Songs"}
+                          </Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
                 </View>
               </View>
             )}
@@ -1058,8 +1060,6 @@ const ProfileUser: React.FC = () => {
         initialPrivatePrice={data?.private_price ?? ""}
         video_creator_id={data?.video_creator_id ?? 0}
       />
-
-      <Toast />
     </SafeAreaView>
   );
 };

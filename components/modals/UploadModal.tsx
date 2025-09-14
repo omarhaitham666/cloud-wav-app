@@ -3,7 +3,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import AlbumUploadForm from "../AlbumUploadForm";
 import SongUploadForm from "../SongUploadForm";
@@ -17,7 +23,11 @@ type Props = {
   onUploadComplete?: () => void;
 };
 
-const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) => {
+const UploadModal: React.FC<Props> = ({
+  visible,
+  onClose,
+  onUploadComplete,
+}) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [uploadType, setUploadType] = useState<UploadType>("choose");
@@ -27,8 +37,8 @@ const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) =>
     if (isUploading) {
       Toast.show({
         type: "info",
-        text1: "Upload in Progress",
-        text2: "Please wait for the upload to complete",
+        text1: t("upload.alerts.uploadInProgressTitle"),
+        text2: t("upload.alerts.uploadInProgressMessage"),
       });
       return;
     }
@@ -66,9 +76,10 @@ const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) =>
           <LinearGradient
             colors={["#3B82F6", "#1D4ED8"]}
             className="flex-row items-center p-6 rounded-xl"
-            style={{ flexDirection: isRTL ? "row-reverse" : "row",
+            style={{
+              flexDirection: isRTL ? "row-reverse" : "row",
               borderRadius: 10,
-             }}
+            }}
           >
             <View className="bg-white/20 p-3 rounded-full">
               <Ionicons name="musical-notes" size={28} color="white" />
@@ -104,9 +115,10 @@ const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) =>
           <LinearGradient
             colors={["#10B981", "#059669"]}
             className="flex-row items-center p-6 rounded-xl"
-            style={{ flexDirection: isRTL ? "row-reverse" : "row",
+            style={{
+              flexDirection: isRTL ? "row-reverse" : "row",
               borderRadius: 10,
-             }}
+            }}
           >
             <View className="bg-white/20 p-3 rounded-full">
               <Ionicons name="albums" size={28} color="white" />
@@ -142,16 +154,16 @@ const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) =>
     switch (uploadType) {
       case "song":
         return (
-          <SongUploadForm 
-            isRTL={isRTL} 
+          <SongUploadForm
+            isRTL={isRTL}
             onUploadStart={() => setIsUploading(true)}
             onUploadComplete={handleUploadComplete}
           />
         );
       case "album":
         return (
-          <AlbumUploadForm 
-            isRTL={isRTL} 
+          <AlbumUploadForm
+            isRTL={isRTL}
             onUploadStart={() => setIsUploading(true)}
             onUploadComplete={handleUploadComplete}
           />
@@ -175,7 +187,6 @@ const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) =>
         >
           <View className="pt-12 pb-4 px-6">
             <View
-            
               className="flex-row justify-between items-center"
               style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
             >
@@ -224,7 +235,6 @@ const UploadModal: React.FC<Props> = ({ visible, onClose, onUploadComplete }) =>
           <View className="flex-1 px-6 pb-6">{renderContent()}</View>
         </LinearGradient>
       </View>
-      <Toast />
     </Modal>
   );
 };

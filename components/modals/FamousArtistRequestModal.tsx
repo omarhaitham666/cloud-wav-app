@@ -534,7 +534,6 @@ export default function FamousArtistRequestModal({
                 )}
               </Text>
             </TouchableOpacity>
-            <Toast />
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

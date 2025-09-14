@@ -55,8 +55,12 @@ function RootLayout() {
                     borderRadius: 8,
                     marginHorizontal: 16,
                     marginTop: 50,
-                    zIndex: 9999,
-                    elevation: 9999,
+                    zIndex: 999999,
+                    elevation: 999999,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
                   }}
                 >
                   <Text style={{ color: "white", fontWeight: "bold" }}>
@@ -78,8 +82,39 @@ function RootLayout() {
                     borderRadius: 8,
                     marginHorizontal: 16,
                     marginTop: 50,
-                    zIndex: 9999999,
-                    elevation: 99999,
+                    zIndex: 999999,
+                    elevation: 999999,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                >
+                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                    {props.text1}
+                  </Text>
+                  {props.text2 && (
+                    <Text style={{ color: "white", marginTop: 4 }}>
+                      {props.text2}
+                    </Text>
+                  )}
+                </View>
+              ),
+              info: (props) => (
+                <View
+                  style={{
+                    backgroundColor: "#3B82F6",
+                    paddingHorizontal: 16,
+                    paddingVertical: 12,
+                    borderRadius: 8,
+                    marginHorizontal: 16,
+                    marginTop: 50,
+                    zIndex: 999999,
+                    elevation: 999999,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
                   }}
                 >
                   <Text style={{ color: "white", fontWeight: "bold" }}>
@@ -93,6 +128,7 @@ function RootLayout() {
                 </View>
               ),
             }}
+            topOffset={60}
           />
         </DrawerRefreshProvider>
       </AuthProvider>

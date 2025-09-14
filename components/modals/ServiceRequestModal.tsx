@@ -14,19 +14,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { z } from "zod";
 
-const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
-  phone: z.string().min(1, "Phone number is required"),
-  whatsapp: z.string().optional(),
-  platform: z.string().optional(),
-  social: z.string().optional(),
-  details: z.string().optional(),
-});
-
-const getTranslatedSchema = (t: any) =>
+const getSchema = (t: any) =>
   z.object({
     name: z
       .string()
@@ -43,7 +34,7 @@ const getTranslatedSchema = (t: any) =>
     details: z.string().optional(),
   });
 
-export type FormData = z.infer<typeof schema>;
+export type FormData = z.infer<ReturnType<typeof getSchema>>;
 
 type Props = {
   visible: boolean;
@@ -67,7 +58,7 @@ export default function ServiceRequestModal({
     formState: { errors },
     reset,
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(getSchema(t)),
   });
 
   const onSubmit = async (data: FormData) => {
@@ -81,7 +72,19 @@ export default function ServiceRequestModal({
     try {
       await onSubmitForm(data);
       reset();
-    } catch (error) {
+      Toast.show({
+        type: "success",
+        text1: t("services.platformManagement.modal.alerts.successTitle"),
+        text2: t("services.platformManagement.modal.alerts.successMessage"),
+      });
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: t("services.platformManagement.modal.alerts.errorTitle"),
+        text2:
+          error?.data?.message ||
+          t("services.platformManagement.modal.alerts.errorMessage"),
+      });
       // Error is handled by the parent component
       console.error("Form submission error:", error);
     }
@@ -140,7 +143,12 @@ export default function ServiceRequestModal({
     },
   ];
   return (
-    <Modal visible={visible} animationType="fade" transparent>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent
+      statusBarTranslucent
+    >
       <View className="flex-1 bg-black/40 justify-center items-center px-4">
         <View className="bg-white rounded-2xl w-full max-h-[80%]">
           <View
@@ -158,7 +166,9 @@ export default function ServiceRequestModal({
             </Text>
             <TouchableOpacity onPress={onClose} disabled={isLoading}>
               <Text
-                className={`text-xl ${isLoading ? "text-gray-400" : "text-gray-600"}`}
+                className={`text-xl ${
+                  isLoading ? "text-gray-400" : "text-gray-600"
+                }`}
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}
@@ -223,7 +233,7 @@ export default function ServiceRequestModal({
                       fontFamily: AppFonts.semibold,
                     }}
                   >
-                    {t("services.platformManagement.modal.sending") || "Sending..."}
+                    {t("services.platformManagement.modal.sending")}
                   </Text>
                 </View>
               ) : (

@@ -6,13 +6,13 @@ import { router } from "expo-router";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Modal,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { useTranslation } from "react-i18next";
@@ -87,15 +87,18 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
       .then(() => {
         Toast.show({
           type: "success",
-          text1: "Service Artist Sent Successfully",
+          text1: t("services.musicDistribution.modal.alerts.successTitle"),
+          text2: t("services.musicDistribution.modal.alerts.successMessage"),
         });
         onClose();
       })
       .catch((e) => {
         Toast.show({
           type: "error",
-          text1: "Service Artist Failed",
-          text2: e?.data?.message || "Something went wrong",
+          text1: t("services.musicDistribution.modal.alerts.errorTitle"),
+          text2:
+            e?.data?.message ||
+            t("services.musicDistribution.modal.alerts.errorMessage"),
         });
       });
   };
@@ -108,7 +111,12 @@ export default function MusicServiceModal({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal visible={visible} animationType="fade" transparent>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent
+      statusBarTranslucent
+    >
       <View className="flex-1 bg-black/40 justify-center items-center pt-3 pb-3 px-6">
         <View className="bg-white rounded-2xl w-full h-full my-3">
           <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">

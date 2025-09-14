@@ -229,6 +229,12 @@
         "singOptions": {
           "singMyself": "I Will Sing It Myself",
           "needSpecific": "I Will Need A Specific"
+        },
+        "alerts": {
+          "successTitle": "Request Sent Successfully",
+          "successMessage": "Your music service request has been sent successfully. We will contact you soon.",
+          "errorTitle": "Failed to Send Request",
+          "errorMessage": "An error occurred while sending the request. Please try again."
         }
       }
     },
@@ -242,6 +248,8 @@
       "modal": {
         "title": "Service Request",
         "close": "✕",
+        "submit": "Send Now",
+        "sending": "Sending...",
         "fields": {
           "name": {
             "label": "Your Name",
@@ -272,11 +280,16 @@
             "placeholder": "Enter additional details"
           }
         },
-        "submit": "Send Now",
         "validation": {
           "nameRequired": "Name is required",
           "invalidEmail": "Invalid email",
           "phoneRequired": "Phone number is required"
+        },
+        "alerts": {
+          "successTitle": "Request Sent Successfully",
+          "successMessage": "Your service request has been sent successfully. We will contact you soon.",
+          "errorTitle": "Failed to Send Request",
+          "errorMessage": "An error occurred while sending the request. Please try again."
         }
       },
       "features": {
@@ -674,7 +687,15 @@
     "private": "Private",
     "business": "Business",
     "loading": "Loading creators...",
-    "noCreators": "No creators available"
+    "noCreators": "No creators available",
+    "order": {
+      "alerts": {
+        "successTitle": "Request Sent Successfully",
+        "successMessage": "Your personalized video request has been sent successfully. We will contact you soon.",
+        "errorTitle": "Failed to Send Request",
+        "errorMessage": "An error occurred while sending the request. Please try again."
+      }
+    }
   },
   "song": {
     "songNotFound": "Song not found",
@@ -763,6 +784,10 @@
       "titleRequired": "Album title is required",
       "coverRequired": "Album cover is required",
       "fileRequired": "Please select a file"
+    },
+    "alerts": {
+      "uploadInProgressTitle": "Upload in Progress",
+      "uploadInProgressMessage": "Please wait for the upload to complete"
     }
   }
 }

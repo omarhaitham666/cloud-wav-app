@@ -22,7 +22,9 @@ import Toast from "react-native-toast-message";
 
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
-  const [selectedService, setSelectedService] = useState<ServiceType>("verify social media accounts");
+  const [selectedService, setSelectedService] = useState<ServiceType>(
+    "verify social media accounts"
+  );
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -59,9 +61,8 @@ const SocialMedia = () => {
   const handleFormSubmit = async (data: FormData): Promise<void> => {
     if (!selectedService) return;
 
-    // Clean phone numbers by removing + prefix and any non-numeric characters except digits
     const cleanPhoneNumber = (phone: string) => {
-      return phone.replace(/^\+/, '').replace(/\D/g, '');
+      return phone.replace(/^\+/, "").replace(/\D/g, "");
     };
 
     const requestData = {
@@ -87,12 +88,13 @@ const SocialMedia = () => {
         setVisible(false);
       })
       .catch((error) => {
+        console.log("Service Request Failed", error);
         Toast.show({
           type: "error",
           text1: "Service Request Failed",
           text2: error?.data?.message || "Something went wrong",
         });
-        throw error; // Re-throw the error so the modal doesn't close
+        throw error;
       });
   };
 

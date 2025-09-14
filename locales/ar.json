@@ -229,6 +229,12 @@
         "singOptions": {
           "singMyself": "سأغنيها بنفسي",
           "needSpecific": "أحتاج إلى شخص محدد"
+        },
+        "alerts": {
+          "successTitle": "تم إرسال الطلب بنجاح",
+          "successMessage": "تم إرسال طلب الخدمة الموسيقية بنجاح. سنتواصل معك قريباً.",
+          "errorTitle": "فشل في إرسال الطلب",
+          "errorMessage": "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى."
         }
       }
     },
@@ -242,6 +248,8 @@
       "modal": {
         "title": "طلب الخدمة",
         "close": "✕",
+        "submit": "إرسال الآن",
+        "sending": "جارٍ الإرسال...",
         "fields": {
           "name": {
             "label": "اسمك",
@@ -272,11 +280,16 @@
             "placeholder": "أدخل تفاصيل إضافية"
           }
         },
-        "submit": "إرسال الآن",
         "validation": {
           "nameRequired": "الاسم مطلوب",
           "invalidEmail": "بريد إلكتروني غير صالح",
           "phoneRequired": "رقم الهاتف مطلوب"
+        },
+        "alerts": {
+          "successTitle": "تم إرسال الطلب بنجاح",
+          "successMessage": "تم إرسال طلب الخدمة بنجاح. سنتواصل معك قريباً.",
+          "errorTitle": "فشل في إرسال الطلب",
+          "errorMessage": "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى."
         }
       },
       "features": {
@@ -674,7 +687,15 @@
     "private": "خاص",
     "business": "تجاري",
     "loading": "جارٍ تحميل المبدعين...",
-    "noCreators": "لا يوجد مبدعون متاحون"
+    "noCreators": "لا يوجد مبدعون متاحون",
+    "order": {
+      "alerts": {
+        "successTitle": "تم إرسال الطلب بنجاح",
+        "successMessage": "تم إرسال طلب الفيديو الشخصي بنجاح. سنتواصل معك قريباً.",
+        "errorTitle": "فشل في إرسال الطلب",
+        "errorMessage": "حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى."
+      }
+    }
   },
   "song": {
     "songNotFound": "الأغنية غير موجودة",
@@ -763,6 +784,10 @@
       "titleRequired": "عنوان الألبوم مطلوب",
       "coverRequired": "غلاف الألبوم مطلوب",
       "fileRequired": "يرجى اختيار ملف"
+    },
+    "alerts": {
+      "uploadInProgressTitle": "جاري الرفع",
+      "uploadInProgressMessage": "يرجى الانتظار حتى اكتمال الرفع"
     }
   }
 }

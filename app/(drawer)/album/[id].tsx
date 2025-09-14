@@ -228,7 +228,6 @@ export default function AlbumDetails() {
             : { id: "", title: "", coverImage: "" }
         }
       />
-      <Toast />
     </View>
   );
 }

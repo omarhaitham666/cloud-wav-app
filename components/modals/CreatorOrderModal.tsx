@@ -96,15 +96,16 @@ export default function CreatorOrderModal({
       .then(() => {
         Toast.show({
           type: "success",
-          text1: "Video Content Creator Sent Successfully",
+          text1: t("creators.order.alerts.successTitle"),
+          text2: t("creators.order.alerts.successMessage"),
         });
         onClose();
       })
       .catch((err: any) => {
         Toast.show({
           type: "error",
-          text1: "Video Content Creator Failed",
-          text2: err?.data?.message || "Something went wrong",
+          text1: t("creators.order.alerts.errorTitle"),
+          text2: err?.data?.message || t("creators.order.alerts.errorMessage"),
         });
       });
   };
@@ -117,7 +118,12 @@ export default function CreatorOrderModal({
 
   return (
     <View className="p-4">
-      <Modal visible={visible} animationType="slide" transparent>
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent
+        statusBarTranslucent
+      >
         <View className="flex-1 bg-black/40 justify-center items-center px-4">
           <View className="bg-white rounded-2xl w-full max-h-[85%] p-5">
             <ScrollView showsVerticalScrollIndicator={false}>

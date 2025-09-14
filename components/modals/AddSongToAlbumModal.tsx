@@ -207,7 +207,6 @@ function AddSongToAlbumModal({
         }
       );
 
-
       if (!response.ok) {
         let errorData;
         try {
@@ -311,7 +310,12 @@ function AddSongToAlbumModal({
   };
 
   return (
-    <Modal visible={visible} animationType="fade" transparent>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent
+      statusBarTranslucent
+    >
       <View className="flex-1 bg-black/40 justify-center items-center px-4">
         <View className="bg-white rounded-2xl w-full h-[90%] overflow-y-auto">
           <View

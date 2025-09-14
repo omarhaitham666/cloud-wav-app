@@ -31,6 +31,7 @@ const SocialServiesModal = ({ visible, setModalVisible, onClose }: Props) => {
       animationType="slide"
       transparent={true}
       visible={visible}
+      statusBarTranslucent
       onRequestClose={() => setModalVisible(false)}
     >
       <View className="flex-1 bg-black/50 items-center justify-center px-6">

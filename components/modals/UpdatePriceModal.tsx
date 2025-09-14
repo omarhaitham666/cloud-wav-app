@@ -123,7 +123,12 @@ function UpdatePriceModal({
   ];
 
   return (
-    <Modal visible={visible} animationType="fade" transparent>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent
+      statusBarTranslucent
+    >
       <View className="flex-1 bg-black/40 justify-center items-center px-4">
         <View className="bg-white rounded-2xl w-full max-h-[80%]">
           <View

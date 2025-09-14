@@ -62,7 +62,12 @@ export default function OTPModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide">
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      statusBarTranslucent
+    >
       <View className="flex-1 justify-center items-center bg-black/50">
         <View
           className="bg-white p-6 rounded-2xl w-80"
