@@ -1,8 +1,6 @@
 import { makeRedirectUri } from "expo-auth-session";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
-
-const secret = "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";
 export interface GoogleAuthConfig {
   clientId: string;
   redirectUri: string;
@@ -19,12 +17,16 @@ export function getGoogleAuthConfig(): GoogleAuthConfig {
 
   return {
     clientId: isExpoGo
-      ? "620097653378-8t12ljiavs9l5cgd5qvde19ia56a7d84.apps.googleusercontent.com" // Web client for Expo Go
+      ? process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
+        "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
       : Platform.OS === "android"
-      ? "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com" // Android client for builds
-      : "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com", // Fallback
+      ? process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ||
+        "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com"
+      : process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ||
+        "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
     redirectUri: isExpoGo
-      ? "https://auth.expo.io/@omar666/cloud-wav"
+      ? process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI ||
+        "https://auth.expo.io/@omar666/cloud-wav"
       : makeRedirectUri({ scheme: "cloudwav", path: "auth" }),
     environment: isExpoGo ? "expo" : "standalone",
   };
