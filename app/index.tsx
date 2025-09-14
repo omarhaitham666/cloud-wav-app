@@ -3,14 +3,14 @@ import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Dimensions,
-  FlatList,
-  Image,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Text,
-  TouchableOpacity,
-  View,
+    Dimensions,
+    FlatList,
+    Image,
+    NativeScrollEvent,
+    NativeSyntheticEvent,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { slides } from "../utils/data";
 

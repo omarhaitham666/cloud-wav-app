@@ -72,21 +72,39 @@ export default function ServiceRequestModal({
     try {
       await onSubmitForm(data);
       reset();
+      onClose(); // Close the modal after successful submission
       Toast.show({
         type: "success",
         text1: t("services.platformManagement.modal.alerts.successTitle"),
         text2: t("services.platformManagement.modal.alerts.successMessage"),
       });
     } catch (error: any) {
+      console.error("Form submission error:", error);
+      
+      // Extract specific validation errors
+      let errorMessage = t("services.platformManagement.modal.alerts.errorMessage");
+      
+      if (error?.data?.errors) {
+        const errors = error.data.errors;
+        const errorMessages = [];
+        
+        if (errors.name) errorMessages.push(`Name: ${errors.name[0]}`);
+        if (errors.email) errorMessages.push(`Email: ${errors.email[0]}`);
+        if (errors.phone) errorMessages.push(`Phone: ${errors.phone[0]}`);
+        if (errors.whatsapp_number) errorMessages.push(`WhatsApp: ${errors.whatsapp_number[0]}`);
+        
+        if (errorMessages.length > 0) {
+          errorMessage = errorMessages.join('\n');
+        }
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      }
+      
       Toast.show({
         type: "error",
         text1: t("services.platformManagement.modal.alerts.errorTitle"),
-        text2:
-          error?.data?.message ||
-          t("services.platformManagement.modal.alerts.errorMessage"),
+        text2: errorMessage,
       });
-      // Error is handled by the parent component
-      console.error("Form submission error:", error);
     }
   };
 
