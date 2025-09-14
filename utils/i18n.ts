@@ -1,52 +1,28 @@
 import { getLocales } from "expo-localization";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { I18nManager, NativeModules, Platform } from "react-native";
+import { I18nManager } from "react-native";
 
-import ar from "../locales/ar.json";
+import ar from "../locales/ar.json"; // example Arabic
 import en from "../locales/en.json";
 
-// Detect device language using Expo Localization
+// detect device language using Expo Localization
 const locales = getLocales();
 const lng =
   locales.length > 0 && locales[0].languageCode
     ? locales[0].languageCode
     : "en";
 
-// --- DIRECTION HANDLING ---
-// We want to allow RTL for Arabic, but keep LTR for English.
-// To avoid stale direction/layout issues, we must:
-// 1. Set direction on every language change
-// 2. Optionally reload the app if direction changes (required for full effect)
+// Force the UI direction to always be LTR regardless of language
+I18nManager.allowRTL(false);
+I18nManager.forceRTL(false);
+// Ensure no auto mirroring of left/right styles
+// @ts-ignore - older React Native types may not include this API
+I18nManager.swapLeftAndRightInRTL && I18nManager.swapLeftAndRightInRTL(false);
 
-const isRTL = (languageCode: string) => languageCode === "ar";
-
-// Helper to set direction and reload if needed
-const setAppDirection = (rtl: boolean) => {
-  // Only update if direction actually changes
-  if (I18nManager.isRTL !== rtl) {
-    I18nManager.allowRTL(rtl);
-    I18nManager.forceRTL(rtl);
-    // @ts-ignore
-    I18nManager.swapLeftAndRightInRTL && I18nManager.swapLeftAndRightInRTL(rtl);
-
-    // Full reload is required for direction change to take effect everywhere
-    if (Platform.OS === "android") {
-      NativeModules.DevSettings.reload();
-    } else if (Platform.OS === "ios") {
-      NativeModules.RNRestart ? NativeModules.RNRestart.Restart() : NativeModules.DevSettings.reload();
-    }
-  }
-};
-
-// Set initial direction
-setAppDirection(isRTL(lng));
-
-// Function to change language and direction
-export const changeLanguage = async (languageCode: string) => {
-  await i18n.changeLanguage(languageCode);
-  setAppDirection(isRTL(languageCode));
-  // The reload will be triggered if direction changes
+// Function to change language only (no direction changes)
+export const changeLanguage = (languageCode: string) => {
+  i18n.changeLanguage(languageCode);
 };
 
 i18n.use(initReactI18next).init({
@@ -61,5 +37,7 @@ i18n.use(initReactI18next).init({
     useSuspense: false,
   },
 });
+
+// Direction is locked to LTR above; no further init needed
 
 export default i18n;
