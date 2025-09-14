@@ -63,9 +63,7 @@ const songApi = mainApi.injectEndpoints({
         url: `/video-creator-requests`,
         method: "POST",
         data: formData,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        // Don't set Content-Type manually for FormData - let axios handle it
       }),
     }),
     topVideoCreatorsAll: builder.query<videoCreator[], void>({
