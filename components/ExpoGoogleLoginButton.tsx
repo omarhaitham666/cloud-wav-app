@@ -6,7 +6,11 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import Toast from "react-native-toast-message";
-import { getGoogleAuthConfig, googleDiscovery, logGoogleAuthConfig } from "../utils/googleAuthConfig";
+import {
+  getGoogleAuthConfig,
+  googleDiscovery,
+  logGoogleAuthConfig,
+} from "../utils/googleAuthConfig";
 
 // Configure WebBrowser for better UX
 WebBrowser.maybeCompleteAuthSession();
@@ -43,60 +47,49 @@ export default function ExpoGoogleLoginButton() {
       scopes: ["openid", "profile", "email"],
       redirectUri: googleConfig.redirectUri,
       responseType: "code",
-      extraParams: {
-        access_type: "offline",
-      },
     },
     googleDiscovery
   );
 
   useEffect(() => {
-    if (response?.type === "success") {
-      handleAuthResponse(response.params.code);
+    if (response?.type === "success" && response.params.access_token) {
+      handleAuthResponse(response.params.access_token);
     }
   }, [response]);
 
-  const handleAuthResponse = async (code: string) => {
+  const handleAuthResponse = async (accessToken: string) => {
     try {
       setIsInProgress(true);
-      
-      // Exchange authorization code for tokens
-      const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          client_id: googleConfig.clientId,
-          code,
-          grant_type: "authorization_code",
-          redirect_uri: googleConfig.redirectUri,
-        }).toString(),
-      });
 
-      const tokens = await tokenResponse.json();
+      // Send token to backend
+      const apiResponse = await fetch(
+        "https://api.cloudwavproduction.com/api/auth/google/mobile",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: accessToken }),
+        }
+      );
 
-      if (tokens.access_token) {
-        // Get user info
-        const userResponse = await fetch(
-          `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${tokens.access_token}`
-        );
-        const userInfo = await userResponse.json();
+      const result = await apiResponse.json();
 
-        // Navigate to profile with user data
+      if (apiResponse.ok) {
+        // Navigate to profile with server response
         router.push({
           pathname: "/(drawer)/(tabs)/profile",
           params: {
-            email: userInfo.email,
-            name: userInfo.name,
-            image: userInfo.picture,
+            email: result?.user?.email ?? "",
+            name: result?.user?.name ?? "",
+            image: result?.user?.picture ?? "",
           },
         });
       } else {
         Toast.show({
           type: "error",
           text1: t("auth.error"),
-          text2: t("auth.Google Sign In Failed"),
+          text2: result.message || t("auth.Google Sign In Failed"),
         });
       }
     } catch (error) {
@@ -119,8 +112,8 @@ export default function ExpoGoogleLoginButton() {
         scopes: request.scopes,
         responseType: request.responseType,
         environment: googleConfig.environment,
-        isExpoGo: googleConfig.environment === 'expo',
-        isStandalone: googleConfig.environment === 'standalone',
+        isExpoGo: googleConfig.environment === "expo",
+        isStandalone: googleConfig.environment === "standalone",
       });
       promptAsync();
     }
