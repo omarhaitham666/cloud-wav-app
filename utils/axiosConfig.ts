@@ -11,7 +11,11 @@ mainApi.interceptors.request.use(async (config) => {
   const token = await getToken("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    config.headers["Content-Type"] = "application/json";
+    // Only set Content-Type to application/json if it's not FormData
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    }
+    // For FormData, let axios set the Content-Type with boundary
   }
   return config;
 });

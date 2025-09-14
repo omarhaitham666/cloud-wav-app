@@ -2,10 +2,11 @@ import { useVideoCreatorMutation } from "@/store/api/global/videoCreator";
 import { AppFonts } from "@/utils/fonts";
 import { getToken } from "@/utils/secureStore";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Picker } from "@react-native-picker/picker";
 import Checkbox from "expo-checkbox";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Controller,
   FieldError,
@@ -25,14 +26,24 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CountryPicker from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
-
+const GENRES = [
+  "Tiktokers",
+  "Musician",
+  "Youtuber",
+  "Content creator",
+  "Athlete",
+  "public_figure",
+];
 const formSchema = z.object({
   fullName: z.string().min(3, "Full name is required"),
   email: z.string().email("Invalid email"),
   phoneNumber: z.string().min(8, "Phone number is required"),
+  phoneCountryCode: z.string().min(1, "Country code is required"),
   whatsappNumber: z.string().min(8, "WhatsApp number is required"),
+  whatsappCountryCode: z.string().min(1, "WhatsApp country code is required"),
   division: z.string().min(1, "Division is required"),
   socialLink: z.string().url("Enter a valid URL"),
   privatePrice: z.string().min(1, "Private price is required"),
@@ -163,6 +174,19 @@ export default function CreatorRegister({ visible, onClose }: Props) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [videoCreator, { isLoading }] = useVideoCreatorMutation();
+
+  // Country picker states
+  const [phoneCountry, setPhoneCountry] = useState({
+    cca2: "EG",
+    callingCode: "20",
+    name: "Egypt",
+  });
+  const [whatsappCountry, setWhatsappCountry] = useState({
+    cca2: "EG",
+    callingCode: "20",
+    name: "Egypt",
+  });
+
   const {
     control,
     handleSubmit,
@@ -173,7 +197,9 @@ export default function CreatorRegister({ visible, onClose }: Props) {
       fullName: "",
       email: "",
       phoneNumber: "",
+      phoneCountryCode: "20",
       whatsappNumber: "",
+      whatsappCountryCode: "20",
       division: "",
       socialLink: "",
       privatePrice: "",
@@ -192,34 +218,64 @@ export default function CreatorRegister({ visible, onClose }: Props) {
       return;
     }
 
-    await videoCreator({
-      name: data.fullName,
-      email: data.email,
-      number: data.phoneNumber,
-      whatsapp_number: data.whatsappNumber,
-      division: data.division,
-      social_links: data.socialLink,
-      details: data.additionalDetails || "",
-      private_price: Number(data.privatePrice),
-      bussiness_price: Number(data.businessPrice),
-      profile_image: data.profileImage,
-      id_card: data.idCard,
-    })
-      .unwrap()
-      .then(() => {
-        Toast.show({
-          type: "success",
-          text1: "Video Content Creator Sent Successfully",
+    try {
+      const formData = new FormData();
+
+      formData.append("name", data.fullName);
+      formData.append("email", data.email);
+      formData.append("number", `+${data.phoneCountryCode}${data.phoneNumber}`);
+      formData.append(
+        "whatsapp_number",
+        `+${data.whatsappCountryCode}${data.whatsappNumber}`
+      );
+      formData.append("division", data.division);
+      formData.append("social_links", data.socialLink);
+      formData.append("details", data.additionalDetails || "");
+      formData.append("private_price", Number(data.privatePrice).toString());
+      formData.append("bussiness_price", Number(data.businessPrice).toString());
+
+      if (data.profileImage) {
+        formData.append("profile_image", {
+          uri: data.profileImage.uri,
+          type: data.profileImage.type || "image/jpeg",
+          name: data.profileImage.fileName || "profile_image.jpg",
+        } as any);
+      }
+
+      if (data.idCard) {
+        formData.append("id_card", {
+          uri: data.idCard.uri,
+          type: data.idCard.type || "image/jpeg",
+          name: data.idCard.fileName || "id_card.jpg",
+        } as any);
+      }
+      console.log(formData);
+
+      await videoCreator(formData)
+        .unwrap()
+        .then(() => {
+          Toast.show({
+            type: "success",
+            text1: "Video Content Creator Sent Successfully",
+          });
+          onClose();
+        })
+        .catch((e) => {
+          console.log(e);
+          Toast.show({
+            type: "error",
+            text1: "Video Content Creator Failed",
+            text2: e?.data?.message || e?.data || "Something went wrong",
+          });
         });
-        onClose();
-      })
-      .catch((e) => {
-        Toast.show({
-          type: "error",
-          text1: "Video Content Creator Failed",
-          text2: e?.data?.message || "Something went wrong",
-        });
+    } catch (e: any) {
+      console.log(e);
+      Toast.show({
+        type: "error",
+        text1: "Video Content Creator Failed",
+        text2: e?.data?.message || "Something went wrong",
       });
+    }
   };
 
   return (
@@ -279,27 +335,124 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                 placeholder="example@domain.com"
                 error={errors.email?.message}
               />
-              <FormInput
+              <Controller
+                control={control}
                 name="phoneNumber"
-                control={control}
-                label="Phone Number"
-                placeholder="+201234567890"
-                error={errors.phoneNumber?.message}
+                render={({ field: { value, onChange } }) => (
+                  <View className="mb-4">
+                    <Text className="text-gray-700 mb-1">Phone Number</Text>
+                    <View className="flex-row items-center border border-gray-300 rounded-lg">
+                      <CountryPicker
+                        countryCode={phoneCountry.cca2 as any}
+                        withCallingCode
+                        withFlag
+                        withFilter
+                        withAlphaFilter
+                        onSelect={(country) => {
+                          setPhoneCountry({
+                            cca2: country.cca2 as string,
+                            callingCode: country.callingCode[0],
+                            name: country.name as string,
+                          });
+                          control._formValues.phoneCountryCode =
+                            country.callingCode[0];
+                        }}
+                        containerButtonStyle={{ paddingHorizontal: 10 }}
+                      />
+                      <Text className="px-2">+{phoneCountry.callingCode}</Text>
+                      <TextInput
+                        className="flex-1 p-3"
+                        placeholder="1234567890"
+                        value={value}
+                        onChangeText={onChange}
+                        keyboardType="phone-pad"
+                      />
+                    </View>
+                    {errors.phoneNumber && (
+                      <Text className="text-red-500">
+                        {errors.phoneNumber.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
               />
-              <FormInput
+              <Controller
+                control={control}
                 name="whatsappNumber"
-                control={control}
-                label="WhatsApp Number"
-                placeholder="+201234567890"
-                error={errors.whatsappNumber?.message}
+                render={({ field: { value, onChange } }) => (
+                  <View className="mb-4">
+                    <Text className="text-gray-700 mb-1">WhatsApp Number</Text>
+                    <View className="flex-row items-center border border-gray-300 rounded-lg">
+                      <CountryPicker
+                        countryCode={whatsappCountry.cca2 as any}
+                        withCallingCode
+                        withFlag
+                        withFilter
+                        withAlphaFilter
+                        onSelect={(country) => {
+                          setWhatsappCountry({
+                            cca2: country.cca2 as string,
+                            callingCode: country.callingCode[0],
+                            name: country.name as string,
+                          });
+                          control._formValues.whatsappCountryCode =
+                            country.callingCode[0];
+                        }}
+                        containerButtonStyle={{ paddingHorizontal: 10 }}
+                      />
+                      <Text className="px-2">
+                        +{whatsappCountry.callingCode}
+                      </Text>
+                      <TextInput
+                        className="flex-1 p-3"
+                        placeholder="1234567890"
+                        value={value}
+                        onChangeText={onChange}
+                        keyboardType="phone-pad"
+                      />
+                    </View>
+                    {errors.whatsappNumber && (
+                      <Text className="text-red-500">
+                        {errors.whatsappNumber.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
               />
-              <FormInput
-                name="division"
-                control={control}
-                label="Division"
-                placeholder="e.g. Actor / Musician"
-                error={errors.division?.message}
-              />
+
+              <View className="mb-4">
+                <Text
+                  className="text-black mb-2"
+                  style={{
+                    fontFamily: AppFonts.medium,
+                    textAlign: isRTL ? "right" : "left",
+                  }}
+                >
+                  Division
+                </Text>
+                <Controller
+                  control={control}
+                  name="division"
+                  render={({ field: { onChange, value } }) => (
+                    <Picker
+                      selectedValue={value}
+                      onValueChange={onChange}
+                      style={{
+                        color: "black",
+                        backgroundColor: "rgba(0,0,0,0.05)",
+                        borderWidth: 1,
+                        borderColor: "rgba(0,0,0,0.1)",
+                        borderRadius: 12,
+                      }}
+                    >
+                      <Picker.Item label="Select Genre" value="" />
+                      {GENRES.map((genre) => (
+                        <Picker.Item key={genre} label={genre} value={genre} />
+                      ))}
+                    </Picker>
+                  )}
+                />
+              </View>
               <FormInput
                 name="socialLink"
                 control={control}
@@ -375,10 +528,15 @@ export default function CreatorRegister({ visible, onClose }: Props) {
               <TouchableOpacity
                 className="bg-blue-600 py-3 rounded-full mt-4"
                 onPress={handleSubmit(onSubmit)}
+                disabled={isLoading}
               >
-                <Text className="text-white text-center font-semibold">
-                  {isLoading ? <ActivityIndicator color="#fff" /> : " Send Now"}
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-white text-center font-semibold">
+                    Send Now
+                  </Text>
+                )}
               </TouchableOpacity>
             </ScrollView>
           </SafeAreaView>

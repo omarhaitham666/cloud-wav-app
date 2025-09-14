@@ -5,6 +5,7 @@ import Checkbox from "expo-checkbox";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Modal,
@@ -53,6 +54,7 @@ export default function CreatorOrderModal({
 }: Props) {
   const [countryCode, setCountryCode] = useState<CountryCode>("US");
   const [callingCode, setCallingCode] = useState("1");
+  const { t } = useTranslation();
   const {
     control,
     handleSubmit,
@@ -80,17 +82,11 @@ export default function CreatorOrderModal({
 
     await OrderVideoCreators({
       video_creator_id: Number(id),
-      order_name: data.name,
-      order_email: data.email,
       phone: `+${callingCode}${data.number}`,
       whatsapp: `+${callingCode}${data.number}`,
-      order_mas: data.text,
-      order_type: data.priceType,
-      order_artistName: name,
-      private_price:
-        data.priceType === "private" ? Number(private_price) : undefined,
+      private_price: data.priceType === "private" ? Number(private_price) : 0,
       bussiness_price:
-        data.priceType === "business" ? Number(bussiness_price) : undefined,
+        data.priceType === "business" ? Number(bussiness_price) : 0,
     })
       .unwrap()
       .then(() => {

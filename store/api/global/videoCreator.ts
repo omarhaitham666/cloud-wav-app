@@ -58,11 +58,14 @@ interface videos {
 }
 const songApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    videoCreator: builder.mutation<videoCreator[], videoCreator>({
-      query: (body) => ({
+    videoCreator: builder.mutation<void, FormData>({
+      query: (formData) => ({
         url: `/video-creator-requests`,
         method: "POST",
-        data: body,
+        data: formData,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       }),
     }),
     topVideoCreatorsAll: builder.query<videoCreator[], void>({
