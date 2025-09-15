@@ -307,7 +307,7 @@ const ProfileUser: React.FC = () => {
         err?.data?.errors?.email?.[0] ||
         err?.message ||
         "Update failed";
-
+      console.log("message", err);
       Toast.show({
         type: "error",
         text1: t("profile.user.updateFailed") || "Update Failed",
@@ -461,14 +461,12 @@ const ProfileUser: React.FC = () => {
   }
 
   if (error) {
-    // Check if it's a 401 Unauthenticated error
     const isUnauthenticated =
       (error as any)?.status === 401 ||
       (error as any)?.data?.message === "Unauthenticated." ||
       (error as any)?.data?.message?.includes("Unauthenticated");
 
     if (isUnauthenticated) {
-      // Show session expired message and logout button
       return (
         <View className="flex-1 justify-center items-center bg-black px-6">
           <View className="items-center mb-6">
@@ -540,7 +538,6 @@ const ProfileUser: React.FC = () => {
       );
     }
 
-    // Regular error handling
     return (
       <View className="flex-1 justify-center items-center bg-black px-6">
         <Text
@@ -569,6 +566,8 @@ const ProfileUser: React.FC = () => {
       </View>
     );
   }
+
+  console.log("data", data);
 
   const userData = data as UserData;
   const isArtistOrCreator =
@@ -600,7 +599,7 @@ const ProfileUser: React.FC = () => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View className="px-6 pt-12 pb-6">
+          <View className="px-6 pt-5 pb-6">
             <View className="flex-row items-center justify-between mb-4">
               <TouchableOpacity onPress={() => router.back()}>
                 <Ionicons name="arrow-back" size={24} color="white" />
@@ -619,73 +618,74 @@ const ProfileUser: React.FC = () => {
           </View>
 
           <View className="px-6 mb-8">
-            <View className="items-center mb-6">
-              <TouchableOpacity
-                onPress={pickImage}
-                className="relative mb-4"
-                activeOpacity={0.7}
-              >
-                <View className="w-36 h-36 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl">
-                  {profileImage ? (
-                    <Image
-                      source={{ uri: profileImage }}
-                      className="w-full h-full"
-                      style={{ resizeMode: "cover" }}
-                    />
-                  ) : (
-                    <LinearGradient
-                      colors={["#4C1D95", "#1E3A8A"]}
-                      className="w-full h-full justify-center items-center"
-                    >
-                      <Ionicons name="camera" size={40} color="white" />
-                      <Text
-                        className="text-white text-sm mt-2"
-                        style={{
-                          fontFamily: AppFonts.medium,
-                          textAlign: isRTL ? "center" : "center",
-                        }}
+            {userData?.role !== "user" && (
+              <View className="items-center mb-6">
+                <TouchableOpacity
+                  onPress={pickImage}
+                  className="relative mb-4"
+                  activeOpacity={0.7}
+                >
+                  <View className="w-36 h-36 rounded-full overflow-hidden border-4 border-purple-500 shadow-2xl">
+                    {profileImage ? (
+                      <Image
+                        source={{ uri: profileImage }}
+                        className="w-full h-full"
+                        style={{ resizeMode: "cover" }}
+                      />
+                    ) : (
+                      <LinearGradient
+                        colors={["#4C1D95", "#1E3A8A"]}
+                        className="w-full h-full justify-center items-center"
                       >
-                        {t("profile.user.addPhoto") || "Add Photo"}
-                      </Text>
-                    </LinearGradient>
-                  )}
-                </View>
-                {isArtistOrCreator && (
-                  <View
-                    className={`absolute bottom-0 ${
-                      isRTL ? "-left-1" : "-right-1"
-                    } bg-purple-600 p-3 rounded-full shadow-lg`}
-                  >
-                    <Ionicons name="camera" size={16} color="white" />
+                        <Ionicons name="camera" size={40} color="white" />
+                        <Text
+                          className="text-white text-sm mt-2"
+                          style={{
+                            fontFamily: AppFonts.medium,
+                            textAlign: isRTL ? "center" : "center",
+                          }}
+                        >
+                          {t("profile.user.addPhoto") || "Add Photo"}
+                        </Text>
+                      </LinearGradient>
+                    )}
                   </View>
-                )}
-              </TouchableOpacity>
+                  {isArtistOrCreator && (
+                    <View
+                      className={`absolute bottom-0 ${
+                        isRTL ? "-left-1" : "-right-1"
+                      } bg-purple-600 p-3 rounded-full shadow-lg`}
+                    >
+                      <Ionicons name="camera" size={16} color="white" />
+                    </View>
+                  )}
+                </TouchableOpacity>
 
-              <View
-                className="flex-row items-center px-4 py-2 rounded-full mb-4"
-                style={{
-                  backgroundColor:
-                    getRoleColor(userData?.role, userData?.type) + "20",
-                }}
-              >
-                <Ionicons
-                  name={getRoleIcon(userData?.role, userData?.type)}
-                  size={18}
-                  color={getRoleColor(userData?.role, userData?.type)}
-                />
-                <Text
-                  className="ml-2 text-sm font-medium"
+                <View
+                  className="flex-row items-center px-4 py-2 rounded-full mb-4"
                   style={{
-                    fontFamily: AppFonts.medium,
-                    color: getRoleColor(userData?.role, userData?.type),
-                    textAlign: isRTL ? "right" : "left",
+                    backgroundColor:
+                      getRoleColor(userData?.role, userData?.type) + "20",
                   }}
                 >
-                  {getRoleDisplayName(userData?.role, userData?.type)}
-                </Text>
+                  <Ionicons
+                    name={getRoleIcon(userData?.role, userData?.type)}
+                    size={18}
+                    color={getRoleColor(userData?.role, userData?.type)}
+                  />
+                  <Text
+                    className="ml-2 text-sm font-medium"
+                    style={{
+                      fontFamily: AppFonts.medium,
+                      color: getRoleColor(userData?.role, userData?.type),
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {getRoleDisplayName(userData?.role, userData?.type)}
+                  </Text>
+                </View>
               </View>
-            </View>
-
+            )}
             {isArtistOrCreator && (
               <View className="mb-6">
                 <Text
@@ -698,7 +698,6 @@ const ProfileUser: React.FC = () => {
                   {t("profile.user.quickActions") || "Quick Actions"}
                 </Text>
                 <View className="flex-row justify-between gap-3">
-                  {/* Show video creator profile button only if user has both video_creator_id and artist_id */}
                   {data?.video_creator_id && data?.artist_id && (
                     <TouchableOpacity
                       onPress={() =>
@@ -733,7 +732,6 @@ const ProfileUser: React.FC = () => {
                     </TouchableOpacity>
                   )}
 
-                  {/* Show update pricing button for video creators (but not if they have both roles) */}
                   {(userData?.role === "videoCreator" ||
                     userData?.role === "user,videoCreator") &&
                     !data?.artist_id && (
