@@ -11,18 +11,17 @@ mainApi.interceptors.request.use(async (config) => {
   const token = await getToken("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    // Only set Content-Type to application/json if it's not FormData
     if (!(config.data instanceof FormData)) {
       config.headers["Content-Type"] = "application/json";
     }
     // For FormData, let axios set the Content-Type with boundary
   }
-  
+
   // Mark logout requests for special handling
-  if (config.url?.includes('/logout')) {
-    config.metadata = { isLogoutRequest: true };
+  if (config.url?.includes("/logout")) {
+    (config as any).metadata = { isLogoutRequest: true };
   }
-  
+
   return config;
 });
 
@@ -55,7 +54,7 @@ export const axiosBaseQuery =
 
       if (err.response?.status === 401) {
         await AsyncStorage.removeItem("token");
-        
+
         // For logout requests, don't log session expired message
         if (!isLogoutRequest) {
           console.warn("Session expired, redirecting to login...");

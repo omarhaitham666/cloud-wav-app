@@ -3,7 +3,7 @@ import { AppFonts } from "@/utils/fonts";
 import { getToken } from "@/utils/secureStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Picker } from "@react-native-picker/picker";
-import Checkbox from "expo-checkbox";
+import { Checkbox } from "expo-checkbox";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -115,20 +115,41 @@ function FileInput({
   error?: string;
 }) {
   const pickImage = async (onChange: (file: any) => void) => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.7,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: true,
+      });
 
-    if (!result.canceled) {
-      const asset = result.assets[0];
-      const file = {
-        uri: asset.uri,
-        name: asset.fileName ?? `${name}.jpg`,
-        type: asset.type ?? "image/jpeg",
-      };
-      onChange(file);
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        const asset = result.assets[0];
+        const fileName = asset.fileName || `${name}_${Date.now()}.jpg`;
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        const imageFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+          base64: asset.base64,
+        };
+
+        onChange(imageFile);
+        Toast.show({
+          type: "success",
+          text1: "Image Selected",
+          text2: `${label} uploaded successfully`,
+        });
+      }
+    } catch (error) {
+      console.error(`Error picking ${name}:`, error);
+      Toast.show({
+        type: "error",
+        text1: "Selection Failed",
+        text2: `Unable to select ${label.toLowerCase()}. Please try again.`,
+      });
     }
   };
 
@@ -141,16 +162,34 @@ function FileInput({
           <Text className="mb-1 font-medium text-gray-700">{label}</Text>
           <TouchableOpacity
             onPress={() => pickImage(onChange)}
-            className="border border-gray-300 rounded-lg px-3 py-2 items-center bg-gray-50"
+            className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center bg-gray-50"
           >
-            <Text>{value ? "Change File" : "Choose File"}</Text>
+            {value ? (
+              <View className="items-center">
+                <Image
+                  source={{ uri: value.uri }}
+                  className="w-16 h-16 rounded-lg mb-2"
+                  resizeMode="cover"
+                />
+                <Text className="text-sm text-green-600 font-medium">
+                  {value.name}
+                </Text>
+                <Text className="text-xs text-gray-500 mt-1">
+                  Tap to change image
+                </Text>
+              </View>
+            ) : (
+              <View className="items-center">
+                <Text className="text-2xl mb-2">📷</Text>
+                <Text className="text-sm text-gray-600 font-medium">
+                  Choose {label}
+                </Text>
+                <Text className="text-xs text-gray-500 mt-1">
+                  Tap to select image
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
-          {value && (
-            <Image
-              source={{ uri: value.uri }}
-              className="w-24 h-24 mt-2 rounded-lg"
-            />
-          )}
           {error && <Text className="text-red-500 mt-1">{error}</Text>}
         </View>
       )}
@@ -171,11 +210,10 @@ function getStringError(
   return undefined;
 }
 export default function CreatorRegister({ visible, onClose }: Props) {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [videoCreator, { isLoading }] = useVideoCreatorMutation();
 
-  // Country picker states
   const [phoneCountry, setPhoneCountry] = useState({
     cca2: "EG",
     callingCode: "20",
@@ -231,25 +269,28 @@ export default function CreatorRegister({ visible, onClose }: Props) {
       formData.append("division", data.division);
       formData.append("social_links", data.socialLink);
       formData.append("details", data.additionalDetails || "");
-      formData.append("private_price", Number(data.privatePrice).toString());
-      formData.append("bussiness_price", Number(data.businessPrice).toString());
+      formData.append("private_price", data.privatePrice);
+      formData.append("bussiness_price", data.businessPrice);
 
       if (data.profileImage) {
-        formData.append("profile_image", {
+        const profileImageFile = {
           uri: data.profileImage.uri,
           type: data.profileImage.type || "image/jpeg",
-          name: data.profileImage.fileName || "profile_image.jpg",
-        } as any);
+          name: data.profileImage.name || `profile_image_${Date.now()}.jpg`,
+        };
+        formData.append("profile_image", profileImageFile as any);
       }
 
       if (data.idCard) {
-        formData.append("id_card", {
+        const idCardFile = {
           uri: data.idCard.uri,
           type: data.idCard.type || "image/jpeg",
-          name: data.idCard.fileName || "id_card.jpg",
-        } as any);
+          name: data.idCard.name || `id_card_${Date.now()}.jpg`,
+        };
+        formData.append("id_card", idCardFile as any);
       }
-      console.log(formData);
+
+      console.log("formData", formData);
 
       await videoCreator(formData)
         .unwrap()
