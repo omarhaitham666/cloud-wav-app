@@ -796,5 +796,83 @@
       "uploadInProgressTitle": "جاري الرفع",
       "uploadInProgressMessage": "يرجى الانتظار حتى اكتمال الرفع"
     }
+  },
+  "creatorRegister": {
+    "title": "تسجيل مبدع المحتوى المرئي",
+    "close": "إغلاق",
+    "form": {
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phoneNumber": "رقم الهاتف",
+      "whatsappNumber": "رقم الواتساب",
+      "division": "التخصص",
+      "socialLink": "رابط وسائل التواصل الاجتماعي",
+      "privatePrice": "السعر الخاص",
+      "businessPrice": "السعر التجاري",
+      "additionalDetails": "تفاصيل إضافية",
+      "profileImage": "صورة الملف الشخصي",
+      "idCard": "صورة الهوية",
+      "terms": "أوافق على الشروط والأحكام"
+    },
+    "placeholders": {
+      "fullName": "أدخل اسمك الكامل",
+      "email": "example@domain.com",
+      "phoneNumber": "1234567890",
+      "whatsappNumber": "1234567890",
+      "socialLink": "https://facebook.com/youraccount",
+      "privatePrice": "400",
+      "businessPrice": "400",
+      "additionalDetails": "أي معلومات إضافية...",
+      "selectGenre": "اختر التخصص"
+    },
+    "genres": {
+      "tiktokers": "مبدعو تيك توك",
+      "musician": "موسيقي",
+      "youtuber": "مبدع يوتيوب",
+      "contentCreator": "مبدع محتوى",
+      "athlete": "رياضي",
+      "publicFigure": "شخصية عامة"
+    },
+    "genreOptions": [
+      "مبدعو تيك توك",
+      "موسيقي",
+      "مبدع يوتيوب",
+      "مبدع محتوى",
+      "رياضي",
+      "شخصية عامة"
+    ],
+    "fileUpload": {
+      "chooseImage": "اختر {label}",
+      "tapToSelect": "اضغط لاختيار صورة",
+      "tapToChange": "اضغط لتغيير الصورة",
+      "imageSelected": "تم اختيار الصورة",
+      "uploadSuccess": "تم رفع {label} بنجاح",
+      "selectionFailed": "فشل الاختيار",
+      "unableToSelect": "تعذر اختيار {label}. يرجى المحاولة مرة أخرى."
+    },
+    "submit": "إرسال الآن",
+    "sending": "جارٍ الإرسال...",
+    "validation": {
+      "fullNameRequired": "الاسم الكامل مطلوب",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "invalidEmail": "بريد إلكتروني غير صالح",
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "phoneCountryCodeRequired": "رمز الدولة مطلوب",
+      "whatsappNumberRequired": "رقم الواتساب مطلوب",
+      "whatsappCountryCodeRequired": "رمز دولة الواتساب مطلوب",
+      "divisionRequired": "التخصص مطلوب",
+      "socialLinkRequired": "رابط وسائل التواصل الاجتماعي مطلوب",
+      "invalidUrl": "أدخل رابط صالح",
+      "privatePriceRequired": "السعر الخاص مطلوب",
+      "businessPriceRequired": "السعر التجاري مطلوب",
+      "termsRequired": "يجب الموافقة على الشروط",
+      "profileImageRequired": "صورة الملف الشخصي مطلوبة",
+      "idCardRequired": "صورة الهوية مطلوبة"
+    },
+    "alerts": {
+      "successTitle": "تم إرسال طلب مبدع المحتوى المرئي بنجاح",
+      "errorTitle": "فشل في إرسال طلب مبدع المحتوى المرئي",
+      "errorMessage": "حدث خطأ ما"
+    }
   }
 }

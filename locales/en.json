@@ -796,5 +796,83 @@
       "uploadInProgressTitle": "Upload in Progress",
       "uploadInProgressMessage": "Please wait for the upload to complete"
     }
+  },
+  "creatorRegister": {
+    "title": "Register Video Content Creator",
+    "close": "Close",
+    "form": {
+      "fullName": "Full Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "whatsappNumber": "WhatsApp Number",
+      "division": "Division",
+      "socialLink": "Social Media Link",
+      "privatePrice": "Private Price",
+      "businessPrice": "Business Price",
+      "additionalDetails": "Additional Details",
+      "profileImage": "Profile Image",
+      "idCard": "ID Card",
+      "terms": "I agree to the Terms and Conditions"
+    },
+    "placeholders": {
+      "fullName": "Enter your full name",
+      "email": "example@domain.com",
+      "phoneNumber": "1234567890",
+      "whatsappNumber": "1234567890",
+      "socialLink": "https://facebook.com/youraccount",
+      "privatePrice": "400",
+      "businessPrice": "400",
+      "additionalDetails": "Any extra info...",
+      "selectGenre": "Select Genre"
+    },
+    "genres": {
+      "tiktokers": "Tiktokers",
+      "musician": "Musician",
+      "youtuber": "Youtuber",
+      "contentCreator": "Content creator",
+      "athlete": "Athlete",
+      "publicFigure": "Public Figure"
+    },
+    "genreOptions": [
+      "Tiktokers",
+      "Musician",
+      "Youtuber",
+      "Content creator",
+      "Athlete",
+      "public_figure"
+    ],
+    "fileUpload": {
+      "chooseImage": "Choose {label}",
+      "tapToSelect": "Tap to select image",
+      "tapToChange": "Tap to change image",
+      "imageSelected": "Image Selected",
+      "uploadSuccess": "{label} uploaded successfully",
+      "selectionFailed": "Selection Failed",
+      "unableToSelect": "Unable to select {label}. Please try again."
+    },
+    "submit": "Send Now",
+    "sending": "Sending...",
+    "validation": {
+      "fullNameRequired": "Full name is required",
+      "emailRequired": "Email is required",
+      "invalidEmail": "Invalid email",
+      "phoneNumberRequired": "Phone number is required",
+      "phoneCountryCodeRequired": "Country code is required",
+      "whatsappNumberRequired": "WhatsApp number is required",
+      "whatsappCountryCodeRequired": "WhatsApp country code is required",
+      "divisionRequired": "Division is required",
+      "socialLinkRequired": "Social link is required",
+      "invalidUrl": "Enter a valid URL",
+      "privatePriceRequired": "Private price is required",
+      "businessPriceRequired": "Business price is required",
+      "termsRequired": "You must accept terms",
+      "profileImageRequired": "Profile image is required",
+      "idCardRequired": "ID card is required"
+    },
+    "alerts": {
+      "successTitle": "Video Content Creator Sent Successfully",
+      "errorTitle": "Video Content Creator Failed",
+      "errorMessage": "Something went wrong"
+    }
   }
 }

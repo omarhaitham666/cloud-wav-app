@@ -1,4 +1,3 @@
-import { useVideoCreatorMutation } from "@/store/api/global/videoCreator";
 import { AppFonts } from "@/utils/fonts";
 import { getToken } from "@/utils/secureStore";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,7 +28,7 @@ import {
 import CountryPicker from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
-const GENRES = [
+const GENRES_EN = [
   "Tiktokers",
   "Musician",
   "Youtuber",
@@ -37,26 +36,65 @@ const GENRES = [
   "Athlete",
   "public_figure",
 ];
-const formSchema = z.object({
-  fullName: z.string().min(3, "Full name is required"),
-  email: z.string().email("Invalid email"),
-  phoneNumber: z.string().min(8, "Phone number is required"),
-  phoneCountryCode: z.string().min(1, "Country code is required"),
-  whatsappNumber: z.string().min(8, "WhatsApp number is required"),
-  whatsappCountryCode: z.string().min(1, "WhatsApp country code is required"),
-  division: z.string().min(1, "Division is required"),
-  socialLink: z.string().url("Enter a valid URL"),
-  privatePrice: z.string().min(1, "Private price is required"),
-  businessPrice: z.string().min(1, "Business price is required"),
-  additionalDetails: z.string().optional(),
-  terms: z.boolean().refine((val) => val === true, "You must accept terms"),
-  profileImage: z
-    .any()
-    .refine((val) => val !== null, "Profile image is required"),
-  idCard: z.any().refine((val) => val !== null, "ID card is required"),
-});
 
-type FormValues = z.infer<typeof formSchema>;
+const GENRES_AR = [
+  "مبدعو تيك توك",
+  "موسيقي",
+  "مبدع يوتيوب",
+  "مبدع محتوى",
+  "رياضي",
+  "شخصية عامة",
+];
+const createFormSchema = (t: any) =>
+  z.object({
+    fullName: z
+      .string()
+      .min(3, t("creatorRegister.validation.fullNameRequired")),
+    email: z.string().email(t("creatorRegister.validation.invalidEmail")),
+    phoneNumber: z
+      .string()
+      .min(8, t("creatorRegister.validation.phoneNumberRequired")),
+    phoneCountryCode: z
+      .string()
+      .min(1, t("creatorRegister.validation.phoneCountryCodeRequired")),
+    whatsappNumber: z
+      .string()
+      .min(8, t("creatorRegister.validation.whatsappNumberRequired")),
+    whatsappCountryCode: z
+      .string()
+      .min(1, t("creatorRegister.validation.whatsappCountryCodeRequired")),
+    division: z
+      .string()
+      .min(1, t("creatorRegister.validation.divisionRequired")),
+    socialLink: z.string().url(t("creatorRegister.validation.invalidUrl")),
+    privatePrice: z
+      .string()
+      .min(1, t("creatorRegister.validation.privatePriceRequired")),
+    businessPrice: z
+      .string()
+      .min(1, t("creatorRegister.validation.businessPriceRequired")),
+    additionalDetails: z.string().optional(),
+    terms: z
+      .boolean()
+      .refine(
+        (val) => val === true,
+        t("creatorRegister.validation.termsRequired")
+      ),
+    profileImage: z
+      .any()
+      .refine(
+        (val) => val !== null,
+        t("creatorRegister.validation.profileImageRequired")
+      ),
+    idCard: z
+      .any()
+      .refine(
+        (val) => val !== null,
+        t("creatorRegister.validation.idCardRequired")
+      ),
+  });
+
+type FormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
 type Props = {
   visible: boolean;
@@ -70,6 +108,7 @@ function FormInput({
   placeholder,
   error,
   multiline = false,
+  isRTL = false,
 }: {
   name: keyof FormValues;
   control: any;
@@ -77,6 +116,7 @@ function FormInput({
   placeholder: string;
   error?: string;
   multiline?: boolean;
+  isRTL?: boolean;
 }) {
   return (
     <Controller
@@ -84,7 +124,12 @@ function FormInput({
       name={name}
       render={({ field: { onChange, onBlur, value } }) => (
         <View className="mb-4">
-          <Text className="mb-1 font-medium text-gray-700">{label}</Text>
+          <Text
+            className="mb-1 font-medium text-gray-700"
+            style={{ textAlign: isRTL ? "right" : "left" }}
+          >
+            {label}
+          </Text>
           <TextInput
             className={`border rounded-lg px-3 py-2 ${
               error ? "border-red-500" : "border-gray-300"
@@ -95,8 +140,17 @@ function FormInput({
             onChangeText={onChange}
             multiline={multiline}
             numberOfLines={multiline ? 4 : 1}
+            textAlign={isRTL ? "right" : "left"}
+            style={{ textAlign: isRTL ? "right" : "left" }}
           />
-          {error && <Text className="text-red-500 mt-1">{error}</Text>}
+          {error && (
+            <Text
+              className="text-red-500 mt-1"
+              style={{ textAlign: isRTL ? "right" : "left" }}
+            >
+              {error}
+            </Text>
+          )}
         </View>
       )}
     />
@@ -108,11 +162,15 @@ function FileInput({
   control,
   label,
   error,
+  t,
+  isRTL = false,
 }: {
   name: keyof FormValues;
   control: any;
   label: string;
   error?: string;
+  t: any;
+  isRTL?: boolean;
 }) {
   const pickImage = async (onChange: (file: any) => void) => {
     try {
@@ -139,16 +197,18 @@ function FileInput({
         onChange(imageFile);
         Toast.show({
           type: "success",
-          text1: "Image Selected",
-          text2: `${label} uploaded successfully`,
+          text1: t("creatorRegister.fileUpload.imageSelected"),
+          text2: t("creatorRegister.fileUpload.uploadSuccess", { label }),
         });
       }
     } catch (error) {
       console.error(`Error picking ${name}:`, error);
       Toast.show({
         type: "error",
-        text1: "Selection Failed",
-        text2: `Unable to select ${label.toLowerCase()}. Please try again.`,
+        text1: t("creatorRegister.fileUpload.selectionFailed"),
+        text2: t("creatorRegister.fileUpload.unableToSelect", {
+          label: label.toLowerCase(),
+        }),
       });
     }
   };
@@ -159,7 +219,12 @@ function FileInput({
       name={name}
       render={({ field: { value, onChange } }) => (
         <View className="mb-4">
-          <Text className="mb-1 font-medium text-gray-700">{label}</Text>
+          <Text
+            className="mb-1 font-medium text-gray-700"
+            style={{ textAlign: isRTL ? "right" : "left" }}
+          >
+            {label}
+          </Text>
           <TouchableOpacity
             onPress={() => pickImage(onChange)}
             className="border-2 border-dashed border-gray-300 rounded-lg p-6 items-center bg-gray-50"
@@ -171,26 +236,45 @@ function FileInput({
                   className="w-16 h-16 rounded-lg mb-2"
                   resizeMode="cover"
                 />
-                <Text className="text-sm text-green-600 font-medium">
+                <Text
+                  className="text-sm text-green-600 font-medium"
+                  style={{ textAlign: isRTL ? "right" : "left" }}
+                >
                   {value.name}
                 </Text>
-                <Text className="text-xs text-gray-500 mt-1">
-                  Tap to change image
+                <Text
+                  className="text-xs text-gray-500 mt-1"
+                  style={{ textAlign: isRTL ? "right" : "left" }}
+                >
+                  {t("creatorRegister.fileUpload.tapToChange")}
                 </Text>
               </View>
             ) : (
               <View className="items-center">
                 <Text className="text-2xl mb-2">📷</Text>
-                <Text className="text-sm text-gray-600 font-medium">
-                  Choose {label}
+                <Text
+                  className="text-sm text-gray-600 font-medium"
+                  style={{ textAlign: isRTL ? "right" : "left" }}
+                >
+                  {t("creatorRegister.fileUpload.chooseImage", { label })}
                 </Text>
-                <Text className="text-xs text-gray-500 mt-1">
-                  Tap to select image
+                <Text
+                  className="text-xs text-gray-500 mt-1"
+                  style={{ textAlign: isRTL ? "right" : "left" }}
+                >
+                  {t("creatorRegister.fileUpload.tapToSelect")}
                 </Text>
               </View>
             )}
           </TouchableOpacity>
-          {error && <Text className="text-red-500 mt-1">{error}</Text>}
+          {error && (
+            <Text
+              className="text-red-500 mt-1"
+              style={{ textAlign: isRTL ? "right" : "left" }}
+            >
+              {error}
+            </Text>
+          )}
         </View>
       )}
     />
@@ -210,9 +294,9 @@ function getStringError(
   return undefined;
 }
 export default function CreatorRegister({ visible, onClose }: Props) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-  const [videoCreator, { isLoading }] = useVideoCreatorMutation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [phoneCountry, setPhoneCountry] = useState({
     cca2: "EG",
@@ -230,7 +314,7 @@ export default function CreatorRegister({ visible, onClose }: Props) {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(createFormSchema(t)),
     defaultValues: {
       fullName: "",
       email: "",
@@ -256,6 +340,8 @@ export default function CreatorRegister({ visible, onClose }: Props) {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const formData = new FormData();
 
@@ -272,7 +358,14 @@ export default function CreatorRegister({ visible, onClose }: Props) {
       formData.append("private_price", data.privatePrice);
       formData.append("bussiness_price", data.businessPrice);
 
-      if (data.profileImage) {
+      if (data.profileImage && data.profileImage.base64) {
+        const base64File = {
+          uri: `data:${data.profileImage.type};base64,${data.profileImage.base64}`,
+          type: data.profileImage.type || "image/jpeg",
+          name: data.profileImage.name || `profile_image_${Date.now()}.jpg`,
+        };
+        formData.append("profile_image", base64File as any);
+      } else if (data.profileImage) {
         const profileImageFile = {
           uri: data.profileImage.uri,
           type: data.profileImage.type || "image/jpeg",
@@ -281,7 +374,14 @@ export default function CreatorRegister({ visible, onClose }: Props) {
         formData.append("profile_image", profileImageFile as any);
       }
 
-      if (data.idCard) {
+      if (data.idCard && data.idCard.base64) {
+        const base64File = {
+          uri: `data:${data.idCard.type};base64,${data.idCard.base64}`,
+          type: data.idCard.type || "image/jpeg",
+          name: data.idCard.name || `id_card_${Date.now()}.jpg`,
+        };
+        formData.append("id_card", base64File as any);
+      } else if (data.idCard) {
         const idCardFile = {
           uri: data.idCard.uri,
           type: data.idCard.type || "image/jpeg",
@@ -290,32 +390,38 @@ export default function CreatorRegister({ visible, onClose }: Props) {
         formData.append("id_card", idCardFile as any);
       }
 
-      console.log("formData", formData);
+      const response = await fetch(
+        "https://api.cloudwavproduction.com/api/video-creator-requests",
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      await videoCreator(formData)
-        .unwrap()
-        .then(() => {
-          Toast.show({
-            type: "success",
-            text1: "Video Content Creator Sent Successfully",
-          });
-          onClose();
-        })
-        .catch((e) => {
-          console.log(e);
-          Toast.show({
-            type: "error",
-            text1: "Video Content Creator Failed",
-            text2: e?.data?.message || e?.data || "Something went wrong",
-          });
+      if (response.status === 200 || response.status === 201) {
+        Toast.show({
+          type: "success",
+          text1: t("creatorRegister.alerts.successTitle"),
         });
+        onClose();
+      }
     } catch (e: any) {
-      console.log(e);
+      console.log("Error:", e);
+      console.log("Error response:", e.response?.data);
       Toast.show({
         type: "error",
-        text1: "Video Content Creator Failed",
-        text2: e?.data?.message || "Something went wrong",
+        text1: t("creatorRegister.alerts.errorTitle"),
+        text2:
+          e?.response?.data?.message ||
+          e?.response?.data ||
+          t("creatorRegister.alerts.errorMessage"),
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -339,7 +445,7 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                 fontFamily: AppFonts.semibold,
               }}
             >
-              Register Video Content Creator
+              {t("creatorRegister.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
               <Text
@@ -348,7 +454,7 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                   fontFamily: AppFonts.semibold,
                 }}
               >
-                Close
+                {t("creatorRegister.close")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -359,29 +465,39 @@ export default function CreatorRegister({ visible, onClose }: Props) {
               showsVerticalScrollIndicator={false}
             >
               <Text className="text-2xl font-bold mb-6 text-center">
-                Register Video Content Creator
+                {t("creatorRegister.title")}
               </Text>
 
               <FormInput
                 name="fullName"
                 control={control}
-                label="Full Name"
-                placeholder="Enter your full name"
+                label={t("creatorRegister.form.fullName")}
+                placeholder={t("creatorRegister.placeholders.fullName")}
                 error={errors.fullName?.message}
+                isRTL={isRTL}
               />
               <FormInput
                 name="email"
                 control={control}
-                label="Email"
-                placeholder="example@domain.com"
+                label={t("creatorRegister.form.email")}
+                placeholder={t("creatorRegister.placeholders.email")}
                 error={errors.email?.message}
+                isRTL={isRTL}
               />
               <Controller
                 control={control}
                 name="phoneNumber"
                 render={({ field: { value, onChange } }) => (
                   <View className="mb-4">
-                    <Text className="text-gray-700 mb-1">Phone Number</Text>
+                    <Text
+                      className="text-gray-700 mb-1"
+                      style={{
+                        fontFamily: AppFonts.medium,
+                        textAlign: isRTL ? "right" : "left",
+                      }}
+                    >
+                      {t("creatorRegister.form.phoneNumber")}
+                    </Text>
                     <View className="flex-row items-center border border-gray-300 rounded-lg">
                       <CountryPicker
                         countryCode={phoneCountry.cca2 as any}
@@ -403,14 +519,21 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                       <Text className="px-2">+{phoneCountry.callingCode}</Text>
                       <TextInput
                         className="flex-1 p-3"
-                        placeholder="1234567890"
+                        placeholder={t(
+                          "creatorRegister.placeholders.phoneNumber"
+                        )}
                         value={value}
                         onChangeText={onChange}
                         keyboardType="phone-pad"
+                        textAlign={isRTL ? "right" : "left"}
+                        style={{ textAlign: isRTL ? "right" : "left" }}
                       />
                     </View>
                     {errors.phoneNumber && (
-                      <Text className="text-red-500">
+                      <Text
+                        className="text-red-500"
+                        style={{ textAlign: isRTL ? "right" : "left" }}
+                      >
                         {errors.phoneNumber.message}
                       </Text>
                     )}
@@ -422,7 +545,15 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                 name="whatsappNumber"
                 render={({ field: { value, onChange } }) => (
                   <View className="mb-4">
-                    <Text className="text-gray-700 mb-1">WhatsApp Number</Text>
+                    <Text
+                      className="text-gray-700 mb-1"
+                      style={{
+                        fontFamily: AppFonts.medium,
+                        textAlign: isRTL ? "right" : "left",
+                      }}
+                    >
+                      {t("creatorRegister.form.whatsappNumber")}
+                    </Text>
                     <View className="flex-row items-center border border-gray-300 rounded-lg">
                       <CountryPicker
                         countryCode={whatsappCountry.cca2 as any}
@@ -446,14 +577,21 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                       </Text>
                       <TextInput
                         className="flex-1 p-3"
-                        placeholder="1234567890"
+                        placeholder={t(
+                          "creatorRegister.placeholders.whatsappNumber"
+                        )}
                         value={value}
                         onChangeText={onChange}
                         keyboardType="phone-pad"
+                        textAlign={isRTL ? "right" : "left"}
+                        style={{ textAlign: isRTL ? "right" : "left" }}
                       />
                     </View>
                     {errors.whatsappNumber && (
-                      <Text className="text-red-500">
+                      <Text
+                        className="text-red-500"
+                        style={{ textAlign: isRTL ? "right" : "left" }}
+                      >
                         {errors.whatsappNumber.message}
                       </Text>
                     )}
@@ -469,7 +607,7 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                     textAlign: isRTL ? "right" : "left",
                   }}
                 >
-                  Division
+                  {t("creatorRegister.form.division")}
                 </Text>
                 <Controller
                   control={control}
@@ -484,11 +622,19 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                         borderWidth: 1,
                         borderColor: "rgba(0,0,0,0.1)",
                         borderRadius: 12,
+                        textAlign: isRTL ? "right" : "left",
                       }}
                     >
-                      <Picker.Item label="Select Genre" value="" />
-                      {GENRES.map((genre) => (
-                        <Picker.Item key={genre} label={genre} value={genre} />
+                      <Picker.Item
+                        label={t("creatorRegister.placeholders.selectGenre")}
+                        value=""
+                      />
+                      {(isRTL ? GENRES_AR : GENRES_EN).map((genre, index) => (
+                        <Picker.Item
+                          key={isRTL ? GENRES_EN[index] : genre}
+                          label={genre}
+                          value={isRTL ? GENRES_EN[index] : genre}
+                        />
                       ))}
                     </Picker>
                   )}
@@ -497,28 +643,36 @@ export default function CreatorRegister({ visible, onClose }: Props) {
               <FormInput
                 name="socialLink"
                 control={control}
-                label="Social Media Link"
-                placeholder="https://facebook.com/youraccount"
+                label={t("creatorRegister.form.socialLink")}
+                placeholder={t("creatorRegister.placeholders.socialLink")}
                 error={errors.socialLink?.message}
+                isRTL={isRTL}
               />
 
-              <View className="flex-row gap-4">
+              <View
+                className="flex-row gap-4"
+                style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+              >
                 <View className="flex-1">
                   <FormInput
                     name="privatePrice"
                     control={control}
-                    label="Private Price"
-                    placeholder="400"
+                    label={t("creatorRegister.form.privatePrice")}
+                    placeholder={t("creatorRegister.placeholders.privatePrice")}
                     error={errors.privatePrice?.message}
+                    isRTL={isRTL}
                   />
                 </View>
                 <View className="flex-1">
                   <FormInput
                     name="businessPrice"
                     control={control}
-                    label="Business Price"
-                    placeholder="400"
+                    label={t("creatorRegister.form.businessPrice")}
+                    placeholder={t(
+                      "creatorRegister.placeholders.businessPrice"
+                    )}
                     error={errors.businessPrice?.message}
+                    isRTL={isRTL}
                   />
                 </View>
               </View>
@@ -526,42 +680,55 @@ export default function CreatorRegister({ visible, onClose }: Props) {
               <FormInput
                 name="additionalDetails"
                 control={control}
-                label="Additional Details"
-                placeholder="Any extra info..."
+                label={t("creatorRegister.form.additionalDetails")}
+                placeholder={t(
+                  "creatorRegister.placeholders.additionalDetails"
+                )}
                 multiline
                 error={errors.additionalDetails?.message}
+                isRTL={isRTL}
               />
 
               <FileInput
                 name="profileImage"
                 control={control}
-                label="Profile Image"
+                label={t("creatorRegister.form.profileImage")}
                 error={getStringError(errors.profileImage?.message)}
+                t={t}
+                isRTL={isRTL}
               />
               <FileInput
                 name="idCard"
                 control={control}
-                label="ID Card"
+                label={t("creatorRegister.form.idCard")}
                 error={getStringError(errors.idCard?.message)}
+                t={t}
+                isRTL={isRTL}
               />
 
               <Controller
                 control={control}
                 name="terms"
                 render={({ field: { value, onChange } }) => (
-                  <View className="flex-row items-center mb-4">
+                  <View
+                    className="flex-row items-center mb-4"
+                    style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+                  >
                     <Checkbox value={value} onValueChange={onChange} />
-                    <Text className="ml-2">
-                      I agree to the{" "}
-                      <Text className="text-blue-600 underline">
-                        Terms and Conditions
-                      </Text>
+                    <Text
+                      className={isRTL ? "mr-2" : "ml-2"}
+                      style={{ textAlign: isRTL ? "right" : "left" }}
+                    >
+                      {t("creatorRegister.form.terms")}
                     </Text>
                   </View>
                 )}
               />
               {errors.terms && (
-                <Text className="text-red-500 mb-2">
+                <Text
+                  className="text-red-500 mb-2"
+                  style={{ textAlign: isRTL ? "right" : "left" }}
+                >
                   {errors.terms.message}
                 </Text>
               )}
@@ -575,7 +742,7 @@ export default function CreatorRegister({ visible, onClose }: Props) {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text className="text-white text-center font-semibold">
-                    Send Now
+                    {t("creatorRegister.submit")}
                   </Text>
                 )}
               </TouchableOpacity>

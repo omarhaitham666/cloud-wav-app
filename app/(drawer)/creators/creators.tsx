@@ -112,7 +112,7 @@ const Creators = () => {
               >
                 <View className="w-20 h-20 rounded-full bg-gray-600 mb-2 overflow-hidden shadow-lg">
                   <Image
-                    source={{ uri: category.image }}
+                    source={category.image}
                     className="w-full h-full"
                     resizeMode="cover"
                   />
