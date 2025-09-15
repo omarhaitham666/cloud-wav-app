@@ -612,7 +612,14 @@
       "retry": "Try Again",
       "error": "Something went wrong",
       "profileUpdatedTextOnly": "Profile Updated (Text Only)",
-      "imageUploadFailed": "Image upload failed, but text fields were updated successfully"
+      "imageUploadFailed": "Image upload failed, but text fields were updated successfully",
+      "sessionExpired": "Session Expired",
+      "sessionExpiredMessage": "Your session has expired. Please log in again.",
+      "logout": "Logout",
+      "loggedOut": "Logged Out",
+      "loggedOutMessage": "You have been successfully logged out",
+      "logoutError": "Logout Error",
+      "logoutErrorMessage": "There was an error during logout"
     },
     "dashboard": {
       "welcomeBack": "Welcome Back!",

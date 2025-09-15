@@ -1,10 +1,15 @@
 import {
   useGetUserQuery,
+  useLogoutMutation,
   useUpdateProfileARTISTORCREATORUserMutation,
   useUpdateUserMutation,
 } from "@/store/api/user/user";
+import { useAuth } from "@/store/auth-context";
+import { invalidateAllQueries } from "@/store/utils";
 import { AppFonts } from "@/utils/fonts";
+import { deleteToken } from "@/utils/secureStore";
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -51,10 +56,13 @@ const ProfileUser: React.FC = () => {
     updateProfileARTISTORCREATORUser,
     { isLoading: updateProfileLoading },
   ] = useUpdateProfileARTISTORCREATORUserMutation();
+  const [logout] = useLogoutMutation();
+  const { setUser, triggerAuthRefresh } = useAuth();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<any>(null);
   const [UpdatePrice, setUpdatePrice] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const {
     control,
@@ -123,7 +131,8 @@ const ProfileUser: React.FC = () => {
           base64: asset.base64,
         });
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Image selection error:", error);
       Toast.show({
         type: "error",
         text1: "Image Selection Failed",
@@ -199,6 +208,7 @@ const ProfileUser: React.FC = () => {
               refetch();
               return;
             } catch (base64Error) {
+              console.error("Base64 upload error:", base64Error);
               const payload = {
                 email: formData.email.trim(),
                 new_name: formData.fullName.trim(),
@@ -320,6 +330,75 @@ const ProfileUser: React.FC = () => {
     }
   }, [data, reset]);
 
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+
+      await logout().unwrap();
+
+      await deleteToken("access_token");
+      await deleteToken("refresh_token");
+      await AsyncStorage.multiRemove([
+        "token",
+        "user",
+        "auth_state",
+        "refresh_token",
+      ]);
+
+      setUser(null);
+
+      triggerAuthRefresh();
+
+      invalidateAllQueries();
+
+      Toast.show({
+        type: "success",
+        text1: t("profile.user.loggedOut") || "Logged Out",
+        text2:
+          t("profile.user.loggedOutMessage") ||
+          "You have been successfully logged out",
+      });
+
+      router.replace("/(drawer)/(auth)/login");
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      try {
+        await deleteToken("access_token");
+        await deleteToken("refresh_token");
+        await AsyncStorage.multiRemove([
+          "token",
+          "user",
+          "auth_state",
+          "refresh_token",
+        ]);
+
+        setUser(null);
+        triggerAuthRefresh();
+        invalidateAllQueries();
+
+        Toast.show({
+          type: "info",
+          text1: t("profile.user.loggedOut") || "Logged Out",
+          text2:
+            t("profile.user.loggedOutMessage") || "You have been logged out",
+        });
+
+        router.replace("/(drawer)/(auth)/login");
+      } catch (clearError) {
+        console.error("Error clearing local storage:", clearError);
+        Toast.show({
+          type: "error",
+          text1: t("profile.user.logoutError") || "Logout Error",
+          text2:
+            t("profile.user.logoutErrorMessage") ||
+            "There was an error during logout",
+        });
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   const getRoleDisplayName = (role?: string, type?: string) => {
     if (!role && !type) return "User";
 
@@ -382,6 +461,86 @@ const ProfileUser: React.FC = () => {
   }
 
   if (error) {
+    // Check if it's a 401 Unauthenticated error
+    const isUnauthenticated =
+      (error as any)?.status === 401 ||
+      (error as any)?.data?.message === "Unauthenticated." ||
+      (error as any)?.data?.message?.includes("Unauthenticated");
+
+    if (isUnauthenticated) {
+      // Show session expired message and logout button
+      return (
+        <View className="flex-1 justify-center items-center bg-black px-6">
+          <View className="items-center mb-6">
+            <Ionicons name="time-outline" size={64} color="#EF4444" />
+            <Text
+              className="text-red-400 text-center mb-2 text-lg"
+              style={{
+                fontFamily: AppFonts.bold,
+                textAlign: isRTL ? "right" : "left",
+              }}
+            >
+              {t("profile.user.sessionExpired") || "Session Expired"}
+            </Text>
+            <Text
+              className="text-gray-300 text-center mb-6"
+              style={{
+                fontFamily: AppFonts.medium,
+                textAlign: isRTL ? "right" : "left",
+              }}
+            >
+              {t("profile.user.sessionExpiredMessage") ||
+                "Your session has expired. Please log in again."}
+            </Text>
+          </View>
+
+          <View className="w-full gap-3">
+            <TouchableOpacity
+              onPress={handleLogout}
+              disabled={isLoggingOut}
+              className="bg-red-600 px-6 py-4 rounded-lg"
+            >
+              {isLoggingOut ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <View className="flex-row items-center justify-center">
+                  <Ionicons name="log-out-outline" size={20} color="white" />
+                  <Text
+                    className="text-white ml-2"
+                    style={{
+                      fontFamily: AppFonts.bold,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {t("profile.user.logout") || "Logout"}
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={refetch}
+              className="bg-purple-600 px-6 py-4 rounded-lg"
+            >
+              <View className="flex-row items-center justify-center">
+                <Ionicons name="refresh-outline" size={20} color="white" />
+                <Text
+                  className="text-white ml-2"
+                  style={{
+                    fontFamily: AppFonts.medium,
+                    textAlign: isRTL ? "right" : "left",
+                  }}
+                >
+                  {t("profile.user.retry") || "Try Again"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    }
+
+    // Regular error handling
     return (
       <View className="flex-1 justify-center items-center bg-black px-6">
         <Text

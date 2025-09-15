@@ -612,7 +612,14 @@
       "retry": "حاول مرة أخرى",
       "error": "حدث خطأ ما",
       "profileUpdatedTextOnly": "تم تحديث الملف الشخصي (النص فقط)",
-      "imageUploadFailed": "فشل رفع الصورة، لكن تم تحديث الحقول النصية بنجاح"
+      "imageUploadFailed": "فشل رفع الصورة، لكن تم تحديث الحقول النصية بنجاح",
+      "sessionExpired": "انتهت صلاحية الجلسة",
+      "sessionExpiredMessage": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
+      "logout": "تسجيل الخروج",
+      "loggedOut": "تم تسجيل الخروج",
+      "loggedOutMessage": "تم تسجيل خروجك بنجاح",
+      "logoutError": "خطأ في تسجيل الخروج",
+      "logoutErrorMessage": "حدث خطأ أثناء تسجيل الخروج"
     },
     "dashboard": {
       "welcomeBack": "مرحباً بعودتك!",
