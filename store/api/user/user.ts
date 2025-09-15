@@ -111,6 +111,14 @@ const authApi = mainApi.injectEndpoints({
         url: "/logout",
         method: "POST",
       }),
+      // Handle 401 errors silently during logout
+      transformErrorResponse: (response: any) => {
+        // If it's a 401 error during logout, treat it as success
+        if (response.status === 401) {
+          return { success: true };
+        }
+        return response;
+      },
     }),
     getUser: builder.query<User, void>({
       query: () => ({

@@ -216,7 +216,12 @@
           "details": "Details",
           "selectOptions": "Select one or more options:",
           "selectSingOption": "Select an option:",
-          "submit": "Submit"
+          "submit": "Submit",
+          "submitting": "Submitting...",
+          "nameRequired": "Name is required (minimum 2 characters)",
+          "emailRequired": "Email is required",
+          "emailInvalid": "Please enter a valid email address",
+          "phoneRequired": "Phone number is required (minimum 10 digits)"
         },
         "options": {
           "voiceRecording": "Voice Recording",
@@ -234,7 +239,9 @@
           "successTitle": "Request Sent Successfully",
           "successMessage": "Your music service request has been sent successfully. We will contact you soon.",
           "errorTitle": "Failed to Send Request",
-          "errorMessage": "An error occurred while sending the request. Please try again."
+          "errorMessage": "An error occurred while sending the request. Please try again.",
+          "validationTitle": "Validation Error",
+          "validationMessage": "Please fill in all required fields correctly."
         }
       }
     },

@@ -17,6 +17,12 @@ mainApi.interceptors.request.use(async (config) => {
     }
     // For FormData, let axios set the Content-Type with boundary
   }
+  
+  // Mark logout requests for special handling
+  if (config.url?.includes('/logout')) {
+    config.metadata = { isLogoutRequest: true };
+  }
+  
   return config;
 });
 
@@ -44,9 +50,21 @@ export const axiosBaseQuery =
     } catch (axiosError) {
       const err = axiosError as AxiosError;
 
+      // Check if this is a logout request
+      const isLogoutRequest = (err.config as any)?.metadata?.isLogoutRequest;
+
       if (err.response?.status === 401) {
         await AsyncStorage.removeItem("token");
-        console.warn("Session expired, redirecting to login...");
+        
+        // For logout requests, don't log session expired message
+        if (!isLogoutRequest) {
+          console.warn("Session expired, redirecting to login...");
+        }
+      }
+
+      // For logout requests with 401, return success instead of error
+      if (isLogoutRequest && err.response?.status === 401) {
+        return { data: { success: true } };
       }
 
       return {

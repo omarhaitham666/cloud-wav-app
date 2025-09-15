@@ -2,7 +2,7 @@ import { useLogoutMutation } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { useDrawerRefresh } from "@/store/drawerRefreshContext";
 import { invalidateAllQueries } from "@/store/utils";
-import AppRefreshService, { setDrawerRefreshTrigger } from "@/utils/appRefresh";
+import { setDrawerRefreshTrigger } from "@/utils/appRefresh";
 import { AppFonts } from "@/utils/fonts";
 import { deleteToken, getToken } from "@/utils/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -106,15 +106,19 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
 
   const handleLogout = async () => {
     try {
-      // Clear all tokens from SecureStore
+      // Call logout API first
+      await logout().unwrap();
+
+      // Only clear local storage after successful API call
       await deleteToken("access_token");
       await deleteToken("refresh_token");
-
-      // Clear all data from AsyncStorage
-      await AsyncStorage.clear();
-
-      // Call logout API
-      await logout().unwrap();
+      // Clear specific keys instead of all storage to avoid app reload
+      await AsyncStorage.multiRemove([
+        'token',
+        'user',
+        'auth_state',
+        'refresh_token'
+      ]);
 
       // Clear user state and token state
       setUser(null);
@@ -126,8 +130,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       // Trigger drawer refresh to update the UI
       triggerDrawerRefresh();
 
-      // Refresh app state
-      await AppRefreshService.refreshAfterAuthChange("logout");
+      // Invalidate queries to refresh data
       invalidateAllQueries();
 
       Toast.show({
@@ -136,17 +139,42 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         text2: "You have been successfully logged out",
       });
     } catch (e: any) {
-      // Even if API call fails, clear local state
+      // If API call fails, still clear local state for security
+      try {
+        await deleteToken("access_token");
+        await deleteToken("refresh_token");
+        // Clear specific keys instead of all storage to avoid app reload
+        await AsyncStorage.multiRemove([
+          'token',
+          'user',
+          'auth_state',
+          'refresh_token'
+        ]);
+      } catch (clearError) {
+        console.error("Error clearing local storage:", clearError);
+      }
+
       setUser(null);
       setToken(null);
       triggerAuthRefresh();
       triggerDrawerRefresh();
+      invalidateAllQueries();
 
-      Toast.show({
-        type: "error",
-        text1: "Logout Failed",
-        text2: e?.data?.message || "Something went wrong",
-      });
+      // Only show error if it's not a 401 (unauthenticated) error
+      if (e?.status !== 401) {
+        Toast.show({
+          type: "error",
+          text1: "Logout Failed",
+          text2: e?.data?.message || "Something went wrong",
+        });
+      } else {
+        // For 401 errors, show success message since user is already logged out
+        Toast.show({
+          type: "success",
+          text1: "Logged Out",
+          text2: "You have been successfully logged out",
+        });
+      }
     }
   };
 
