@@ -259,7 +259,6 @@ export default function CreatorRegister({ visible, onClose }: Props) {
     try {
       const formData = new FormData();
 
-      // Append basic fields
       formData.append("name", data.fullName);
       formData.append("email", data.email);
       formData.append("number", `+${data.phoneCountryCode}${data.phoneNumber}`);
@@ -271,64 +270,51 @@ export default function CreatorRegister({ visible, onClose }: Props) {
       formData.append("social_links", data.socialLink);
       formData.append("details", data.additionalDetails || "");
       formData.append("private_price", data.privatePrice);
-      formData.append("bussiness_price", data.businessPrice); // Note: keep the typo if that's what the API expects
+      formData.append("bussiness_price", data.businessPrice);
 
-      // Handle profile image - React Native specific
       if (data.profileImage) {
-        // For React Native, you need to append the file differently
-        formData.append("profile_image", {
+        const profileImageFile = {
           uri: data.profileImage.uri,
           type: data.profileImage.type || "image/jpeg",
           name: data.profileImage.name || `profile_image_${Date.now()}.jpg`,
-        } as any);
+        };
+        formData.append("profile_image", profileImageFile as any);
       }
 
-      // Handle ID card - React Native specific
       if (data.idCard) {
-        formData.append("id_card", {
+        const idCardFile = {
           uri: data.idCard.uri,
           type: data.idCard.type || "image/jpeg",
           name: data.idCard.name || `id_card_${Date.now()}.jpg`,
-        } as any);
+        };
+        formData.append("id_card", idCardFile as any);
       }
 
-      // Debug: Log what's being sent
-      console.log("Form data being sent:");
-      console.log("name:", data.fullName);
-      console.log("email:", data.email);
-      console.log("division:", data.division);
-      console.log("profileImage exists:", !!data.profileImage);
-      console.log("idCard exists:", !!data.idCard);
+      console.log("formData", formData);
 
-      const response = await videoCreator(formData).unwrap();
-
-      Toast.show({
-        type: "success",
-        text1: "Video Content Creator Sent Successfully",
-      });
-      onClose();
+      await videoCreator(formData)
+        .unwrap()
+        .then(() => {
+          Toast.show({
+            type: "success",
+            text1: "Video Content Creator Sent Successfully",
+          });
+          onClose();
+        })
+        .catch((e) => {
+          console.log(e);
+          Toast.show({
+            type: "error",
+            text1: "Video Content Creator Failed",
+            text2: e?.data?.message || e?.data || "Something went wrong",
+          });
+        });
     } catch (e: any) {
-      console.log("Full error object:", JSON.stringify(e, null, 2));
-
-      // More detailed error handling
-      let errorMessage = "Something went wrong";
-      if (e?.data?.message) {
-        errorMessage = e.data.message;
-      } else if (e?.data?.errors) {
-        // Handle validation errors
-        const errors = Object.entries(e.data.errors)
-          .map(
-            ([field, messages]) =>
-              `${field}: ${(messages as string[]).join(", ")}`
-          )
-          .join("\n");
-        errorMessage = errors;
-      }
-
+      console.log(e);
       Toast.show({
         type: "error",
         text1: "Video Content Creator Failed",
-        text2: errorMessage,
+        text2: e?.data?.message || "Something went wrong",
       });
     }
   };
