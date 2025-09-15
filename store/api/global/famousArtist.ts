@@ -25,7 +25,7 @@ const famousArtistApi = mainApi.injectEndpoints({
       FormData
     >({
       query: (formData) => ({
-        url: "/famous-artist-requests",
+        url: "famous-artist-requests",
         method: "POST",
         data: formData,
         headers: {

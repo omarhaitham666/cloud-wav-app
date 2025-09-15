@@ -50,7 +50,7 @@ function AddSongToAlbumModal({
   album,
   onSongAdded,
 }: Props) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [selectedCoverImage, setSelectedCoverImage] = useState<any>(null);
@@ -87,15 +87,18 @@ function AddSongToAlbumModal({
         setSelectedFile(audioFile);
         Toast.show({
           type: "success",
-          text1: "File Selected",
+          text1: t("upload.addSongModal.fileSelected") || "File Selected",
           text2: fileName,
         });
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("Error picking audio file:", error);
       Toast.show({
         type: "error",
-        text1: "Selection Failed",
-        text2: "Unable to select audio file. Please try again.",
+        text1: t("upload.addSongModal.selectionFailed") || "Selection Failed",
+        text2:
+          t("upload.addSongModal.unableToSelectAudio") ||
+          "Unable to select audio file. Please try again.",
       });
     }
   };
@@ -125,16 +128,22 @@ function AddSongToAlbumModal({
         setSelectedCoverImage(imageFile);
         Toast.show({
           type: "success",
-          text1: "Cover Image Selected",
-          text2: "Cover image uploaded successfully",
+          text1:
+            t("upload.addSongModal.coverImageSelected") ||
+            "Cover Image Selected",
+          text2:
+            t("upload.addSongModal.coverImageUploaded") ||
+            "Cover image uploaded successfully",
         });
       }
     } catch (error) {
       console.error("Error picking cover image:", error);
       Toast.show({
         type: "error",
-        text1: "Selection Failed",
-        text2: "Unable to select cover image. Please try again.",
+        text1: t("upload.addSongModal.selectionFailed") || "Selection Failed",
+        text2:
+          t("upload.addSongModal.unableToSelectCover") ||
+          "Unable to select cover image. Please try again.",
       });
     }
   };
@@ -143,8 +152,11 @@ function AddSongToAlbumModal({
     if (!selectedFile || !album.id) {
       Toast.show({
         type: "error",
-        text1: "Missing Information",
-        text2: "Please select an audio file",
+        text1:
+          t("upload.addSongModal.missingInformation") || "Missing Information",
+        text2:
+          t("upload.addSongModal.selectAudioFile") ||
+          "Please select an audio file",
       });
       return;
     }
@@ -152,8 +164,11 @@ function AddSongToAlbumModal({
     if (!songTitle.trim()) {
       Toast.show({
         type: "error",
-        text1: "Missing Information",
-        text2: "Please enter a song title",
+        text1:
+          t("upload.addSongModal.missingInformation") || "Missing Information",
+        text2:
+          t("upload.addSongModal.enterSongTitle") ||
+          "Please enter a song title",
       });
       return;
     }
@@ -161,8 +176,11 @@ function AddSongToAlbumModal({
     if (!division) {
       Toast.show({
         type: "error",
-        text1: "Missing Information",
-        text2: "Please select a genre/division",
+        text1:
+          t("upload.addSongModal.missingInformation") || "Missing Information",
+        text2:
+          t("upload.addSongModal.selectGenreDivision") ||
+          "Please select a genre/division",
       });
       return;
     }
@@ -220,18 +238,21 @@ function AddSongToAlbumModal({
 
       const contentType = response.headers.get("content-type");
 
-      let result;
       if (contentType && contentType.includes("application/json")) {
-        result = await response.json();
+        await response.json();
       } else {
-        const textResponse = await response.text();
-        result = { success: true, message: "Song added successfully" };
+        await response.text();
       }
 
       Toast.show({
         type: "success",
-        text1: "Song Added Successfully",
-        text2: `${songTitle.trim()} has been added to the album`,
+        text1:
+          t("upload.addSongModal.songAddedSuccessfully") ||
+          "Song Added Successfully",
+        text2:
+          t("upload.addSongModal.songAddedToAlbum", {
+            songTitle: songTitle.trim(),
+          }) || `${songTitle.trim()} has been added to the album`,
       });
 
       // Reset form
@@ -250,7 +271,9 @@ function AddSongToAlbumModal({
       console.error("Error type:", typeof error);
       console.error("Error message:", error?.message);
 
-      let errorMessage = "Failed to add song to album. Please try again.";
+      let errorMessage =
+        t("upload.addSongModal.failedToAddSong") ||
+        "Failed to add song to album. Please try again.";
 
       if (error?.message) {
         try {
@@ -263,7 +286,7 @@ function AddSongToAlbumModal({
 
       Toast.show({
         type: "error",
-        text1: "Upload Failed",
+        text1: t("upload.addSongModal.uploadFailed") || "Upload Failed",
         text2: errorMessage,
       });
     } finally {
@@ -273,15 +296,16 @@ function AddSongToAlbumModal({
 
   const handleDeleteAlbum = () => {
     Alert.alert(
-      "Delete Album",
-      "Are you sure you want to delete this album? This action cannot be undone.",
+      t("upload.addSongModal.deleteAlbum") || "Delete Album",
+      t("upload.addSongModal.confirmDeleteAlbum") ||
+        "Are you sure you want to delete this album? This action cannot be undone.",
       [
         {
-          text: "Cancel",
+          text: t("upload.addSongModal.cancel") || "Cancel",
           style: "cancel",
         },
         {
-          text: "Delete",
+          text: t("upload.addSongModal.delete") || "Delete",
           style: "destructive",
           onPress: () => {
             onDeleteAlbum(album.id);
@@ -296,8 +320,11 @@ function AddSongToAlbumModal({
     if (isLoading || isAddingSong) {
       Toast.show({
         type: "info",
-        text1: "Upload in Progress",
-        text2: "Please wait for the upload to complete",
+        text1:
+          t("upload.addSongModal.uploadInProgress") || "Upload in Progress",
+        text2:
+          t("upload.addSongModal.waitForUpload") ||
+          "Please wait for the upload to complete",
       });
       return;
     }
@@ -329,7 +356,8 @@ function AddSongToAlbumModal({
                 fontFamily: AppFonts.semibold,
               }}
             >
-              Add Song to &quot;{album.title}&quot;
+              {t("upload.addSongModal.title", { albumTitle: album.title }) ||
+                `Add Song to "${album.title}"`}
             </Text>
             <TouchableOpacity onPress={handleClose}>
               <Text
@@ -338,7 +366,7 @@ function AddSongToAlbumModal({
                   fontFamily: AppFonts.semibold,
                 }}
               >
-                ✕
+                {t("upload.addSongModal.close") || "✕"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -354,7 +382,7 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  Album
+                  {t("upload.addSongModal.album") || "Album"}
                 </Text>
 
                 <View className="flex-row items-center p-3 border border-gray-300 rounded-lg mb-2">
@@ -397,7 +425,7 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  Audio File *
+                  {t("upload.addSongModal.audioFileRequired") || "Audio File *"}
                 </Text>
 
                 <TouchableOpacity
@@ -446,7 +474,8 @@ function AddSongToAlbumModal({
                           fontFamily: AppFonts.medium,
                         }}
                       >
-                        Tap to change file
+                        {t("upload.addSongModal.tapToChangeFile") ||
+                          "Tap to change file"}
                       </Text>
                     </View>
                   ) : (
@@ -465,7 +494,8 @@ function AddSongToAlbumModal({
                           textAlign: isRTL ? "right" : "left",
                         }}
                       >
-                        Tap to select audio file
+                        {t("upload.addSongModal.tapToSelectAudio") ||
+                          "Tap to select audio file"}
                       </Text>
                       <Text
                         style={{
@@ -476,7 +506,8 @@ function AddSongToAlbumModal({
                           textAlign: isRTL ? "right" : "left",
                         }}
                       >
-                        Supported: MP3, WAV, OGG
+                        {t("upload.addSongModal.supportedFormats") ||
+                          "Supported: MP3, WAV, OGG"}
                       </Text>
                     </View>
                   )}
@@ -494,10 +525,12 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  Song Title *
+                  {t("upload.addSongModal.songTitleRequired") || "Song Title *"}
                 </Text>
                 <TextInput
-                  placeholder="Enter song title"
+                  placeholder={
+                    t("upload.addSongModal.songTitle") || "Enter song title"
+                  }
                   value={songTitle}
                   onChangeText={setSongTitle}
                   style={{
@@ -516,7 +549,6 @@ function AddSongToAlbumModal({
                 />
               </View>
 
-              {/* Division/Genre */}
               <View>
                 <Text
                   style={{
@@ -527,7 +559,8 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  Genre/Division *
+                  {t("upload.addSongModal.genreDivisionRequired") ||
+                    "Genre/Division *"}
                 </Text>
                 <View
                   style={{
@@ -545,7 +578,12 @@ function AddSongToAlbumModal({
                       fontFamily: AppFonts.medium,
                     }}
                   >
-                    <Picker.Item label="Select Genre" value="" />
+                    <Picker.Item
+                      label={
+                        t("upload.addSongModal.selectGenre") || "Select Genre"
+                      }
+                      value=""
+                    />
                     {GENRES.map((genre) => (
                       <Picker.Item key={genre} label={genre} value={genre} />
                     ))}
@@ -553,7 +591,6 @@ function AddSongToAlbumModal({
                 </View>
               </View>
 
-              {/* Cover Image Selection */}
               <View>
                 <Text
                   className="text-gray-700 mb-2"
@@ -562,7 +599,8 @@ function AddSongToAlbumModal({
                     fontFamily: AppFonts.semibold,
                   }}
                 >
-                  Select Cover Image (Optional)
+                  {t("upload.addSongModal.coverImage") ||
+                    "Select Cover Image (Optional)"}
                 </Text>
 
                 <TouchableOpacity
@@ -586,8 +624,10 @@ function AddSongToAlbumModal({
                     }}
                   >
                     {selectedCoverImage
-                      ? "Cover image selected"
-                      : "Choose Cover Image"}
+                      ? t("upload.addSongModal.coverImageSelected") ||
+                        "Cover image selected"
+                      : t("upload.addSongModal.chooseCoverImage") ||
+                        "Choose Cover Image"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -627,7 +667,8 @@ function AddSongToAlbumModal({
                       fontFamily: AppFonts.semibold,
                     }}
                   >
-                    Add Song to Album
+                    {t("upload.addSongModal.addSongToAlbum") ||
+                      "Add Song to Album"}
                   </Text>
                 )}
               </TouchableOpacity>

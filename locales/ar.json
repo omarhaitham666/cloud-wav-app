@@ -524,6 +524,28 @@
       "symphony": "سيمفونية",
       "orchestra": "أوركسترا",
       "concerto": "كونشيرتو"
+    },
+    "imageSelected": "تم اختيار الصورة",
+    "uploadSuccess": "تم اختيار صورة {{type}} بنجاح",
+    "selectionFailed": "فشل الاختيار",
+    "unableToSelect": "تعذر اختيار صورة {{type}}. يرجى المحاولة مرة أخرى.",
+    "tapToChange": "اضغط للتغيير",
+    "tapToSelect": "اضغط للاختيار",
+    "alerts": {
+      "successTitle": "تم إرسال الطلب",
+      "successMessage": "تم إرسال طلب الفنان المشهور بنجاح",
+      "errorTitle": "فشل الطلب",
+      "errorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك بالإنترنت.",
+      "timeoutError": "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.",
+      "unauthorizedError": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+      "forbiddenError": "تم رفض الوصول. يرجى التحقق من صلاحياتك.",
+      "notFoundError": "الخدمة غير موجودة. يرجى المحاولة لاحقاً.",
+      "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً."
+    },
+    "validation": {
+      "phoneMustBe11Digits": "رقم الهاتف يجب أن يكون 11 رقم بالضبط",
+      "whatsappMustBe11Digits": "رقم الواتساب يجب أن يكون 11 رقم بالضبط"
     }
   },
   "drawer": {
@@ -620,6 +642,30 @@
       "loggedOutMessage": "تم تسجيل خروجك بنجاح",
       "logoutError": "خطأ في تسجيل الخروج",
       "logoutErrorMessage": "حدث خطأ أثناء تسجيل الخروج"
+    },
+    "famousArtist": {
+      "imageSelected": "تم اختيار الصورة",
+      "uploadSuccess": "تم اختيار صورة {{type}} بنجاح",
+      "selectionFailed": "فشل الاختيار",
+      "unableToSelect": "تعذر اختيار صورة {{type}}. يرجى المحاولة مرة أخرى.",
+      "tapToChange": "اضغط للتغيير",
+      "tapToSelect": "اضغط للاختيار",
+      "alerts": {
+        "successTitle": "تم إرسال الطلب",
+        "successMessage": "تم إرسال طلب الفنان المشهور بنجاح",
+        "errorTitle": "فشل الطلب",
+        "errorMessage": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+        "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك بالإنترنت.",
+        "timeoutError": "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.",
+        "unauthorizedError": "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+        "forbiddenError": "تم رفض الوصول. يرجى التحقق من صلاحياتك.",
+        "notFoundError": "الخدمة غير موجودة. يرجى المحاولة لاحقاً.",
+        "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً."
+      },
+      "validation": {
+        "phoneMustBe11Digits": "رقم الهاتف يجب أن يكون 11 رقم بالضبط",
+        "whatsappMustBe11Digits": "رقم الواتساب يجب أن يكون 11 رقم بالضبط"
+      }
     },
     "dashboard": {
       "welcomeBack": "مرحباً بعودتك!",
@@ -778,6 +824,44 @@
     "fileSelected": "تم اختيار الملف بنجاح",
     "submit": "إنشاء الألبوم",
     "uploading": "جارٍ الرفع...",
+    "addSongModal": {
+      "title": "إضافة أغنية إلى \"{{albumTitle}}\"",
+      "close": "✕",
+      "album": "الألبوم",
+      "audioFile": "ملف الصوت",
+      "audioFileRequired": "ملف الصوت *",
+      "songTitle": "عنوان الأغنية",
+      "songTitleRequired": "عنوان الأغنية *",
+      "genreDivision": "النوع/التخصص",
+      "genreDivisionRequired": "النوع/التخصص *",
+      "coverImage": "اختر صورة الغلاف (اختياري)",
+      "selectGenre": "اختر النوع",
+      "tapToSelectAudio": "اضغط لاختيار ملف صوتي",
+      "tapToChangeFile": "اضغط لتغيير الملف",
+      "supportedFormats": "المدعومة: MP3، WAV، OGG",
+      "coverImageSelected": "تم اختيار صورة الغلاف",
+      "chooseCoverImage": "اختر صورة الغلاف",
+      "addSongToAlbum": "إضافة أغنية للألبوم",
+      "fileSelected": "تم اختيار الملف",
+      "coverImageUploaded": "تم رفع صورة الغلاف بنجاح",
+      "selectionFailed": "فشل الاختيار",
+      "unableToSelectAudio": "تعذر اختيار ملف الصوت. يرجى المحاولة مرة أخرى.",
+      "unableToSelectCover": "تعذر اختيار صورة الغلاف. يرجى المحاولة مرة أخرى.",
+      "missingInformation": "معلومات مفقودة",
+      "selectAudioFile": "يرجى اختيار ملف صوتي",
+      "enterSongTitle": "يرجى إدخال عنوان الأغنية",
+      "selectGenreDivision": "يرجى اختيار النوع/التخصص",
+      "songAddedSuccessfully": "تم إضافة الأغنية بنجاح",
+      "songAddedToAlbum": "تم إضافة {{songTitle}} إلى الألبوم",
+      "uploadFailed": "فشل الرفع",
+      "failedToAddSong": "فشل في إضافة الأغنية للألبوم. يرجى المحاولة مرة أخرى.",
+      "uploadInProgress": "جاري الرفع",
+      "waitForUpload": "يرجى الانتظار حتى اكتمال الرفع",
+      "deleteAlbum": "حذف الألبوم",
+      "confirmDeleteAlbum": "هل أنت متأكد من حذف هذا الألبوم؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    },
     "songUpload": {
       "title": "ارفع أغانيك",
       "subtitle": "Cloud.Wave يوفر لك تخزين غير محدود.",

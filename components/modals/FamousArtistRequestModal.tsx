@@ -1,15 +1,13 @@
-import {
-  FamousArtistRequest,
-  useCreateFamousArtistRequestMutation,
-} from "@/store/api/global/famousArtist";
+import { FamousArtistRequest } from "@/store/api/global/famousArtist";
 import { AppFonts } from "@/utils/fonts";
+import { getToken } from "@/utils/secureStore";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
   Image,
   KeyboardAvoidingView,
   Modal,
@@ -20,6 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CountryPicker from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
 
 interface FamousArtistRequestModalProps {
@@ -31,9 +30,9 @@ export default function FamousArtistRequestModal({
   visible,
   onClose,
 }: FamousArtistRequestModalProps) {
-  const { t } = useTranslation();
-  const [createFamousArtistRequest, { isLoading }] =
-    useCreateFamousArtistRequestMutation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState<FamousArtistRequest>({
     famous_name: "",
@@ -48,22 +47,33 @@ export default function FamousArtistRequestModal({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [idCardImage, setIdCardImage] = useState<string | null>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [idCardImage, setIdCardImage] = useState<any>(null);
+  const [profileImage, setProfileImage] = useState<any>(null);
   const [showDivisionPicker, setShowDivisionPicker] = useState(false);
 
+  const [phoneCountry, setPhoneCountry] = useState({
+    cca2: "EG",
+    callingCode: "20",
+    name: "Egypt",
+  });
+  const [whatsappCountry, setWhatsappCountry] = useState({
+    cca2: "EG",
+    callingCode: "20",
+    name: "Egypt",
+  });
+
   const divisions = [
-    { key: "rap", label: t("famousArtist.divisions.rap") },
-    { key: "pop", label: t("famousArtist.divisions.pop") },
-    { key: "blues", label: t("famousArtist.divisions.blues") },
-    { key: "rock", label: t("famousArtist.divisions.rock") },
-    { key: "mahraganat", label: t("famousArtist.divisions.mahraganat") },
-    { key: "jazz", label: t("famousArtist.divisions.jazz") },
-    { key: "metal", label: t("famousArtist.divisions.metal") },
-    { key: "sonata", label: t("famousArtist.divisions.sonata") },
-    { key: "symphony", label: t("famousArtist.divisions.symphony") },
-    { key: "orchestra", label: t("famousArtist.divisions.orchestra") },
-    { key: "concerto", label: t("famousArtist.divisions.concerto") },
+    { key: "Rap", label: t("famousArtist.divisions.rap") },
+    { key: "Pop", label: t("famousArtist.divisions.pop") },
+    { key: "Blues", label: t("famousArtist.divisions.blues") },
+    { key: "Rock", label: t("famousArtist.divisions.rock") },
+    { key: "Mahraganat", label: t("famousArtist.divisions.mahraganat") },
+    { key: "Jazz", label: t("famousArtist.divisions.jazz") },
+    { key: "Metal & Heavy Metal", label: t("famousArtist.divisions.metal") },
+    { key: "Sonata", label: t("famousArtist.divisions.sonata") },
+    { key: "Symphony", label: t("famousArtist.divisions.symphony") },
+    { key: "Orchestra", label: t("famousArtist.divisions.orchestra") },
+    { key: "Concerto", label: t("famousArtist.divisions.concerto") },
   ];
 
   const handleInputChange = (
@@ -104,18 +114,22 @@ export default function FamousArtistRequestModal({
     if (!formData.famous_number.trim()) {
       newErrors.famous_number = t("validation.phoneRequired");
     } else {
-      const phoneRegex = /^[0-9]{10,15}$/;
-      if (!phoneRegex.test(formData.famous_number.replace(/\s/g, ""))) {
-        newErrors.famous_number = t("validation.phoneInvalid");
+      // Remove any non-digit characters and check length
+      const cleanNumber = formData.famous_number.replace(/\D/g, "");
+      if (cleanNumber.length !== 11) {
+        newErrors.famous_number =
+          t("famousArtist.validation.phoneMustBe11Digits") ||
+          "Phone number must be exactly 11 digits";
       }
     }
 
     if (formData.famous_whatsapp_number.trim()) {
-      const phoneRegex = /^[0-9]{10,15}$/;
-      if (
-        !phoneRegex.test(formData.famous_whatsapp_number.replace(/\s/g, ""))
-      ) {
-        newErrors.famous_whatsapp_number = t("validation.phoneInvalid");
+      // Remove any non-digit characters and check length
+      const cleanNumber = formData.famous_whatsapp_number.replace(/\D/g, "");
+      if (cleanNumber.length !== 11) {
+        newErrors.famous_whatsapp_number =
+          t("famousArtist.validation.whatsappMustBe11Digits") ||
+          "WhatsApp number must be exactly 11 digits";
       }
     }
 
@@ -137,20 +151,65 @@ export default function FamousArtistRequestModal({
         allowsEditing: true,
         aspect: type === "profile" ? [1, 1] : [4, 3],
         quality: 0.8,
+        base64: true,
       });
 
-      if (!result.canceled) {
-        const imageUri = result.assets[0].uri;
+      if (!result.canceled && result.assets?.[0]?.uri) {
+        const asset = result.assets[0];
+        const fileName = asset.fileName || `${type}_${Date.now()}.jpg`;
+        const mimeType = asset.mimeType || "image/jpeg";
+
+        const imageFile = {
+          uri: asset.uri,
+          name: fileName,
+          type: mimeType,
+          base64: asset.base64,
+        };
+
         if (type === "id_card") {
-          setIdCardImage(imageUri);
-          setFormData((prev) => ({ ...prev, famous_id_card_image: imageUri }));
+          setIdCardImage(imageFile);
+          setFormData((prev) => ({ ...prev, famous_id_card_image: asset.uri }));
         } else {
-          setProfileImage(imageUri);
-          setFormData((prev) => ({ ...prev, famous_profile_image: imageUri }));
+          setProfileImage(imageFile);
+          setFormData((prev) => ({ ...prev, famous_profile_image: asset.uri }));
         }
+
+        Toast.show({
+          type: "success",
+          text1: t("famousArtist.imageSelected") || "Image Selected",
+          text2:
+            t("famousArtist.uploadSuccess", {
+              type:
+                type === "id_card"
+                  ? t("famousArtist.fields.idCard")
+                  : t("famousArtist.fields.profileImage"),
+            }) ||
+            `${
+              type === "id_card"
+                ? t("famousArtist.fields.idCard")
+                : t("famousArtist.fields.profileImage")
+            } ${t("famousArtist.imageSelected")}`,
+        });
       }
-    } catch {
-      Alert.alert(t("common.error"), t("common.imagePickerError"));
+    } catch (error) {
+      console.error(`Error picking ${type} image:`, error);
+      Toast.show({
+        type: "error",
+        text1: t("famousArtist.selectionFailed") || "Selection Failed",
+        text2:
+          t("famousArtist.unableToSelect", {
+            type:
+              type === "id_card"
+                ? t("famousArtist.fields.idCard")
+                : t("famousArtist.fields.profileImage"),
+          }) ||
+          `${t("famousArtist.unableToSelect", {
+            type:
+              type === "id_card"
+                ? t("famousArtist.fields.idCard")
+                : t("famousArtist.fields.profileImage"),
+          })}. ${t("common.retry")}`,
+      });
     }
   };
 
@@ -158,6 +217,14 @@ export default function FamousArtistRequestModal({
     if (!validateForm()) {
       return;
     }
+
+    const token = await getToken("access_token");
+    if (!token) {
+      router.replace("/(drawer)/(auth)/login");
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const formDataToSend = new FormData();
@@ -167,11 +234,15 @@ export default function FamousArtistRequestModal({
         "famous_email",
         formData.famous_email.trim().toLowerCase()
       );
-      formDataToSend.append("famous_number", formData.famous_number.trim());
-      formDataToSend.append(
-        "famous_whatsapp_number",
-        formData.famous_whatsapp_number.trim()
+
+      const cleanPhoneNumber = formData.famous_number.replace(/\D/g, "");
+      formDataToSend.append("famous_number", cleanPhoneNumber);
+
+      const cleanWhatsappNumber = formData.famous_whatsapp_number.replace(
+        /\D/g,
+        ""
       );
+      formDataToSend.append("famous_whatsapp_number", cleanWhatsappNumber);
       formDataToSend.append("famous_details", formData.famous_details.trim());
       formDataToSend.append("famous_division", formData.famous_division.trim());
       formDataToSend.append(
@@ -179,78 +250,139 @@ export default function FamousArtistRequestModal({
         formData.famous_social_links.trim()
       );
 
-      if (idCardImage) {
-        formDataToSend.append("famous_id_card_image", {
-          uri: idCardImage,
-          type: "image/jpeg",
-          name: "id_card.jpg",
-        } as any);
+      if (profileImage && profileImage.base64) {
+        const base64File = {
+          uri: `data:${profileImage.type};base64,${profileImage.base64}`,
+          type: profileImage.type || "image/jpeg",
+          name: profileImage.name || `famous_profile_${Date.now()}.jpg`,
+        };
+        formDataToSend.append("famous_profile_image", base64File as any);
+      } else if (profileImage) {
+        const profileImageFile = {
+          uri: profileImage.uri,
+          type: profileImage.type || "image/jpeg",
+          name: profileImage.name || `famous_profile_${Date.now()}.jpg`,
+        };
+        formDataToSend.append("famous_profile_image", profileImageFile as any);
       }
 
-      if (profileImage) {
-        formDataToSend.append("famous_profile_image", {
-          uri: profileImage,
-          type: "image/jpeg",
-          name: "profile.jpg",
-        } as any);
+      if (idCardImage && idCardImage.base64) {
+        const base64File = {
+          uri: `data:${idCardImage.type};base64,${idCardImage.base64}`,
+          type: idCardImage.type || "image/jpeg",
+          name: idCardImage.name || `famous_id_card_${Date.now()}.jpg`,
+        };
+        formDataToSend.append("famous_id_card_image", base64File as any);
+      } else if (idCardImage) {
+        const idCardImageFile = {
+          uri: idCardImage.uri,
+          type: idCardImage.type || "image/jpeg",
+          name: idCardImage.name || `famous_id_card_${Date.now()}.jpg`,
+        };
+        formDataToSend.append("famous_id_card_image", idCardImageFile as any);
       }
 
-      await createFamousArtistRequest(formDataToSend)
-        .unwrap()
-        .then(() => {
-          resetForm();
-          onClose();
+      console.log("Submitting famous artist request...");
+      console.log("Form data prepared with fields:", formDataToSend);
 
-          setTimeout(() => {
-            Toast.show({
-              type: "success",
-              text1: t("common.success"),
-              text2: t("famousArtist.requestSubmitted"),
-              visibilityTime: 3000,
-              position: "top",
-              topOffset: 50,
-            });
-          }, 300);
-        })
-        .catch((e) => {
-          console.log("Famous artist request error:", e);
-          const errorMessage =
-            e?.data?.message ||
-            e?.data?.error ||
-            t("common.somethingWentWrong");
+      const response = await fetch(
+        "https://api.cloudwavproduction.com/api/famous-artist-requests",
+        {
+          method: "POST",
+          body: formDataToSend,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-          Alert.alert(t("common.error"), errorMessage, [
-            { text: t("common.ok") || "OK" },
-          ]);
-
-          Toast.show({
-            type: "error",
-            text1: t("common.error"),
-            text2: errorMessage,
-            visibilityTime: 4000,
-            position: "top",
-            topOffset: 50,
-          });
+      if (response.status === 200 || response.status === 201) {
+        Toast.show({
+          type: "success",
+          text1: t("famousArtist.alerts.successTitle") || "Request Submitted",
+          text2:
+            t("famousArtist.alerts.successMessage") ||
+            "Your famous artist request has been submitted successfully",
         });
-    } catch (err: any) {
-      console.log("Famous artist request error:", err);
-      const errorMessage =
-        err?.data?.message ||
-        err?.data?.error ||
-        t("common.somethingWentWrong");
+        resetForm();
+        onClose();
+      } else {
+        let errorMessage =
+          t("famousArtist.alerts.errorMessage") || "Request failed";
+        try {
+          const errorData = await response.json();
+          console.log("Error response data:", errorData);
 
-      Alert.alert(t("common.error"), errorMessage, [
-        { text: t("common.ok") || "OK" },
-      ]);
+          if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (errorData.error) {
+            if (typeof errorData.error === "string") {
+              errorMessage = errorData.error;
+            } else if (
+              errorData.error.famous_number ||
+              errorData.error.famous_whatsapp_number
+            ) {
+              const phoneErrors = [];
+              if (errorData.error.famous_number) {
+                phoneErrors.push(
+                  `${t("famousArtist.fields.phone")}: ${
+                    errorData.error.famous_number[0]
+                  }`
+                );
+              }
+              if (errorData.error.famous_whatsapp_number) {
+                phoneErrors.push(
+                  `${t("famousArtist.fields.whatsapp")}: ${
+                    errorData.error.famous_whatsapp_number[0]
+                  }`
+                );
+              }
+              errorMessage = phoneErrors.join(", ");
+            } else {
+              errorMessage = JSON.stringify(errorData.error);
+            }
+          } else if (errorData.errors) {
+            const firstError = Object.values(errorData.errors)[0];
+            if (Array.isArray(firstError)) {
+              errorMessage = firstError[0];
+            } else {
+              errorMessage = firstError as string;
+            }
+          } else if (errorData.data?.message) {
+            errorMessage = errorData.data.message;
+          }
+        } catch (parseError) {
+          console.log("Error parsing response:", parseError);
+          console.log("Response status:", response.status);
+          console.log("Response status text:", response.statusText);
+          errorMessage = `${
+            t("famousArtist.alerts.serverError") || "Server error"
+          }: ${response.status} ${response.statusText}`;
+        }
+
+        throw new Error(errorMessage);
+      }
+    } catch (error: any) {
+      console.log("Famous artist request error:", error);
+      console.log("Error details:", {
+        message: error?.message,
+        status: error?.response?.status,
+        data: error?.response?.data,
+      });
+
+      let errorMessage =
+        error?.message ||
+        t("common.somethingWentWrong") ||
+        "Something went wrong. Please try again.";
 
       Toast.show({
         type: "error",
-        text1: t("common.error"),
+        text1: t("famousArtist.alerts.errorTitle") || "Request Failed",
         text2: errorMessage,
-        visibilityTime: 4000,
-        position: "top",
-        topOffset: 50,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -270,6 +402,16 @@ export default function FamousArtistRequestModal({
     setProfileImage(null);
     setErrors({});
     setShowDivisionPicker(false);
+    setPhoneCountry({
+      cca2: "EG",
+      callingCode: "20",
+      name: "Egypt",
+    });
+    setWhatsappCountry({
+      cca2: "EG",
+      callingCode: "20",
+      name: "Egypt",
+    });
   };
 
   const renderInput = (
@@ -284,14 +426,27 @@ export default function FamousArtistRequestModal({
     }
   ) => (
     <View className="mb-5">
-      <View className="flex-row items-center mb-2">
+      <View
+        className="flex-row items-center mb-2"
+        style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+      >
         <Text
           className="text-gray-800 text-base"
-          style={{ fontFamily: AppFonts.medium }}
+          style={{
+            fontFamily: AppFonts.medium,
+            textAlign: isRTL ? "right" : "left",
+          }}
         >
           {label}
         </Text>
-        {options?.required && <Text className="text-red-500 ml-1">*</Text>}
+        {options?.required && (
+          <Text
+            className={`text-red-500 ${isRTL ? "mr-1" : "ml-1"}`}
+            style={{ textAlign: isRTL ? "right" : "left" }}
+          >
+            *
+          </Text>
+        )}
       </View>
       <TextInput
         value={formData[field]}
@@ -302,6 +457,7 @@ export default function FamousArtistRequestModal({
         style={{
           fontFamily: AppFonts.regular,
           textAlignVertical: options?.multiline ? "top" : "center",
+          textAlign: isRTL ? "right" : "left",
         }}
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
@@ -312,7 +468,10 @@ export default function FamousArtistRequestModal({
       {errors[field] && (
         <Text
           className="text-red-500 text-sm mt-1"
-          style={{ fontFamily: AppFonts.regular }}
+          style={{
+            fontFamily: AppFonts.regular,
+            textAlign: isRTL ? "right" : "left",
+          }}
         >
           {errors[field]}
         </Text>
@@ -322,10 +481,16 @@ export default function FamousArtistRequestModal({
 
   const renderDivisionPicker = () => (
     <View className="mb-5">
-      <View className="flex-row items-center mb-2">
+      <View
+        className="flex-row items-center mb-2"
+        style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+      >
         <Text
           className="text-gray-800 text-base"
-          style={{ fontFamily: AppFonts.medium }}
+          style={{
+            fontFamily: AppFonts.medium,
+            textAlign: isRTL ? "right" : "left",
+          }}
         >
           {t("famousArtist.fields.division")}
         </Text>
@@ -340,7 +505,10 @@ export default function FamousArtistRequestModal({
           className={`text-base ${
             formData.famous_division ? "text-gray-800" : "text-gray-400"
           }`}
-          style={{ fontFamily: AppFonts.regular }}
+          style={{
+            fontFamily: AppFonts.regular,
+            textAlign: isRTL ? "right" : "left",
+          }}
         >
           {formData.famous_division
             ? divisions.find((d) => d.key === formData.famous_division)
@@ -351,7 +519,10 @@ export default function FamousArtistRequestModal({
       {errors.famous_division && (
         <Text
           className="text-red-500 text-sm mt-1"
-          style={{ fontFamily: AppFonts.regular }}
+          style={{
+            fontFamily: AppFonts.regular,
+            textAlign: isRTL ? "right" : "left",
+          }}
         >
           {errors.famous_division}
         </Text>
@@ -363,13 +534,16 @@ export default function FamousArtistRequestModal({
     type: "id_card" | "profile",
     label: string,
     placeholder: string,
-    image: string | null,
+    image: any,
     iconName: string
   ) => (
     <View className="mb-5">
       <Text
         className="text-gray-800 text-base mb-2"
-        style={{ fontFamily: AppFonts.medium }}
+        style={{
+          fontFamily: AppFonts.medium,
+          textAlign: isRTL ? "right" : "left",
+        }}
       >
         {label}
       </Text>
@@ -380,7 +554,7 @@ export default function FamousArtistRequestModal({
         {image ? (
           <View className="items-center">
             <Image
-              source={{ uri: image }}
+              source={{ uri: image.uri }}
               className={`${
                 type === "profile"
                   ? "w-24 h-24 rounded-full"
@@ -389,9 +563,21 @@ export default function FamousArtistRequestModal({
             />
             <Text
               className="text-green-600 text-sm"
-              style={{ fontFamily: AppFonts.medium }}
+              style={{
+                fontFamily: AppFonts.medium,
+                textAlign: isRTL ? "right" : "left",
+              }}
             >
-              {t("common.imageSelected")}
+              {image.name}
+            </Text>
+            <Text
+              className="text-xs text-gray-500 mt-1"
+              style={{
+                fontFamily: AppFonts.regular,
+                textAlign: isRTL ? "right" : "left",
+              }}
+            >
+              {t("famousArtist.tapToChange") || "Tap to change"}
             </Text>
           </View>
         ) : (
@@ -401,9 +587,21 @@ export default function FamousArtistRequestModal({
             </View>
             <Text
               className="text-gray-600 text-center text-sm"
-              style={{ fontFamily: AppFonts.regular }}
+              style={{
+                fontFamily: AppFonts.regular,
+                textAlign: isRTL ? "right" : "left",
+              }}
             >
               {placeholder}
+            </Text>
+            <Text
+              className="text-xs text-gray-500 mt-1"
+              style={{
+                fontFamily: AppFonts.regular,
+                textAlign: isRTL ? "right" : "left",
+              }}
+            >
+              {t("famousArtist.tapToSelect") || "Tap to select"}
             </Text>
           </View>
         )}
@@ -422,12 +620,27 @@ export default function FamousArtistRequestModal({
         className="flex-1"
       >
         <View className="flex-1 bg-white">
-          <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-            <Text className="text-lg font-bold text-indigo-600">
+          <View
+            className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
+            style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+          >
+            <Text
+              className="text-lg font-bold text-indigo-600"
+              style={{
+                fontFamily: AppFonts.bold,
+                textAlign: isRTL ? "right" : "left",
+              }}
+            >
               {t("famousArtist.modal.title")}
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-xl text-gray-600">
+              <Text
+                className="text-xl text-gray-600"
+                style={{
+                  fontFamily: AppFonts.semibold,
+                  textAlign: isRTL ? "right" : "left",
+                }}
+              >
                 {t("famousArtist.modal.close")}
               </Text>
             </TouchableOpacity>
@@ -440,7 +653,10 @@ export default function FamousArtistRequestModal({
             <View className="mb-6">
               <Text
                 className="text-lg font-semibold text-gray-800 mb-4"
-                style={{ fontFamily: AppFonts.semibold }}
+                style={{
+                  fontFamily: AppFonts.semibold,
+                  textAlign: isRTL ? "right" : "left",
+                }}
               >
                 {t("famousArtist.sections.personalInfo")}
               </Text>
@@ -461,23 +677,158 @@ export default function FamousArtistRequestModal({
                   autoCapitalize: "none",
                 }
               )}
-              {renderInput(
-                "famous_number",
-                t("famousArtist.fields.phone"),
-                t("famousArtist.placeholders.phone"),
-                { required: true, keyboardType: "phone-pad" }
-              )}
-              {renderInput(
-                "famous_whatsapp_number",
-                t("famousArtist.fields.whatsapp"),
-                t("famousArtist.placeholders.whatsapp"),
-                { keyboardType: "phone-pad" }
-              )}
+              <View className="mb-5">
+                <View
+                  className="flex-row items-center mb-2"
+                  style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+                >
+                  <Text
+                    className="text-gray-800 text-base"
+                    style={{
+                      fontFamily: AppFonts.medium,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {t("famousArtist.fields.phone")}
+                  </Text>
+                  <Text
+                    className={`text-red-500 ${isRTL ? "mr-1" : "ml-1"}`}
+                    style={{ textAlign: isRTL ? "right" : "left" }}
+                  >
+                    *
+                  </Text>
+                </View>
+                <View className="flex-row items-center border border-gray-300 rounded-xl bg-gray-50">
+                  <CountryPicker
+                    countryCode={phoneCountry.cca2 as any}
+                    withCallingCode
+                    withFlag
+                    withFilter
+                    withAlphaFilter
+                    onSelect={(country) => {
+                      setPhoneCountry({
+                        cca2: country.cca2 as string,
+                        callingCode: country.callingCode[0],
+                        name: country.name as string,
+                      });
+                    }}
+                    containerButtonStyle={{ paddingHorizontal: 10 }}
+                  />
+                  <Text
+                    className="px-2"
+                    style={{ textAlign: isRTL ? "right" : "left" }}
+                  >
+                    +{phoneCountry.callingCode}
+                  </Text>
+                  <TextInput
+                    className="flex-1 p-3"
+                    placeholder={
+                      t("famousArtist.placeholders.phone") ||
+                      "Enter 11-digit phone number"
+                    }
+                    value={formData.famous_number}
+                    onChangeText={(value) =>
+                      handleInputChange("famous_number", value)
+                    }
+                    keyboardType="phone-pad"
+                    textAlign={isRTL ? "right" : "left"}
+                    style={{
+                      textAlign: isRTL ? "right" : "left",
+                      fontFamily: AppFonts.regular,
+                    }}
+                    maxLength={11}
+                  />
+                </View>
+                {errors.famous_number && (
+                  <Text
+                    className="text-red-500 text-sm mt-1"
+                    style={{
+                      fontFamily: AppFonts.regular,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {errors.famous_number}
+                  </Text>
+                )}
+              </View>
+
+              {/* WhatsApp Number with Country Picker */}
+              <View className="mb-5">
+                <View
+                  className="flex-row items-center mb-2"
+                  style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+                >
+                  <Text
+                    className="text-gray-800 text-base"
+                    style={{
+                      fontFamily: AppFonts.medium,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {t("famousArtist.fields.whatsapp")}
+                  </Text>
+                </View>
+                <View className="flex-row items-center border border-gray-300 rounded-xl bg-gray-50">
+                  <CountryPicker
+                    countryCode={whatsappCountry.cca2 as any}
+                    withCallingCode
+                    withFlag
+                    withFilter
+                    withAlphaFilter
+                    onSelect={(country) => {
+                      setWhatsappCountry({
+                        cca2: country.cca2 as string,
+                        callingCode: country.callingCode[0],
+                        name: country.name as string,
+                      });
+                    }}
+                    containerButtonStyle={{ paddingHorizontal: 10 }}
+                  />
+                  <Text
+                    className="px-2"
+                    style={{ textAlign: isRTL ? "right" : "left" }}
+                  >
+                    +{whatsappCountry.callingCode}
+                  </Text>
+                  <TextInput
+                    className="flex-1 p-3"
+                    placeholder={
+                      t("famousArtist.placeholders.whatsapp") ||
+                      "Enter 11-digit WhatsApp number"
+                    }
+                    value={formData.famous_whatsapp_number}
+                    onChangeText={(value) =>
+                      handleInputChange("famous_whatsapp_number", value)
+                    }
+                    keyboardType="phone-pad"
+                    textAlign={isRTL ? "right" : "left"}
+                    style={{
+                      textAlign: isRTL ? "right" : "left",
+                      fontFamily: AppFonts.regular,
+                    }}
+                    maxLength={11}
+                  />
+                </View>
+                {errors.famous_whatsapp_number && (
+                  <Text
+                    className="text-red-500 text-sm mt-1"
+                    style={{
+                      fontFamily: AppFonts.regular,
+                      textAlign: isRTL ? "right" : "left",
+                    }}
+                  >
+                    {errors.famous_whatsapp_number}
+                  </Text>
+                )}
+              </View>
             </View>
             <View className="mb-6">
               <Text
                 className="text-lg font-semibold text-gray-800 mb-4"
-                style={{ fontFamily: AppFonts.semibold }}
+                style={{
+                  fontFamily: AppFonts.semibold,
+                  textAlign: isRTL ? "right" : "left",
+                }}
               >
                 {t("famousArtist.sections.professionalInfo")}
               </Text>
@@ -500,7 +851,10 @@ export default function FamousArtistRequestModal({
             <View className="mb-8">
               <Text
                 className="text-lg font-semibold text-gray-800 mb-4"
-                style={{ fontFamily: AppFonts.semibold }}
+                style={{
+                  fontFamily: AppFonts.semibold,
+                  textAlign: isRTL ? "right" : "left",
+                }}
               >
                 {t("famousArtist.sections.documents")}
               </Text>
@@ -526,13 +880,19 @@ export default function FamousArtistRequestModal({
               onPress={handleSubmit}
               disabled={isLoading}
             >
-              <Text className="text-white text-center font-semibold">
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  t("famousArtist.submit")
-                )}
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text
+                  className="text-white text-center font-semibold"
+                  style={{
+                    fontFamily: AppFonts.bold,
+                    textAlign: "center",
+                  }}
+                >
+                  {t("famousArtist.submit")}
+                </Text>
+              )}
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -545,10 +905,16 @@ export default function FamousArtistRequestModal({
       >
         <View className="flex-1 justify-end bg-black bg-opacity-50">
           <View className="bg-white rounded-t-3xl p-6">
-            <View className="flex-row justify-between items-center mb-4">
+            <View
+              className="flex-row justify-between items-center mb-4"
+              style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+            >
               <Text
                 className="text-lg font-semibold text-gray-800"
-                style={{ fontFamily: AppFonts.semibold }}
+                style={{
+                  fontFamily: AppFonts.semibold,
+                  textAlign: isRTL ? "right" : "left",
+                }}
               >
                 {t("famousArtist.fields.division")}
               </Text>
@@ -578,6 +944,7 @@ export default function FamousArtistRequestModal({
                         formData.famous_division === division.key
                           ? AppFonts.semibold
                           : AppFonts.regular,
+                      textAlign: isRTL ? "right" : "left",
                     }}
                   >
                     {division.label}
