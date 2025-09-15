@@ -17,6 +17,10 @@ import {
   useGetSongsQuery,
   useGetTrendSongQuery,
 } from "@/store/api/global/song";
+import { useGetUserQuery } from "@/store/api/user/user";
+import { AppFonts } from "@/utils/fonts";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -41,6 +45,8 @@ const { width } = Dimensions.get("window");
 const Music = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("home");
   const [activeGenre, setActiveGenre] = useState<string>("All Genres");
+  
+  const { data: userData } = useGetUserQuery();
 
   const {
     data: songs,
@@ -146,6 +152,15 @@ const Music = () => {
 
   const handleGenrePress = (genre: string) => {
     setActiveGenre(genre);
+  };
+
+  const handleArtistPress = () => {
+    if (userData?.artist_id) {
+      router.push({
+        pathname: "/(drawer)/artist/[id]",
+        params: { id: String(userData.artist_id) },
+      });
+    }
   };
 
   const renderSongList = (
@@ -372,7 +387,31 @@ const Music = () => {
         </View>
 
         <View className="px-5 mb-8">
-          <Text className="text-2xl font-bold text-gray-900 mb-6">Browse</Text>
+          <View className="flex-row items-center justify-between mb-6">
+            <Text className="text-2xl font-bold text-gray-900">Browse</Text>
+            {/* Show Artist button if user has artist_id */}
+            {userData?.artist_id && (
+              <TouchableOpacity
+                onPress={handleArtistPress}
+                className="bg-purple-600 px-4 py-2 rounded-full flex-row items-center shadow-sm"
+                style={{
+                  shadowColor: "#7c3aed",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  elevation: 6,
+                }}
+              >
+                <Ionicons name="musical-notes" size={16} color="white" />
+                <Text
+                  className="text-white text-sm font-medium ml-2"
+                  style={{ fontFamily: AppFonts.semibold }}
+                >
+                  Artist
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}

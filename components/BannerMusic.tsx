@@ -1,3 +1,4 @@
+import { useGetUserQuery } from "@/store/api/user/user";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +19,7 @@ const BannerMusic = () => {
     useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const opacityAnim = useRef(new Animated.Value(0.8)).current;
+  const { data: userData } = useGetUserQuery();
 
   useEffect(() => {
     const breathe = Animated.loop(
@@ -78,32 +80,35 @@ const BannerMusic = () => {
               </Text>
             </View>
 
-            <Animated.View
-              style={{
-                transform: [{ scale: scaleAnim }],
-                opacity: opacityAnim,
-              }}
-            >
-              <TouchableOpacity
-                onPress={handleFamousArtistPress}
-                className="ml-4"
-                activeOpacity={0.7}
+            {/* Only show Become A Artist button if user doesn't have artist_id */}
+            {!userData?.artist_id && (
+              <Animated.View
+                style={{
+                  transform: [{ scale: scaleAnim }],
+                  opacity: opacityAnim,
+                }}
               >
-                <View className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-2 border border-white/30">
-                  <View className="flex-row items-center">
-                    <Ionicons name="star" size={16} color="#FCD34D" />
-                    <Text
-                      className="text-white text-xs ml-1"
-                      style={{
-                        fontFamily: AppFonts.medium,
-                      }}
-                    >
-                      Become A Artist
-                    </Text>
+                <TouchableOpacity
+                  onPress={handleFamousArtistPress}
+                  className="ml-4"
+                  activeOpacity={0.7}
+                >
+                  <View className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-2 border border-white/30">
+                    <View className="flex-row items-center">
+                      <Ionicons name="star" size={16} color="#FCD34D" />
+                      <Text
+                        className="text-white text-xs ml-1"
+                        style={{
+                          fontFamily: AppFonts.medium,
+                        }}
+                      >
+                        Become A Artist
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
           </View>
         </View>
       </ImageBackground>

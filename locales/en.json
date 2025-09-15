@@ -594,6 +594,7 @@
       "terms": "By continuing, you agree to our Terms & Privacy Policy"
     },
     "user": {
+      "videoCreatorProfile": "Video Creator Profile",
       "editProfile": "Edit Profile",
       "fullName": "Full Name",
       "email": "Email",

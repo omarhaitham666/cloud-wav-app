@@ -4,6 +4,7 @@ import {
   useTopVideoCreatorsAllQuery,
   useTopVideoCreatorsQuery,
 } from "@/store/api/global/videoCreator";
+import { useGetUserQuery } from "@/store/api/user/user";
 import { creatorCategories } from "@/utils/data";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
@@ -31,6 +32,7 @@ const Creators = () => {
     useTopVideoCreatorsAllQuery();
   const { data: creatorsData, isLoading: creatorsIsLoading } =
     useTopVideoCreatorsQuery();
+  const { data: userData } = useGetUserQuery();
 
   const handleCategoryPress = (category: {
     id: number;
@@ -130,28 +132,31 @@ const Creators = () => {
             ))}
           </ScrollView>
 
-          <View className="items-center mt-10">
-            <View className="flex-row gap-6 items-center">
-              <View className="items-center">
-                <TouchableOpacity
-                  onPress={handleJoinPress}
-                  className="w-20 h-20 rounded-full bg-gray-600 items-center justify-center mb-4 shadow-lg"
-                >
-                  <View className="w-8 h-0.5 bg-white" />
-                  <View className="w-0.5 h-8 bg-white absolute" />
-                </TouchableOpacity>
-                <Text
-                  className="text-lg text-gray-900"
-                  style={{
-                    fontFamily: AppFonts.semibold,
-                    textAlign: "center",
-                  }}
-                >
-                  {t("creators.joinUs")}
-                </Text>
+          {/* Only show Join Us button if user doesn't have artist_id */}
+          {!userData?.artist_id && (
+            <View className="items-center mt-10">
+              <View className="flex-row gap-6 items-center">
+                <View className="items-center">
+                  <TouchableOpacity
+                    onPress={handleJoinPress}
+                    className="w-20 h-20 rounded-full bg-gray-600 items-center justify-center mb-4 shadow-lg"
+                  >
+                    <View className="w-8 h-0.5 bg-white" />
+                    <View className="w-0.5 h-8 bg-white absolute" />
+                  </TouchableOpacity>
+                  <Text
+                    className="text-lg text-gray-900"
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("creators.joinUs")}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          )}
         </View>
         <View className="my-8 px-6">
           <View className="my-5">

@@ -45,6 +45,10 @@ type UserData = {
   profile_image?: string;
   role?: string;
   type?: string;
+  artist_id?: number | null;
+  video_creator_id?: number | null;
+  bussiness_price?: string | null;
+  private_price?: string | null;
 };
 
 const ProfileUser: React.FC = () => {
@@ -153,7 +157,13 @@ const ProfileUser: React.FC = () => {
           !userData.role.includes("videoCreator,artist")) ||
         userData?.type === "user";
 
-      if (isRegularUser) {
+      // Check if user has only "user" role and both artist_id and video_creator_id are null
+      const isUserOnlyWithNoIds = 
+        userData?.role === "user" && 
+        !userData?.artist_id && 
+        !userData?.video_creator_id;
+
+      if (isRegularUser || isUserOnlyWithNoIds) {
         const payload = {
           email: formData.email.trim(),
           new_name: formData.fullName.trim(),
@@ -161,9 +171,39 @@ const ProfileUser: React.FC = () => {
           password: formData.password ?? "",
         };
 
-        await updateUser(payload).unwrap();
+        await updateUser(payload)
+          .unwrap()
+          .then(() => {
+            Toast.show({
+              type: "success",
+              text1:
+                t("profile.user.updateSuccess") ||
+                "Profile Updated Successfully",
+            });
+          })
+          .catch((e) => {
+            Toast.show({
+              type: "error",
+              text1: t("profile.user.updateFailed") || "Update Failed",
+              text2: e.data?.message || e.message,
+            });
+          });
+
+        setValue("password", "");
+        setValue("confirmPassword", "");
+        setImageFile(null);
+        setProfileImage(null);
+        reset({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: "",
+          confirmPassword: "",
+        });
+        refetch();
+        return;
       } else {
-        if (imageFile) {
+        // Don't send profile_image if user has only "user" role and no artist/video_creator IDs
+        if (imageFile && !isUserOnlyWithNoIds) {
           if (imageFile.base64) {
             try {
               const base64FormData = new FormData();
@@ -260,10 +300,11 @@ const ProfileUser: React.FC = () => {
             }
           }
         } else {
+          // For artists/creators without image, update text fields only
           const payload = {
             email: formData.email.trim(),
             new_name: formData.fullName.trim(),
-            type: "user",
+            type: userData?.type || "artist",
             password: formData.password ?? "",
           };
 
@@ -281,7 +322,7 @@ const ProfileUser: React.FC = () => {
               Toast.show({
                 type: "error",
                 text1: t("profile.user.updateFailed") || "Update Failed",
-                text2: e.data.message,
+                text2: e.data?.message || e.message,
               });
             });
 
