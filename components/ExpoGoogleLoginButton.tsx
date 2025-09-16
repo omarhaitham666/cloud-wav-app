@@ -16,13 +16,10 @@ WebBrowser.maybeCompleteAuthSession();
 
 const googleConfig = getGoogleAuthConfig();
 
-// Google Icon SVG
-
 export default function ExpoGoogleLoginButton() {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
 
-  // Debug: Log the configuration
   logGoogleAuthConfig(googleConfig);
 
   const [request, response, promptAsync] = useAuthRequest(
@@ -44,8 +41,6 @@ export default function ExpoGoogleLoginButton() {
   const handleAuthResponse = async (accessToken: string) => {
     try {
       setIsInProgress(true);
-
-      // Send token to backend
       const apiResponse = await fetch(
         "https://api.cloudwavproduction.com/api/auth/google/mobile",
         {
@@ -60,7 +55,6 @@ export default function ExpoGoogleLoginButton() {
       const result = await apiResponse.json();
 
       if (apiResponse.ok) {
-        // Navigate to profile with server response
         router.push({
           pathname: "/(drawer)/(tabs)/profile",
           params: {

@@ -3,14 +3,15 @@ import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    Dimensions,
-    FlatList,
-    Image,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
-    Text,
-    TouchableOpacity,
-    View,
+  DevSettings,
+  Dimensions,
+  FlatList,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { slides } from "../utils/data";
 
@@ -33,12 +34,14 @@ export default function WelcomeScreen() {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
       router.replace("/(drawer)/(tabs)");
+      setTimeout(() => {
+        DevSettings.reload();
+      }, 100);
     }
   };
 
   return (
     <View className="flex-1 py-5 bg-red-600 font-cairo">
-      {/* LanguageSwitcher at the top of each slide */}
       <View className={`w-full p-9 items-${isRTL ? "end" : "start"}`}>
         <LanguageSwitcher />
       </View>

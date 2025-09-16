@@ -1,8 +1,8 @@
 import {
-    useGetUserQuery,
-    useLogoutMutation,
-    useUpdateProfileARTISTORCREATORUserMutation,
-    useUpdateUserMutation,
+  useGetUserQuery,
+  useLogoutMutation,
+  useUpdateProfileARTISTORCREATORUserMutation,
+  useUpdateUserMutation,
 } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { invalidateAllQueries } from "@/store/utils";
@@ -17,16 +17,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    Platform,
-    ScrollView,
-    StatusBar,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -157,10 +157,9 @@ const ProfileUser: React.FC = () => {
           !userData.role.includes("videoCreator,artist")) ||
         userData?.type === "user";
 
-      // Check if user has only "user" role and both artist_id and video_creator_id are null
-      const isUserOnlyWithNoIds = 
-        userData?.role === "user" && 
-        !userData?.artist_id && 
+      const isUserOnlyWithNoIds =
+        userData?.role === "user" &&
+        !userData?.artist_id &&
         !userData?.video_creator_id;
 
       if (isRegularUser || isUserOnlyWithNoIds) {
@@ -202,7 +201,6 @@ const ProfileUser: React.FC = () => {
         refetch();
         return;
       } else {
-        // Don't send profile_image if user has only "user" role and no artist/video_creator IDs
         if (imageFile && !isUserOnlyWithNoIds) {
           if (imageFile.base64) {
             try {

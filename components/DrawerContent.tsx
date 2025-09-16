@@ -24,27 +24,43 @@ import Toast from "react-native-toast-message";
 import Feather from "react-native-vector-icons/Feather";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-const DrawerItem = React.memo(({
-  icon,
-  label,
-  isActive,
-  onPress,
-  component = null,
-  isRtl = false,
-}: any) => {
-  const itemStyle = useMemo(() => ({
-    flexDirection: (isRtl ? "row-reverse" : "row") as "row" | "row-reverse",
-    backgroundColor: isActive ? "#eef2ff" : "transparent",
-    borderColor: isActive ? "#e0e7ff" : "transparent",
-    borderWidth: isActive ? 1 : 0,
-  }), [isRtl, isActive]);
+const DrawerItem = React.memo(
+  ({
+    icon,
+    label,
+    isActive,
+    onPress,
+    component = null,
+    isRtl = false,
+  }: any) => {
+    const itemStyle = useMemo(
+      () => ({
+        flexDirection: (isRtl ? "row-reverse" : "row") as "row" | "row-reverse",
+        backgroundColor: isActive ? "#eef2ff" : "transparent",
+        borderColor: isActive ? "#e0e7ff" : "transparent",
+        borderWidth: isActive ? 1 : 0,
+      }),
+      [isRtl, isActive]
+    );
 
-  const textColor = useMemo(() => 
-    isActive ? "#4f46e5" : "#475569", 
-    [isActive]
-  );
+    const textColor = useMemo(
+      () => (isActive ? "#4f46e5" : "#475569"),
+      [isActive]
+    );
 
-  if (component) {
+    if (component) {
+      return (
+        <TouchableOpacity
+          onPress={onPress}
+          className="items-center py-3 px-6 mx-3 rounded-lg"
+          style={itemStyle}
+          activeOpacity={0.7}
+        >
+          {component}
+        </TouchableOpacity>
+      );
+    }
+
     return (
       <TouchableOpacity
         onPress={onPress}
@@ -52,33 +68,25 @@ const DrawerItem = React.memo(({
         style={itemStyle}
         activeOpacity={0.7}
       >
-        {component}
+        <View className={`${isRtl ? "ml-3" : "mr-3"} w-6 items-center`}>
+          {icon}
+        </View>
+        <Text
+          className="font-medium"
+          style={{
+            fontFamily: AppFonts.medium,
+            color: textColor,
+          }}
+        >
+          {label}
+        </Text>
       </TouchableOpacity>
     );
   }
+);
 
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      className="items-center py-3 px-6 mx-3 rounded-lg"
-      style={itemStyle}
-      activeOpacity={0.7}
-    >
-      <View className={`${isRtl ? "ml-3" : "mr-3"} w-6 items-center`}>
-        {icon}
-      </View>
-      <Text
-        className="font-medium"
-        style={{ 
-          fontFamily: AppFonts.medium,
-          color: textColor,
-        }}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-});
+// ✅ fix display name warning
+DrawerItem.displayName = "DrawerItem";
 
 export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const { t, i18n } = useTranslation();
@@ -104,45 +112,36 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         const storedToken = await getToken("access_token");
         setToken(storedToken);
       } catch (error) {
-        console.error('Error fetching token:', error);
+        console.error("Error fetching token:", error);
         setToken(null);
       }
     };
     fetchToken();
-  }, [refreshKey, user?.id]); // Only depend on refreshKey and user.id, not state.index
+  }, [refreshKey, user?.id]);
 
   useEffect(() => {
     setDrawerRefreshTrigger(triggerDrawerRefresh);
     return () => setDrawerRefreshTrigger(null);
   }, [triggerDrawerRefresh]);
 
-  const handleLogout = async () => {
+  // ✅ wrap in useCallback to avoid re-creation
+  const handleLogout = useCallback(async () => {
     try {
-      // Call logout API first
       await logout().unwrap();
 
-      // Only clear local storage after successful API call
       await deleteToken("access_token");
       await deleteToken("refresh_token");
-      // Clear specific keys instead of all storage to avoid app reload
       await AsyncStorage.multiRemove([
-        'token',
-        'user',
-        'auth_state',
-        'refresh_token'
+        "token",
+        "user",
+        "auth_state",
+        "refresh_token",
       ]);
 
-      // Clear user state and token state
       setUser(null);
       setToken(null);
-
-      // Trigger auth refresh to update all auth-related components
       triggerAuthRefresh();
-
-      // Trigger drawer refresh to update the UI
       triggerDrawerRefresh();
-
-      // Invalidate queries to refresh data
       invalidateAllQueries();
 
       Toast.show({
@@ -151,16 +150,14 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         text2: "You have been successfully logged out",
       });
     } catch (e: any) {
-      // If API call fails, still clear local state for security
       try {
         await deleteToken("access_token");
         await deleteToken("refresh_token");
-        // Clear specific keys instead of all storage to avoid app reload
         await AsyncStorage.multiRemove([
-          'token',
-          'user',
-          'auth_state',
-          'refresh_token'
+          "token",
+          "user",
+          "auth_state",
+          "refresh_token",
         ]);
       } catch (clearError) {
         console.error("Error clearing local storage:", clearError);
@@ -172,7 +169,6 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       triggerDrawerRefresh();
       invalidateAllQueries();
 
-      // Only show error if it's not a 401 (unauthenticated) error
       if (e?.status !== 401) {
         Toast.show({
           type: "error",
@@ -180,7 +176,6 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
           text2: e?.data?.message || "Something went wrong",
         });
       } else {
-        // For 401 errors, show success message since user is already logged out
         Toast.show({
           type: "success",
           text1: "Logged Out",
@@ -188,67 +183,70 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         });
       }
     }
-  };
+  }, [logout, setUser, triggerAuthRefresh, triggerDrawerRefresh]);
 
-  const handleLoginNavigation = () => {
+  const handleLoginNavigation = useCallback(() => {
     router.push("/(drawer)/(auth)/login");
-  };
+  }, []);
 
-  const drawerItems = useMemo(() => [
-    {
-      label: t("drawer.items.home"),
-      route: "(tabs)",
-      iconName: "home",
-      displayName: "Home",
-    },
-    {
-      label: t("drawer.items.contact"),
-      route: "contact/contact",
-      iconName: "phone",
-      displayName: "Contact",
-    },
-    {
-      label: t("drawer.items.faq"),
-      route: "faq/faq",
-      iconName: "help-circle",
-      displayName: "FAQ",
-    },
-    {
-      label: t("drawer.items.services"),
-      route: "services/services",
-      iconName: "grid",
-      displayName: "Services",
-    },
-    {
-      label: t("drawer.items.creators"),
-      route: "creators/creators",
-      iconName: "users",
-      displayName: "Creators",
-    },
-  ], [t]);
-
-  const languageSwitcherItem = {
-    label: t("drawer.items.language"),
-    route: null,
-    iconName: "globe",
-    component: (
-      <View
-        className="flex-1"
-        style={[
-          rowDirection,
-          { alignItems: "center", justifyContent: "space-between" },
-        ]}
-      >
-        <View style={{ flex: 1 }}>
-          <LanguageSwitcher />
-        </View>
-      </View>
-    ),
-  };
+  const drawerItems = useMemo(
+    () => [
+      {
+        label: t("drawer.items.home"),
+        route: "(tabs)",
+        iconName: "home",
+        displayName: "Home",
+      },
+      {
+        label: t("drawer.items.contact"),
+        route: "contact/contact",
+        iconName: "phone",
+        displayName: "Contact",
+      },
+      {
+        label: t("drawer.items.faq"),
+        route: "faq/faq",
+        iconName: "help-circle",
+        displayName: "FAQ",
+      },
+      {
+        label: t("drawer.items.services"),
+        route: "services/services",
+        iconName: "grid",
+        displayName: "Services",
+      },
+      {
+        label: t("drawer.items.creators"),
+        route: "creators/creators",
+        iconName: "users",
+        displayName: "Creators",
+      },
+    ],
+    [t]
+  );
 
   const secondaryItems = useMemo(() => {
+    const languageSwitcherItem = {
+      label: t("drawer.items.language"),
+      route: null,
+      iconName: "globe",
+      component: (
+        <View
+          className="flex-1"
+          style={[
+            rowDirection,
+            { alignItems: "center", justifyContent: "space-between" },
+          ]}
+        >
+          <View style={{ flex: 1 }}>
+            <LanguageSwitcher />
+          </View>
+        </View>
+      ),
+    };
+
     const isAuthenticated = token || user;
-    
+
     if (isAuthenticated) {
       return [
         {
@@ -268,7 +266,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         languageSwitcherItem,
       ];
     }
-    
+
     return [
       {
         label: t("drawer.items.login"),
@@ -283,50 +281,64 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       },
       languageSwitcherItem,
     ];
-  }, [token, user, isLoading, t, handleLogout, languageSwitcherItem]);
+  }, [
+    token,
+    user,
+    isLoading,
+    t,
+    handleLogout,
+    handleLoginNavigation,
+    rowDirection,
+  ]);
 
-  const navigateTo = useCallback((route: string | null, action?: () => void) => {
-    if (action) {
-      action();
-    } else if (route) {
-      try {
-        const path = `/${route}` as RelativePathString;
-        router.push(path);
-      } catch (error) {
-        console.error(`Navigation error for route: ${route}`, error);
-        Alert.alert("Navigation Error", `Could not navigate to ${route}`);
-      }
-    }
-  }, []);
-
-  const renderDrawerItem = useCallback((item: {
-    label: string;
-    route: string | null;
-    iconName: string;
-    displayName?: string;
-    action?: () => void;
-    component?: React.ReactNode;
-  }) => {
-    const isActive = currentRoute === item.route;
-
-    return (
-      <DrawerItem
-        key={item.displayName || item.route || item.label}
-        icon={
-          <Feather
-            name={item.iconName}
-            size={20}
-            color={isActive ? "#4f46e5" : "#64748b"}
-          />
+  const navigateTo = useCallback(
+    (route: string | null, action?: () => void) => {
+      if (action) {
+        action();
+      } else if (route) {
+        try {
+          const path = `/${route}` as RelativePathString;
+          router.push(path);
+        } catch (error) {
+          console.error(`Navigation error for route: ${route}`, error);
+          Alert.alert("Navigation Error", `Could not navigate to ${route}`);
         }
-        label={item.label}
-        isActive={isActive}
-        onPress={() => navigateTo(item.route, item.action)}
-        isRtl={isArabic}
-        component={item.component}
-      />
-    );
-  }, [currentRoute, navigateTo, isArabic]);
+      }
+    },
+    []
+  );
+
+  const renderDrawerItem = useCallback(
+    (item: {
+      label: string;
+      route: string | null;
+      iconName: string;
+      displayName?: string;
+      action?: () => void;
+      component?: React.ReactNode;
+    }) => {
+      const isActive = currentRoute === item.route;
+
+      return (
+        <DrawerItem
+          key={item.displayName || item.route || item.label}
+          icon={
+            <Feather
+              name={item.iconName}
+              size={20}
+              color={isActive ? "#4f46e5" : "#64748b"}
+            />
+          }
+          label={item.label}
+          isActive={isActive}
+          onPress={() => navigateTo(item.route, item.action)}
+          isRtl={isArabic}
+          component={item.component}
+        />
+      );
+    },
+    [currentRoute, navigateTo, isArabic]
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-white">

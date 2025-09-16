@@ -1,4 +1,7 @@
 import DrawerContent from "@/components/DrawerContent";
+import SplashScreen from "@/components/SplashScreen";
+import { useAuthInit } from "@/hooks/useAuthInit";
+import { useI18nInit } from "@/hooks/useI18nInit";
 import { Drawer } from "expo-router/drawer";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
@@ -6,20 +9,29 @@ import { useTranslation } from "react-i18next";
 function DrawerLayout() {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-  
-  const screenOptions = useMemo(() => ({
-    headerShown: false,
-    drawerPosition: (isArabic ? "right" : "left") as "left" | "right",
-    drawerType: "front" as const,
-    drawerStyle: {
-      width: 280,
-    },
-    drawerActiveTintColor: "#4f46e5",
-    drawerInactiveTintColor: "#64748b",
-    drawerLabelStyle: {
-      fontFamily: "Inter-Medium",
-    },
-  }), [isArabic]);
+  const { isLoading } = useAuthInit();
+  const isI18nReady = useI18nInit();
+
+  const screenOptions = useMemo(
+    () => ({
+      headerShown: false,
+      drawerPosition: (isArabic ? "right" : "left") as "left" | "right",
+      drawerType: "front" as const,
+      drawerStyle: {
+        width: 280,
+      },
+      drawerActiveTintColor: "#4f46e5",
+      drawerInactiveTintColor: "#64748b",
+      drawerLabelStyle: {
+        fontFamily: "Inter-Medium",
+      },
+    }),
+    [isArabic]
+  );
+
+  if (isLoading || !isI18nReady) {
+    return <SplashScreen />;
+  }
 
   return (
     <Drawer

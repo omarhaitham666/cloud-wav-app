@@ -1,7 +1,8 @@
+import SplashScreen from "@/components/SplashScreen";
 import { useAppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { useAuthInit } from "../hooks/useAuthInit";
@@ -15,11 +16,7 @@ function AppContent() {
   const { isLoading } = useAuthInit();
 
   if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   return (
@@ -33,11 +30,7 @@ function RootLayout() {
   const fontsLoaded = useAppFonts();
 
   if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   return (
