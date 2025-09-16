@@ -4,18 +4,15 @@ import { useAuthInit } from "@/hooks/useAuthInit";
 import { useI18nInit } from "@/hooks/useI18nInit";
 import { Drawer } from "expo-router/drawer";
 import { useMemo } from "react";
-import { useTranslation } from "react-i18next";
 
 function DrawerLayout() {
-  const { i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
   const { isLoading } = useAuthInit();
   const isI18nReady = useI18nInit();
 
   const screenOptions = useMemo(
     () => ({
       headerShown: false,
-      drawerPosition: (isArabic ? "right" : "left") as "left" | "right",
+      drawerPosition: "left" as "left" | "right",
       drawerType: "front" as const,
       drawerStyle: {
         width: 280,
@@ -26,7 +23,7 @@ function DrawerLayout() {
         fontFamily: "Inter-Medium",
       },
     }),
-    [isArabic]
+    []
   );
 
   if (isLoading || !isI18nReady) {

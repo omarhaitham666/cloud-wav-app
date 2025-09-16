@@ -5,11 +5,11 @@ import { Audio } from "expo-av";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Dimensions,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface EnhancedAudioPlayerProps {
@@ -54,6 +54,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [audioFocusAvailable, setAudioFocusAvailable] = useState(true);
 
   const soundRef = useRef<Audio.Sound | null>(null);
   const positionUpdateTimeoutRef = useRef<number | null>(null);
@@ -82,6 +83,31 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 200));
     } catch (err) {
       console.error("Error resetting audio mode:", err);
+    }
+  }, []);
+
+  const checkAudioFocusAvailability = useCallback(async () => {
+    try {
+      // Try to set audio mode to test if audio focus is available
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: false,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+      setAudioFocusAvailable(true);
+      return true;
+    } catch (err: any) {
+      if (
+        err.message?.includes("AudioFocusNotAcquiredException") ||
+        err.message?.includes("Audio focus could not be acquired")
+      ) {
+        setAudioFocusAvailable(false);
+        return false;
+      }
+      setAudioFocusAvailable(true);
+      return true;
     }
   }, []);
 
@@ -214,54 +240,13 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         errorMessage.includes("AudioFocusNotAcquiredException") ||
         errorMessage.includes("Audio focus could not be acquired")
       ) {
-        if (retryCount >= 5) {
-          setError(
-            t("common.audioFocusErrorMessage") ||
-              "Unable to acquire audio focus. Another app might be using audio. Please close other audio apps and try again."
-          );
-          onError?.(
-            t("common.audioFocusErrorMessage") ||
-              "Unable to acquire audio focus. Another app might be using audio. Please close other audio apps and try again."
-          );
-        } else {
-          setIsRetrying(true);
-          setRetryCount((prev) => prev + 1);
-
-          const delay = Math.min(Math.pow(1.5, retryCount) * 1000, 5000);
-          retryTimeoutRef.current = setTimeout(async () => {
-            try {
-              await Audio.setAudioModeAsync({
-                allowsRecordingIOS: false,
-                staysActiveInBackground: false,
-                playsInSilentModeIOS: true,
-                shouldDuckAndroid: true,
-                playThroughEarpieceAndroid: false,
-              });
-
-              await new Promise((resolve) =>
-                setTimeout(resolve, 1000 + retryCount * 500)
-              );
-
-              try {
-                await Audio.requestPermissionsAsync();
-              } catch {}
-
-              await loadAudio();
-            } catch (retryErr) {
-              console.error("Retry failed:", retryErr);
-              setError(
-                t("common.audioFocusErrorMessage") ||
-                  "Unable to acquire audio focus. Another app might be using audio. Please close other audio apps and try again."
-              );
-              onError?.(
-                t("common.audioFocusErrorMessage") ||
-                  "Unable to acquire audio focus. Another app might be using audio. Please close other audio apps and try again."
-              );
-            } finally {
-              setIsRetrying(false);
-            }
-          }, delay);
-        }
+        // Don't retry automatically for audio focus issues
+        // Show user-friendly message immediately
+        const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+          "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
+        
+        setError(userFriendlyMessage);
+        onError?.(userFriendlyMessage);
       } else {
         setError(errorMessage);
         onError?.(errorMessage);
@@ -318,6 +303,22 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     };
   }, [unloadAudio]);
 
+  // Periodically check audio focus availability when there's an error
+  useEffect(() => {
+    if (error && error.includes("phone call or video meeting")) {
+      const interval = setInterval(async () => {
+        const focusAvailable = await checkAudioFocusAvailability();
+        if (focusAvailable && !isPlaying) {
+          // Audio focus is available again, clear the error
+          setError(null);
+          setAudioFocusAvailable(true);
+        }
+      }, 2000); // Check every 2 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [error, isPlaying, checkAudioFocusAvailability]);
+
   useEffect(() => {
     if (isPlaying && !isSliding && sound) {
       const updatePosition = async () => {
@@ -361,7 +362,20 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       if (isPlaying) {
         await sound.pauseAsync();
       } else {
+        // Check audio focus availability before attempting to play
+        const focusAvailable = await checkAudioFocusAvailability();
+        
+        if (!focusAvailable) {
+          const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+            "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
+          
+          setError(userFriendlyMessage);
+          onError?.(userFriendlyMessage);
+          return;
+        }
+
         try {
+          // Set audio mode with better focus handling
           await Audio.setAudioModeAsync({
             allowsRecordingIOS: false,
             staysActiveInBackground: false,
@@ -369,6 +383,9 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
             shouldDuckAndroid: true,
             playThroughEarpieceAndroid: false,
           });
+
+          // Small delay to ensure audio mode is set
+          await new Promise((resolve) => setTimeout(resolve, 100));
 
           await sound.playAsync();
         } catch (playError: any) {
@@ -379,30 +396,17 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
             errorMessage.includes("Audio focus could not be acquired")
           ) {
             console.log(
-              "Audio focus error during play, attempting automatic retry..."
+              "Audio focus error during play, showing user-friendly message..."
             );
 
-            try {
-              await Audio.setAudioModeAsync({
-                allowsRecordingIOS: false,
-                staysActiveInBackground: false,
-                playsInSilentModeIOS: true,
-                shouldDuckAndroid: true,
-                playThroughEarpieceAndroid: false,
-              });
-
-              await new Promise((resolve) => setTimeout(resolve, 500));
-
-              await sound.playAsync();
-            } catch (retryError) {
-              console.log(
-                "Audio focus retry failed, showing error to user:",
-                retryError
-              );
-              setError(errorMessage);
-              onError?.(errorMessage);
-              return;
-            }
+            // Show user-friendly error message instead of retrying
+            const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+              "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
+            
+            setError(userFriendlyMessage);
+            onError?.(userFriendlyMessage);
+            setAudioFocusAvailable(false);
+            return;
           } else {
             throw playError;
           }
@@ -499,6 +503,17 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               setError(null);
               setIsLoading(true);
               try {
+                // Check if audio focus is available before retrying
+                const focusAvailable = await checkAudioFocusAvailability();
+                
+                if (!focusAvailable) {
+                  const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+                    "Audio is still being used by another app. Please end the call or close other audio apps and try again.";
+                  setError(userFriendlyMessage);
+                  onError?.(userFriendlyMessage);
+                  return;
+                }
+
                 await resetAudioMode();
                 await loadAudio();
               } catch (err) {
@@ -529,6 +544,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               setRetryCount(0);
               setError(null);
               setIsRetrying(false);
+              setAudioFocusAvailable(true);
             }}
             className="bg-gray-600 py-2 px-4 rounded-lg"
           >

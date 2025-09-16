@@ -87,16 +87,35 @@ const SongDetail = () => {
       console.error("Audio playback error:", error);
       setAudioError(error);
 
-      Alert.alert(
-        t("song.playbackError") || "Playback Error",
-        error || "An error occurred while playing the audio",
-        [
-          {
-            text: t("common.ok") || "OK",
-            onPress: () => setAudioError(null),
-          },
-        ]
-      );
+      // Check if it's an audio focus error
+      if (
+        error.includes("AudioFocusNotAcquiredException") ||
+        error.includes("Audio focus could not be acquired") ||
+        error.includes("phone call or video meeting")
+      ) {
+        Alert.alert(
+          t("song.playbackError") || "Playback Error",
+          t("common.audioFocusCallMessage") || 
+            "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.",
+          [
+            {
+              text: t("common.ok") || "OK",
+              onPress: () => setAudioError(null),
+            },
+          ]
+        );
+      } else {
+        Alert.alert(
+          t("song.playbackError") || "Playback Error",
+          error || "An error occurred while playing the audio",
+          [
+            {
+              text: t("common.ok") || "OK",
+              onPress: () => setAudioError(null),
+            },
+          ]
+        );
+      }
     },
     [t]
   );

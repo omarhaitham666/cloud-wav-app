@@ -472,11 +472,9 @@
     "ok": "OK",
     "retry": "Retry",
     "cancel": "Cancel",
-    "retrying": "Retrying...",
+    "audioFocusCallMessage": "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.",
     "attempt": "Attempt",
-    "audioFocusError": "Unable to acquire audio focus",
-    "audioFocusErrorMessage": "Unable to acquire audio focus. Another app might be using audio. Please close other audio apps and try again.",
-    "audioFocusRetryMessage": "Retrying to acquire audio focus...",
+    "retrying": "Retrying...",
     "audioFocusSuccessMessage": "Audio focus acquired successfully"
   },
   "famousArtist": {

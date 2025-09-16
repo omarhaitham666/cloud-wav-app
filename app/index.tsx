@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  DevSettings,
   Dimensions,
   FlatList,
   Image,
@@ -34,9 +33,6 @@ export default function WelcomeScreen() {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
       router.replace("/(drawer)/(tabs)");
-      setTimeout(() => {
-        DevSettings.reload();
-      }, 100);
     }
   };
 
