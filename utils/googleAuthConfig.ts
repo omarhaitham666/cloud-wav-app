@@ -1,3 +1,5 @@
+// utils/googleAuthConfig.ts
+
 import { makeRedirectUri } from "expo-auth-session";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
@@ -13,22 +15,23 @@ export function getGoogleAuthConfig(): GoogleAuthConfig {
 
   return {
     clientId: isExpoGo
-      ? "620097653378-8t12ljiavs9l5cgd5qvde19ia56a7d84.apps.googleusercontent.com"
+      ? process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
+        "620097653378-8t12ljiavs9l5cgd5qvde19ia56a7d84.apps.googleusercontent.com"
       : Platform.OS === "android"
       ? "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com"
       : "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com",
     redirectUri: isExpoGo
       ? process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI ||
-        "https://auth.expo.io/@omar666/cloud-wav"
+        "https://auth.expo.io/@omar666/cloud-wav" // ✅ بدون مسافات!
       : makeRedirectUri({ scheme: "cloudwav", path: "auth" }),
     environment: isExpoGo ? "expo" : "standalone",
   };
 }
 
 export const googleDiscovery = {
-  authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-  tokenEndpoint: "https://oauth2.googleapis.com/token",
-  revocationEndpoint: "https://oauth2.googleapis.com/revoke",
+  authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth", // ✅ بدون مسافات
+  tokenEndpoint: "https://oauth2.googleapis.com/token", // ✅ بدون مسافات
+  revocationEndpoint: "https://oauth2.googleapis.com/revoke", // ✅ بدون مسافات
 };
 
 export const logGoogleAuthConfig = (config: GoogleAuthConfig) => {

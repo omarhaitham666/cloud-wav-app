@@ -1,3 +1,5 @@
+// components/ExpoGoogleLoginButton.tsx
+
 import { GoogleIcon } from "@/assets/icons/GoogleIcon";
 import { useAuthRequest } from "expo-auth-session";
 import { router } from "expo-router";
@@ -6,28 +8,29 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
+
 import {
   getGoogleAuthConfig,
   googleDiscovery,
   logGoogleAuthConfig,
 } from "../utils/googleAuthConfig";
 
+// ✅ مهم جدًا: تفعيل إعادة التوجيه بعد التفويض
 WebBrowser.maybeCompleteAuthSession();
 
 const googleConfig = getGoogleAuthConfig();
+logGoogleAuthConfig(googleConfig);
 
 export default function ExpoGoogleLoginButton() {
   const { t } = useTranslation();
   const [isInProgress, setIsInProgress] = useState(false);
-
-  logGoogleAuthConfig(googleConfig);
 
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: googleConfig.clientId,
       scopes: ["openid", "profile", "email"],
       redirectUri: googleConfig.redirectUri,
-      responseType: "code",
+      responseType: "code", // ✅ ضروري لتجنب error 400
     },
     googleDiscovery
   );
