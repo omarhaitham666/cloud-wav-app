@@ -113,7 +113,7 @@ export default function ServicesSection() {
           </Text>
 
           <Text
-            className="text-base text-slate-500 text-center"
+            className="text-slate-500 text-center"
             style={{
               textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,

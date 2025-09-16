@@ -5,13 +5,13 @@ import { AppFonts } from "@/utils/fonts";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Modal,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -99,7 +99,9 @@ export default function OTPModal({
             keyboardType="numeric"
             maxLength={6}
             placeholder={t("otp.placeholder")}
-            className="border border-gray-300 rounded-md px-4 py-3 text-center text-lg tracking-widest text-black"
+            className="border border-gray-200 rounded-xl px-4 py-3 text-center text-lg tracking-widest text-gray-800 bg-gray-50"
+            placeholderTextColor="#9CA3AF"
+            textAlignVertical="center"
             style={{
               fontFamily: AppFonts.medium,
             }}

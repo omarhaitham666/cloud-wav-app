@@ -103,7 +103,7 @@ const Search = () => {
   };
 
   const renderHeader = () => (
-    <View>
+    <View style={{ minHeight: 'auto' }}>
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -121,18 +121,21 @@ const Search = () => {
             Platform.OS === "android"
               ? (StatusBar.currentHeight ?? 0) + 20
               : 60,
+          paddingBottom: 20,
         }}
       >
         <Animated.View
-          className="px-6 mb-8"
           style={{
+            paddingHorizontal: 24,
+            marginBottom: screenWidth < 375 ? 24 : 32,
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }}
         >
           <Text
-            className="text-gray-900 text-3xl mb-2"
+            className="text-gray-900 mb-2"
             style={{
+              fontSize: screenWidth < 375 ? 24 : 28,
               fontFamily: AppFonts.semibold,
               textAlign: isRTL ? "right" : "left",
             }}
@@ -140,8 +143,9 @@ const Search = () => {
             {t("creators.title")}
           </Text>
           <Text
-            className="text-gray-600 text-base"
+            className="text-gray-600"
             style={{
+              fontSize: screenWidth < 375 ? 14 : 16,
               fontFamily: AppFonts.semibold,
               textAlign: isRTL ? "right" : "left",
             }}
@@ -151,20 +155,25 @@ const Search = () => {
         </Animated.View>
 
         <Animated.View
-          className="px-6 mb-6"
           style={{
+            paddingHorizontal: 24,
+            marginBottom: screenWidth < 375 ? 20 : 24,
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }}
         >
           <View
-            className={`bg-white rounded-2xl flex-row items-center px-4 py-2 shadow-sm border border-gray-200 ${
+            className={`bg-white rounded-2xl flex-row items-center shadow-sm border border-gray-200 ${
               isRTL ? "flex-row-reverse" : ""
             }`}
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: screenWidth < 375 ? 12 : 16,
+            }}
           >
-            <Icon name="search" size={20} color="#6B7280" />
+            <Icon name="search" size={screenWidth < 375 ? 18 : 20} color="#6B7280" />
             <TextInput
-              className={`flex-1 text-gray-900 text-base ${
+              className={`flex-1 text-gray-900 ${
                 isRTL ? "mr-3" : "ml-3"
               }`}
               placeholder={t("song.searchPlaceholder")}
@@ -174,7 +183,10 @@ const Search = () => {
               returnKeyType="search"
               onSubmitEditing={() => refetch()}
               textAlign={isRTL ? "right" : "left"}
-              style={{ fontFamily: AppFonts.semibold }}
+              style={{ 
+                fontFamily: AppFonts.semibold,
+                fontSize: screenWidth < 375 ? 14 : 16
+              }}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity
@@ -194,34 +206,41 @@ const Search = () => {
           style={{
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
+            marginBottom: screenWidth < 375 ? 20 : 32,
           }}
         >
           <FlatList
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            className="mb-8"
-            contentContainerStyle={{ paddingHorizontal: 24 }}
+            contentContainerStyle={{ 
+              paddingHorizontal: 24,
+              paddingBottom: 8
+            }}
             inverted={isRTL}
             data={categories}
             keyExtractor={(item) => item.id}
             renderItem={({ item: category }) => (
               <TouchableOpacity
                 onPress={() => handleCategoryPress(category.id)}
-                className={`flex-row items-center px-4 py-3 rounded-full ${
+                className={`flex-row items-center rounded-full ${
                   isRTL ? "ml-3" : "mr-3"
                 } ${
                   activeCategory === category.id ? "bg-blue-500" : "bg-white"
                 } shadow-sm ${isRTL ? "flex-row-reverse" : ""}`}
+                style={{
+                  paddingHorizontal: screenWidth < 375 ? 12 : 16,
+                  paddingVertical: screenWidth < 375 ? 8 : 12,
+                }}
                 activeOpacity={0.8}
               >
                 <Icon
                   name={category.icon}
-                  size={16}
+                  size={screenWidth < 375 ? 14 : 16}
                   color={activeCategory === category.id ? "#ffffff" : "#374151"}
                   style={{
-                    marginRight: isRTL ? 0 : 8,
-                    marginLeft: isRTL ? 8 : 0,
+                    marginRight: isRTL ? 0 : 6,
+                    marginLeft: isRTL ? 6 : 0,
                   }}
                 />
                 <Text
@@ -230,7 +249,10 @@ const Search = () => {
                       ? "text-white"
                       : "text-gray-700"
                   }`}
-                  style={{ fontFamily: AppFonts.semibold }}
+                  style={{ 
+                    fontFamily: AppFonts.semibold,
+                    fontSize: screenWidth < 375 ? 12 : 14
+                  }}
                 >
                   {category.label}
                 </Text>
@@ -245,10 +267,15 @@ const Search = () => {
   const renderEmptyState = () => {
     if (isLoading) {
       return (
-        <View className="flex-1 justify-center items-center my-8">
+        <View style={{ 
+          minHeight: screenWidth * 0.6, 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          paddingVertical: 40 
+        }}>
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text
-            className="text-gray-600 mt-2"
+            className="text-gray-600 mt-4"
             style={{
               fontFamily: AppFonts.semibold,
               textAlign: "center",
@@ -262,7 +289,12 @@ const Search = () => {
 
     if (searchQuery.length > 0) {
       return (
-        <View className="items-center py-12">
+        <View style={{ 
+          minHeight: screenWidth * 0.6, 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          paddingVertical: 40 
+        }}>
           <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
             <Icon name="search" size={32} color="#9CA3AF" />
           </View>
@@ -276,7 +308,7 @@ const Search = () => {
             {t("song.noResultsFound")}
           </Text>
           <Text
-            className="text-gray-600 text-center text-base leading-6"
+            className="text-gray-600 text-center leading-6"
             style={{
               fontFamily: AppFonts.semibold,
               textAlign: "center",
@@ -289,7 +321,12 @@ const Search = () => {
     }
 
     return (
-      <View className="items-center py-12">
+      <View style={{ 
+        minHeight: screenWidth * 0.6, 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        paddingVertical: 40 
+      }}>
         <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
           <Icon name="search" size={32} color="#fff" />
         </View>
@@ -303,7 +340,7 @@ const Search = () => {
           {t("song.startSearching")}
         </Text>
         <Text
-          className="text-gray-600 text-center text-base leading-6"
+          className="text-gray-600 text-center leading-6"
           style={{
             fontFamily: AppFonts.semibold,
             textAlign: "center",
@@ -316,9 +353,14 @@ const Search = () => {
   };
 
   const renderFooter = () => (
-    <View className="px-6 mt-8 mb-20">
+    <View style={{ 
+      paddingHorizontal: 24, 
+      paddingTop: 32, 
+      paddingBottom: Platform.OS === 'ios' ? 100 : 80,
+      minHeight: screenWidth * 0.8
+    }}>
       <Text
-        className="text-gray-900 text-xl mb-4"
+        className="text-gray-900 text-xl mb-6"
         style={{
           fontFamily: AppFonts.semibold,
           textAlign: isRTL ? "right" : "left",
@@ -332,23 +374,33 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("actor")}
           className={`flex-1 ${
             isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          } bg-white rounded-xl shadow-sm border border-gray-200`}
+          style={{
+            padding: screenWidth < 375 ? 12 : 16,
+            minHeight: screenWidth < 375 ? 100 : 120
+          }}
         >
           <Icon
             name="video"
-            size={24}
+            size={screenWidth < 375 ? 20 : 24}
             color="#3B82F6"
-            style={{ marginBottom: 8 }}
+            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
           />
           <Text
             className="text-gray-900"
-            style={{ fontFamily: AppFonts.semibold }}
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 14 : 16
+            }}
           >
             {t("song.categories.actor")}
           </Text>
           <Text
-            className="text-gray-600 text-sm"
-            style={{ fontFamily: AppFonts.semibold }}
+            className="text-gray-600"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 11 : 12
+            }}
           >
             {t("song.categoryDescriptions.actor")}
           </Text>
@@ -358,23 +410,33 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("musician")}
           className={`flex-1 ${
             isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          } bg-white rounded-xl shadow-sm border border-gray-200`}
+          style={{
+            padding: screenWidth < 375 ? 12 : 16,
+            minHeight: screenWidth < 375 ? 100 : 120
+          }}
         >
           <Icon
             name="music"
-            size={24}
+            size={screenWidth < 375 ? 20 : 24}
             color="#3B82F6"
-            style={{ marginBottom: 8 }}
+            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
           />
           <Text
             className="text-gray-900"
-            style={{ fontFamily: AppFonts.semibold }}
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 14 : 16
+            }}
           >
             {t("song.categories.musician")}
           </Text>
           <Text
-            className="text-gray-600 text-sm"
-            style={{ fontFamily: AppFonts.semibold }}
+            className="text-gray-600"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 11 : 12
+            }}
           >
             {t("song.categoryDescriptions.musician")}
           </Text>
@@ -386,23 +448,33 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("youtuber")}
           className={`flex-1 ${
             isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          } bg-white rounded-xl shadow-sm border border-gray-200`}
+          style={{
+            padding: screenWidth < 375 ? 12 : 16,
+            minHeight: screenWidth < 375 ? 100 : 120
+          }}
         >
           <Icon
             name="play"
-            size={24}
+            size={screenWidth < 375 ? 20 : 24}
             color="#3B82F6"
-            style={{ marginBottom: 8 }}
+            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
           />
           <Text
             className="text-gray-900"
-            style={{ fontFamily: AppFonts.semibold }}
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 14 : 16
+            }}
           >
             {t("song.categories.youtuber")}
           </Text>
           <Text
-            className="text-gray-600 text-sm"
-            style={{ fontFamily: AppFonts.semibold }}
+            className="text-gray-600"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 11 : 12
+            }}
           >
             {t("song.categoryDescriptions.youtuber")}
           </Text>
@@ -412,23 +484,33 @@ const Search = () => {
           onPress={() => handlePopularCategoryPress("tiktoker")}
           className={`flex-1 ${
             isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl p-4 shadow-sm border border-gray-200`}
+          } bg-white rounded-xl shadow-sm border border-gray-200`}
+          style={{
+            padding: screenWidth < 375 ? 12 : 16,
+            minHeight: screenWidth < 375 ? 100 : 120
+          }}
         >
           <Icon
             name="zap"
-            size={24}
+            size={screenWidth < 375 ? 20 : 24}
             color="#3B82F6"
-            style={{ marginBottom: 8 }}
+            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
           />
           <Text
             className="text-gray-900"
-            style={{ fontFamily: AppFonts.semibold }}
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 14 : 16
+            }}
           >
             {t("song.categories.tiktoker")}
           </Text>
           <Text
-            className="text-gray-600 text-sm"
-            style={{ fontFamily: AppFonts.semibold }}
+            className="text-gray-600"
+            style={{ 
+              fontFamily: AppFonts.semibold,
+              fontSize: screenWidth < 375 ? 11 : 12
+            }}
           >
             {t("song.categoryDescriptions.tiktoker")}
           </Text>
@@ -478,7 +560,11 @@ const Search = () => {
 
       case "creator":
         return (
-          <View className="px-6 mb-4">
+          <View style={{ 
+            paddingHorizontal: 24, 
+            marginBottom: 16,
+            minHeight: 120
+          }}>
             <View style={{ width: screenWidth - 48 }}>
               <CreatorCard
                 id={item.data.id?.toString() ?? ""}
@@ -492,7 +578,14 @@ const Search = () => {
         );
 
       case "empty-state":
-        return <View className="px-6">{renderEmptyState()}</View>;
+        return (
+          <View style={{ 
+            paddingHorizontal: 24,
+            minHeight: screenWidth * 0.7
+          }}>
+            {renderEmptyState()}
+          </View>
+        );
 
       case "footer":
         return renderFooter();
@@ -503,7 +596,7 @@ const Search = () => {
   };
 
   return (
-    <View className="flex-1">
+    <View style={{ flex: 1 }}>
       <TopLoader />
       <FlatList
         ref={scrollViewRef as any}
@@ -511,8 +604,21 @@ const Search = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ 
+          flexGrow: 1,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 10
+        }}
         refreshControl={refreshControl as any}
+        keyboardShouldPersistTaps="handled"
+        removeClippedSubviews={false}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        initialNumToRender={5}
+        getItemLayout={(data, index) => ({
+          length: 120, // Approximate item height
+          offset: 120 * index,
+          index,
+        })}
       />
     </View>
   );

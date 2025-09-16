@@ -87,26 +87,50 @@ const Music = () => {
   );
 
   useAuthRefresh(async () => {
-    await Promise.all([
-      refetchSongs(),
-      refetchArtists(),
-      refetchAlbums(),
-      refetchTrendSongs(),
-      refetchTrendAlbums(),
-      refetchSongsByDivision(),
-    ]);
+    try {
+      const refreshPromises = [];
+      
+      // Only refetch queries that are not skipped
+      if (!isSongLoading) refreshPromises.push(refetchSongs());
+      if (!isArtistLoading) refreshPromises.push(refetchArtists());
+      if (!isAlbumLoading) refreshPromises.push(refetchAlbums());
+      if (!isLoadingTrendSongs) refreshPromises.push(refetchTrendSongs());
+      if (!isLoadingTrendAlbums) refreshPromises.push(refetchTrendAlbums());
+      
+      // Only refetch songsByDivision if it's not skipped
+      if (activeGenre !== "All Genres" && !isLoadingSongsByDivision) {
+        refreshPromises.push(refetchSongsByDivision());
+      }
+      
+      await Promise.all(refreshPromises);
+    } catch (error) {
+      console.error('Auth refresh error:', error);
+      // Don't throw the error to prevent app crash
+    }
   });
 
   const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
     onRefresh: async () => {
-      await Promise.all([
-        refetchSongs(),
-        refetchArtists(),
-        refetchAlbums(),
-        refetchTrendSongs(),
-        refetchTrendAlbums(),
-        refetchSongsByDivision(),
-      ]);
+      try {
+        const refreshPromises = [];
+        
+        // Only refetch queries that are not skipped
+        if (!isSongLoading) refreshPromises.push(refetchSongs());
+        if (!isArtistLoading) refreshPromises.push(refetchArtists());
+        if (!isAlbumLoading) refreshPromises.push(refetchAlbums());
+        if (!isLoadingTrendSongs) refreshPromises.push(refetchTrendSongs());
+        if (!isLoadingTrendAlbums) refreshPromises.push(refetchTrendAlbums());
+        
+        // Only refetch songsByDivision if it's not skipped
+        if (activeGenre !== "All Genres" && !isLoadingSongsByDivision) {
+          refreshPromises.push(refetchSongsByDivision());
+        }
+        
+        await Promise.all(refreshPromises);
+      } catch (error) {
+        console.error('Pull to refresh error:', error);
+        // Don't throw the error to prevent app crash
+      }
     },
     scrollToTopOnRefresh: true,
     showTopLoader: true,
@@ -372,16 +396,16 @@ const Music = () => {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
-      <TopLoader />
-      <ScrollView
-        ref={scrollViewRef}
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 30 }}
-        refreshControl={refreshControl as any}
-      >
+      <View className="flex-1 bg-white">
+        <StatusBar barStyle="dark-content" backgroundColor="white" />
+        <TopLoader />
+        <ScrollView
+          ref={scrollViewRef}
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 30 }}
+          refreshControl={refreshControl as any}
+        >
         <View className="mb-2">
           <BannerMusic />
         </View>

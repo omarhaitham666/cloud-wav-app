@@ -137,7 +137,7 @@ export default function ExpoGoogleLoginButton() {
       ) : (
         <View className="flex-row items-center">
           <GoogleIcon />
-          <Text className="text-gray-700 font-medium text-base ml-3">
+          <Text className="text-gray-700 font-medium ml-3">
             {t("auth.login.continueWithGoogle")}
           </Text>
         </View>

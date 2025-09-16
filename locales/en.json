@@ -203,7 +203,9 @@
         "name": "Your Name",
         "email": "Your Email",
         "projectDetails": "Project Details",
-        "sendMessage": "Send Message"
+        "sendMessage": "Send Message",
+        "submit": "Submit",
+        "submitting": "Submitting..."
       },
       "modal": {
         "title": "Service Request",
@@ -642,7 +644,10 @@
       "loggedOut": "Logged Out",
       "loggedOutMessage": "You have been successfully logged out",
       "logoutError": "Logout Error",
-      "logoutErrorMessage": "There was an error during logout"
+      "logoutErrorMessage": "There was an error during logout",
+      "updateSuccess": "Update Success",
+      "updateSuccessMessage": "Your profile has been updated successfully",
+      "updateFailedMessage": "Something went wrong"
     },
     "dashboard": {
       "welcomeBack": "Welcome Back!",

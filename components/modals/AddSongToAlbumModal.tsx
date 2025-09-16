@@ -7,15 +7,15 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Modal,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -399,7 +399,7 @@ function AddSongToAlbumModal({
                   )}
                   <View className={`flex-1 ${isRTL ? "mr-3" : "ml-3"}`}>
                     <Text
-                      className="text-base font-semibold"
+                      className="font-semibold"
                       style={{
                         fontFamily: AppFonts.semibold,
                         textAlign: isRTL ? "right" : "left",

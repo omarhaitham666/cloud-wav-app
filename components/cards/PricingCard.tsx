@@ -93,7 +93,7 @@ export const PricingCard = ({
         activeOpacity={0.7}
       >
         <Text
-          className="text-center text-base text-gray-700"
+          className="text-center text-gray-700"
           style={{ fontFamily: AppFonts.bold, }}
         >
           {t("pricing.getStarted")}

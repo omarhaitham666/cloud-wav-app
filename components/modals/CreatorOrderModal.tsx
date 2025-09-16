@@ -7,18 +7,18 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 import CountryPicker, {
-  Country,
-  CountryCode,
+    Country,
+    CountryCode,
 } from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
@@ -168,8 +168,10 @@ export default function CreatorOrderModal({
                   <View className="mb-4">
                     <Text className="text-gray-700 mb-1">Your Name</Text>
                     <TextInput
-                      className="border border-gray-300 rounded-lg p-3"
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50"
                       placeholder="Your Name"
+                      placeholderTextColor="#9CA3AF"
+                      textAlignVertical="center"
                       value={value}
                       onChangeText={onChange}
                     />
@@ -189,8 +191,10 @@ export default function CreatorOrderModal({
                   <View className="mb-4">
                     <Text className="text-gray-700 mb-1">Your Email</Text>
                     <TextInput
-                      className="border border-gray-300 rounded-lg p-3"
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50"
                       placeholder="YourMail@gmail.com"
+                      placeholderTextColor="#9CA3AF"
+                      textAlignVertical="center"
                       value={value}
                       onChangeText={onChange}
                     />
@@ -221,8 +225,10 @@ export default function CreatorOrderModal({
                       />
                       <Text className="px-2">+{callingCode}</Text>
                       <TextInput
-                        className="flex-1 p-3"
+                        className="flex-1 px-4 py-3 text-gray-800"
                         placeholder="1234567890"
+                        placeholderTextColor="#9CA3AF"
+                        textAlignVertical="center"
                         value={value}
                         onChangeText={onChange}
                         keyboardType="phone-pad"
@@ -244,8 +250,10 @@ export default function CreatorOrderModal({
                   <View className="mb-4">
                     <Text className="text-gray-700 mb-1">Write your text</Text>
                     <TextInput
-                      className="border border-gray-300 rounded-lg p-3"
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50 h-24"
                       placeholder="Write your text"
+                      placeholderTextColor="#9CA3AF"
+                      textAlignVertical="top"
                       value={value}
                       onChangeText={onChange}
                       multiline

@@ -137,7 +137,7 @@ const SocialMedia = () => {
             {t("services.socialMedia.specialist")}
           </Text>
           <Text
-            className="text-white text-base leading-6 mb-6 mt-4"
+            className="text-white leading-6 mb-6 mt-4"
             style={{
               textAlign: isRTL ? "right" : "left",
               fontFamily: AppFonts.semibold,

@@ -1,16 +1,16 @@
 import { useResetPasswordMutation } from "@/store/api/user/user";
+import { AppFonts } from "@/utils/fonts";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    SafeAreaView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { AppFonts } from "@/utils/fonts";
 
 import Toast from "react-native-toast-message";
 
@@ -75,7 +75,9 @@ export default function ResetPassword() {
           value={verificationCode}
           onChangeText={setVerificationCode}
           keyboardType="numeric"
-          className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
+          className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50 mb-4"
+          placeholderTextColor="#9CA3AF"
+          textAlignVertical="center"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
             fontFamily: AppFonts.semibold,
@@ -87,7 +89,9 @@ export default function ResetPassword() {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
+          className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50 mb-4"
+          placeholderTextColor="#9CA3AF"
+          textAlignVertical="center"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
             fontFamily: AppFonts.semibold,
@@ -99,7 +103,9 @@ export default function ResetPassword() {
           value={passwordConfirmation}
           onChangeText={setPasswordConfirmation}
           secureTextEntry
-          className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
+          className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50 mb-4"
+          placeholderTextColor="#9CA3AF"
+          textAlignVertical="center"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
             fontFamily: AppFonts.semibold,

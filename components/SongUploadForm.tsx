@@ -317,7 +317,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComplet
               <View className="items-center">
                 <Ionicons name="image-outline" size={40} color="#8B5CF6" />
                 <Text
-                  className="text-purple-400 text-base mt-3"
+                  className="text-purple-400 mt-3"
                   style={{
                     fontFamily: AppFonts.medium,
                     textAlign: isRTL ? "right" : "left",
@@ -379,7 +379,7 @@ const SongUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComplet
                   color="#8B5CF6"
                 />
                 <Text
-                  className="text-purple-400 text-base mt-3 text-center"
+                  className="text-purple-400 mt-3 text-center"
                   style={{
                     fontFamily: AppFonts.medium,
                     textAlign: isRTL ? "right" : "left",
@@ -420,8 +420,9 @@ const SongUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComplet
                 placeholder="Enter song title"
                 value={value}
                 onChangeText={onChange}
-                className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                placeholderTextColor="#6B7280"
+                className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50"
+                placeholderTextColor="#9CA3AF"
+                textAlignVertical="center"
                 style={{
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.medium,
@@ -494,8 +495,9 @@ const SongUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComplet
                 placeholder="Enter song caption"
                 value={value}
                 onChangeText={onChange}
-                className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                placeholderTextColor="#6B7280"
+                className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50 h-24"
+                placeholderTextColor="#9CA3AF"
+                textAlignVertical="top"
                 style={{
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.medium,

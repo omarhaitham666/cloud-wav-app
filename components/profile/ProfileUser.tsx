@@ -1,8 +1,8 @@
 import {
-  useGetUserQuery,
-  useLogoutMutation,
-  useUpdateProfileARTISTORCREATORUserMutation,
-  useUpdateUserMutation,
+    useGetUserQuery,
+    useLogoutMutation,
+    useUpdateProfileARTISTORCREATORUserMutation,
+    useUpdateUserMutation,
 } from "@/store/api/user/user";
 import { useAuth } from "@/store/auth-context";
 import { invalidateAllQueries } from "@/store/utils";
@@ -17,16 +17,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  Platform,
-  ScrollView,
-  StatusBar,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Platform,
+    ScrollView,
+    StatusBar,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -897,7 +897,7 @@ const ProfileUser: React.FC = () => {
                       placeholderTextColor="#6B7280"
                       value={value}
                       onChangeText={onChange}
-                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 border border-white/10"
                       style={{
                         fontFamily: AppFonts.medium,
                         textAlign: isRTL ? "right" : "left",
@@ -966,7 +966,7 @@ const ProfileUser: React.FC = () => {
                       autoComplete="email"
                       value={value}
                       onChangeText={onChange}
-                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 border border-white/10"
                       style={{
                         fontFamily: AppFonts.medium,
                         textAlign: isRTL ? "right" : "left",
@@ -1077,7 +1077,7 @@ const ProfileUser: React.FC = () => {
                       autoComplete="new-password"
                       value={value}
                       onChangeText={onChange}
-                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 border border-white/10"
                       style={{
                         fontFamily: AppFonts.medium,
                         textAlign: isRTL ? "right" : "left",
@@ -1153,7 +1153,7 @@ const ProfileUser: React.FC = () => {
                       autoComplete="new-password"
                       value={value}
                       onChangeText={onChange}
-                      className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
+                      className="bg-white/5 text-white rounded-xl px-4 py-4 border border-white/10"
                       style={{
                         fontFamily: AppFonts.medium,
                         textAlign: isRTL ? "right" : "left",
@@ -1235,7 +1235,7 @@ const ProfileUser: React.FC = () => {
                   <View className="flex-row items-center">
                     <Ionicons name="refresh-outline" size={18} color="white" />
                     <Text
-                      className="text-white text-base ml-2"
+                      className="text-white ml-2"
                       style={{
                         fontFamily: AppFonts.medium,
                         textAlign: isRTL ? "right" : "left",

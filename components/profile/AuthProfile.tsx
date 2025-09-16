@@ -54,7 +54,7 @@ const AuthProfile = () => {
             {t("profile.auth.appName")}
           </Text>
           <Text
-            className="text-base text-white/70 text-center leading-6 mt-3"
+            className="text-white/70 text-center leading-6 mt-3"
             style={{
               fontFamily: AppFonts.regular,
               textAlign: isRTL ? "center" : "center",

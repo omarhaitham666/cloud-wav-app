@@ -8,7 +8,7 @@ import { deleteToken, getToken } from "@/utils/secureStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { RelativePathString, router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
@@ -24,7 +24,7 @@ import Toast from "react-native-toast-message";
 import Feather from "react-native-vector-icons/Feather";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-const DrawerItem = ({
+const DrawerItem = React.memo(({
   icon,
   label,
   isActive,
@@ -32,15 +32,24 @@ const DrawerItem = ({
   component = null,
   isRtl = false,
 }: any) => {
+  const itemStyle = useMemo(() => ({
+    flexDirection: (isRtl ? "row-reverse" : "row") as "row" | "row-reverse",
+    backgroundColor: isActive ? "#eef2ff" : "transparent",
+    borderColor: isActive ? "#e0e7ff" : "transparent",
+    borderWidth: isActive ? 1 : 0,
+  }), [isRtl, isActive]);
+
+  const textColor = useMemo(() => 
+    isActive ? "#4f46e5" : "#475569", 
+    [isActive]
+  );
+
   if (component) {
     return (
       <TouchableOpacity
         onPress={onPress}
-        className={`${
-          isRtl ? "flex-row-reverse" : "flex-row"
-        } items-center py-3 px-6 mx-3 rounded-lg ${
-          isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
-        }`}
+        className="items-center py-3 px-6 mx-3 rounded-lg"
+        style={itemStyle}
         activeOpacity={0.7}
       >
         {component}
@@ -51,27 +60,25 @@ const DrawerItem = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`${
-        isRtl ? "flex-row-reverse" : "flex-row"
-      } items-center py-3 px-6 mx-3 rounded-lg ${
-        isActive ? "bg-[#eef2ff] border border-[#e0e7ff]" : ""
-      }`}
+      className="items-center py-3 px-6 mx-3 rounded-lg"
+      style={itemStyle}
       activeOpacity={0.7}
     >
       <View className={`${isRtl ? "ml-3" : "mr-3"} w-6 items-center`}>
         {icon}
       </View>
       <Text
-        className={`text-base font-medium ${
-          isActive ? "text-[#4f46e5]" : "text-[#475569]"
-        }`}
-        style={{ fontFamily: AppFonts.medium }}
+        className="font-medium"
+        style={{ 
+          fontFamily: AppFonts.medium,
+          color: textColor,
+        }}
       >
         {label}
       </Text>
     </TouchableOpacity>
   );
-};
+});
 
 export default function DrawerContent({ state }: DrawerContentComponentProps) {
   const { t, i18n } = useTranslation();
@@ -93,11 +100,16 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
 
   useEffect(() => {
     const fetchToken = async () => {
-      const storedToken = await getToken("access_token");
-      setToken(storedToken);
+      try {
+        const storedToken = await getToken("access_token");
+        setToken(storedToken);
+      } catch (error) {
+        console.error('Error fetching token:', error);
+        setToken(null);
+      }
     };
     fetchToken();
-  }, [state.index, refreshKey, user]);
+  }, [refreshKey, user?.id]); // Only depend on refreshKey and user.id, not state.index
 
   useEffect(() => {
     setDrawerRefreshTrigger(triggerDrawerRefresh);
@@ -182,7 +194,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     router.push("/(drawer)/(auth)/login");
   };
 
-  const drawerItems = [
+  const drawerItems = useMemo(() => [
     {
       label: t("drawer.items.home"),
       route: "(tabs)",
@@ -213,7 +225,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
       iconName: "users",
       displayName: "Creators",
     },
-  ];
+  ], [t]);
 
   const languageSwitcherItem = {
     label: t("drawer.items.language"),
@@ -234,41 +246,46 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
     ),
   };
 
-  const secondaryItems =
-    token || user
-      ? [
-          {
-            label: t("drawer.items.profile"),
-            route: null,
-            iconName: "user",
-            action: () => router.push("/(drawer)/(tabs)/profile"),
-          },
-          {
-            label: isLoading
-              ? t("drawer.items.loggingOut")
-              : t("drawer.items.logout"),
-            route: null,
-            iconName: "log-out",
-            action: handleLogout,
-          },
-          languageSwitcherItem,
-        ]
-      : [
-          {
-            label: t("drawer.items.login"),
-            route: null,
-            iconName: "log-in",
-            action: handleLoginNavigation,
-          },
-          {
-            label: t("drawer.items.register"),
-            route: "(auth)/register",
-            iconName: "user-plus",
-          },
-          languageSwitcherItem,
-        ];
+  const secondaryItems = useMemo(() => {
+    const isAuthenticated = token || user;
+    
+    if (isAuthenticated) {
+      return [
+        {
+          label: t("drawer.items.profile"),
+          route: null,
+          iconName: "user",
+          action: () => router.push("/(drawer)/(tabs)/profile"),
+        },
+        {
+          label: isLoading
+            ? t("drawer.items.loggingOut")
+            : t("drawer.items.logout"),
+          route: null,
+          iconName: "log-out",
+          action: handleLogout,
+        },
+        languageSwitcherItem,
+      ];
+    }
+    
+    return [
+      {
+        label: t("drawer.items.login"),
+        route: null,
+        iconName: "log-in",
+        action: handleLoginNavigation,
+      },
+      {
+        label: t("drawer.items.register"),
+        route: "(auth)/register",
+        iconName: "user-plus",
+      },
+      languageSwitcherItem,
+    ];
+  }, [token, user, isLoading, t, handleLogout, languageSwitcherItem]);
 
-  const navigateTo = (route: string | null, action?: () => void) => {
+  const navigateTo = useCallback((route: string | null, action?: () => void) => {
     if (action) {
       action();
     } else if (route) {
@@ -280,9 +297,9 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         Alert.alert("Navigation Error", `Could not navigate to ${route}`);
       }
     }
-  };
+  }, []);
 
-  const renderDrawerItem = (item: {
+  const renderDrawerItem = useCallback((item: {
     label: string;
     route: string | null;
     iconName: string;
@@ -309,7 +326,7 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         component={item.component}
       />
     );
-  };
+  }, [currentRoute, navigateTo, isArabic]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">

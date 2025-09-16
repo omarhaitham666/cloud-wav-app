@@ -71,7 +71,7 @@ const HomePage = () => {
             </Text>
 
             <Text
-              className="text-white text-base mb-4"
+              className="text-white mb-4"
               style={{
                 fontFamily: AppFonts.semibold,
                 textAlign: isRTL ? "right" : "left",

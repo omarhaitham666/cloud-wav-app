@@ -1,22 +1,36 @@
 import DrawerContent from "@/components/DrawerContent";
 import { Drawer } from "expo-router/drawer";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 function DrawerLayout() {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+  
+  const screenOptions = useMemo(() => ({
+    headerShown: false,
+    drawerPosition: (isArabic ? "right" : "left") as "left" | "right",
+    drawerType: "front" as const,
+    drawerStyle: {
+      width: 280,
+    },
+    drawerActiveTintColor: "#4f46e5",
+    drawerInactiveTintColor: "#64748b",
+    drawerLabelStyle: {
+      fontFamily: "Inter-Medium",
+    },
+  }), [isArabic]);
+
   return (
     <Drawer
-      screenOptions={{
-        headerShown: false,
-        drawerPosition: isArabic ? "right" : "left",
-      }}
+      screenOptions={screenOptions}
       drawerContent={(props) => <DrawerContent {...props} />}
     >
       <Drawer.Screen
         name="(tabs)"
         options={{
           title: "Home",
+          drawerLabel: "Home",
         }}
       />
       <Drawer.Screen
@@ -28,7 +42,7 @@ function DrawerLayout() {
       <Drawer.Screen
         name="faq/faq"
         options={{
-          drawerLabel: "Faq",
+          drawerLabel: "FAQ",
         }}
       />
       <Drawer.Screen
@@ -40,7 +54,7 @@ function DrawerLayout() {
       <Drawer.Screen
         name="creators/creators"
         options={{
-          drawerLabel: "Faq",
+          drawerLabel: "Creators",
         }}
       />
       <Drawer.Screen

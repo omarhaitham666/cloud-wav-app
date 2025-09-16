@@ -1,4 +1,5 @@
 import { useForgotPasswordMutation } from "@/store/api/user/user";
+import { AppFonts } from "@/utils/fonts";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,7 +12,6 @@ import {
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { AppFonts } from "@/utils/fonts";
 
 
 export default function ForgotPassword() {
@@ -63,7 +63,9 @@ export default function ForgotPassword() {
           onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
-          className="border border-gray-300 rounded-md px-4 py-3 text-base text-black mb-4"
+          className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50 mb-4"
+          placeholderTextColor="#9CA3AF"
+          textAlignVertical="center"
           style={{ 
             textAlign: isRTL ? 'right' : 'left',
             writingDirection: isRTL ? 'rtl' : 'ltr',

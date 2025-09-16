@@ -108,7 +108,7 @@ function LoginScreen() {
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
           <View
-            className={`flex-row items-center border border-gray-300 rounded-md px-3 ${
+            className={`flex-row items-center border border-gray-200 rounded-xl px-4 bg-gray-50 ${
               isRTL ? "flex-row-reverse" : ""
             }`}
           >
@@ -121,9 +121,10 @@ function LoginScreen() {
                 !(showToggle && name === "password" ? showPassword : false)
               }
               keyboardType={keyboardType}
-              className="flex-1 py-3 text-base text-black"
-              placeholderTextColor="#888"
+              className="flex-1 py-3 text-gray-800"
+              placeholderTextColor="#9CA3AF"
               autoCapitalize="none"
+              textAlignVertical="center"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 writingDirection: isRTL ? "rtl" : "ltr",
