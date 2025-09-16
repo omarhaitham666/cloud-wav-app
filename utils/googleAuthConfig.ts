@@ -7,11 +7,6 @@ export interface GoogleAuthConfig {
   environment: "development" | "production" | "expo" | "standalone";
 }
 
-/**
- * Get Google OAuth configuration based on the current environment
- * This function automatically detects whether the app is running in development or production
- * and returns the appropriate configuration
- */
 export function getGoogleAuthConfig(): GoogleAuthConfig {
   const isExpoGo = Constants.appOwnership === "expo";
 
@@ -32,18 +27,12 @@ export function getGoogleAuthConfig(): GoogleAuthConfig {
   };
 }
 
-/**
- * Google OAuth discovery document endpoints
- */
 export const googleDiscovery = {
   authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
   tokenEndpoint: "https://oauth2.googleapis.com/token",
   revocationEndpoint: "https://oauth2.googleapis.com/revoke",
 };
 
-/**
- * Debug function to log current configuration
- */
 export const logGoogleAuthConfig = (config: GoogleAuthConfig) => {
   console.log("🔐 Google Auth Configuration:");
   console.log(`   Environment: ${config.environment}`);
