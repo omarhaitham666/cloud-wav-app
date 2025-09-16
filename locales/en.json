@@ -475,7 +475,7 @@
     "audioFocusCallMessage": "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.",
     "attempt": "Attempt",
     "retrying": "Retrying...",
-    "audioFocusSuccessMessage": "Audio focus acquired successfully"
+    "audioFocusSuccessMessage": "Audio focus acquired successfully. You can now play music."
   },
   "famousArtist": {
     "title": "Add artist",
@@ -741,6 +741,7 @@
     "songNotFound": "Song not found",
     "goBack": "Go Back",
     "playbackError": "Playback Error",
+    "playbackSuccess": "Audio Ready",
     "playbackErrorMessage": "Could not play/pause the audio",
     "searchPlaceholder": "Search creators by name or category...",
     "searchingCreators": "Searching creators...",

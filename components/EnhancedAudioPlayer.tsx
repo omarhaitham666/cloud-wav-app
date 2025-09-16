@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 interface EnhancedAudioPlayerProps {
   songUrl: string;
@@ -245,7 +246,16 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         const userFriendlyMessage = t("common.audioFocusCallMessage") || 
           "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
         
-        setError(userFriendlyMessage);
+        // Show toast notification instead of setting error state
+        Toast.show({
+          type: "error",
+          text1: t("song.playbackError") || "Playback Error",
+          text2: userFriendlyMessage,
+          visibilityTime: 6000,
+          autoHide: true,
+          topOffset: 60,
+        });
+        
         onError?.(userFriendlyMessage);
       } else {
         setError(errorMessage);
@@ -309,15 +319,24 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       const interval = setInterval(async () => {
         const focusAvailable = await checkAudioFocusAvailability();
         if (focusAvailable && !isPlaying) {
-          // Audio focus is available again, clear the error
+          // Audio focus is available again, clear the error and show success toast
           setError(null);
           setAudioFocusAvailable(true);
+          
+          Toast.show({
+            type: "success",
+            text1: t("song.playbackSuccess") || "Audio Ready",
+            text2: t("common.audioFocusSuccessMessage") || "Audio focus acquired successfully. You can now play music.",
+            visibilityTime: 3000,
+            autoHide: true,
+            topOffset: 60,
+          });
         }
       }, 2000); // Check every 2 seconds
 
       return () => clearInterval(interval);
     }
-  }, [error, isPlaying, checkAudioFocusAvailability]);
+  }, [error, isPlaying, checkAudioFocusAvailability, t]);
 
   useEffect(() => {
     if (isPlaying && !isSliding && sound) {
@@ -369,7 +388,16 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           const userFriendlyMessage = t("common.audioFocusCallMessage") || 
             "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
           
-          setError(userFriendlyMessage);
+          // Show toast notification instead of setting error state
+          Toast.show({
+            type: "error",
+            text1: t("song.playbackError") || "Playback Error",
+            text2: userFriendlyMessage,
+            visibilityTime: 6000,
+            autoHide: true,
+            topOffset: 60,
+          });
+          
           onError?.(userFriendlyMessage);
           return;
         }
@@ -403,7 +431,16 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
             const userFriendlyMessage = t("common.audioFocusCallMessage") || 
               "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
             
-            setError(userFriendlyMessage);
+            // Show toast notification instead of setting error state
+            Toast.show({
+              type: "error",
+              text1: t("song.playbackError") || "Playback Error",
+              text2: userFriendlyMessage,
+              visibilityTime: 6000,
+              autoHide: true,
+              topOffset: 60,
+            });
+            
             onError?.(userFriendlyMessage);
             setAudioFocusAvailable(false);
             return;
@@ -509,7 +546,17 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
                 if (!focusAvailable) {
                   const userFriendlyMessage = t("common.audioFocusCallMessage") || 
                     "Audio is still being used by another app. Please end the call or close other audio apps and try again.";
-                  setError(userFriendlyMessage);
+                  
+                  // Show toast notification instead of setting error state
+                  Toast.show({
+                    type: "error",
+                    text1: t("song.playbackError") || "Playback Error",
+                    text2: userFriendlyMessage,
+                    visibilityTime: 6000,
+                    autoHide: true,
+                    topOffset: 60,
+                  });
+                  
                   onError?.(userFriendlyMessage);
                   return;
                 }

@@ -7,7 +7,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Image,
   ImageBackground,
@@ -17,7 +16,7 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -93,28 +92,24 @@ const SongDetail = () => {
         error.includes("Audio focus could not be acquired") ||
         error.includes("phone call or video meeting")
       ) {
-        Alert.alert(
-          t("song.playbackError") || "Playback Error",
-          t("common.audioFocusCallMessage") || 
+        Toast.show({
+          type: "error",
+          text1: t("song.playbackError") || "Playback Error",
+          text2: t("common.audioFocusCallMessage") || 
             "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.",
-          [
-            {
-              text: t("common.ok") || "OK",
-              onPress: () => setAudioError(null),
-            },
-          ]
-        );
+          visibilityTime: 6000, // Show for 6 seconds
+          autoHide: true,
+          topOffset: 60,
+        });
       } else {
-        Alert.alert(
-          t("song.playbackError") || "Playback Error",
-          error || "An error occurred while playing the audio",
-          [
-            {
-              text: t("common.ok") || "OK",
-              onPress: () => setAudioError(null),
-            },
-          ]
-        );
+        Toast.show({
+          type: "error",
+          text1: t("song.playbackError") || "Playback Error",
+          text2: error || "An error occurred while playing the audio",
+          visibilityTime: 4000, // Show for 4 seconds
+          autoHide: true,
+          topOffset: 60,
+        });
       }
     },
     [t]

@@ -475,7 +475,7 @@
     "audioFocusCallMessage": "الصوت مستخدم حالياً من قبل تطبيق آخر (مثل مكالمة هاتفية أو اجتماع فيديو). يرجى إنهاء المكالمة أو إغلاق تطبيقات الصوت الأخرى والمحاولة مرة أخرى.",
     "attempt": "محاولة",
     "retrying": "جارٍ المحاولة...",
-    "audioFocusSuccessMessage": "تم الحصول على صلاحية الصوت بنجاح"
+    "audioFocusSuccessMessage": "تم الحصول على صلاحية الصوت بنجاح. يمكنك الآن تشغيل الموسيقى."
   },
   "famousArtist": {
     "title": "إضافة فنان",
@@ -765,6 +765,7 @@
     "songNotFound": "الأغنية غير موجودة",
     "goBack": "العودة",
     "playbackError": "خطأ في التشغيل",
+    "playbackSuccess": "الصوت جاهز",
     "playbackErrorMessage": "لا يمكن تشغيل/إيقاف الصوت",
     "searchPlaceholder": "ابحث عن المبدعين بالاسم أو الفئة...",
     "searchingCreators": "جارٍ البحث عن المبدعين...",
