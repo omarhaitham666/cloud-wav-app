@@ -7,16 +7,16 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Image,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
@@ -451,12 +451,12 @@ export default function FamousArtistRequestModal({
       <TextInput
         value={formData[field]}
         onChangeText={(value) => handleInputChange(field, value)}
-        className={`border rounded-xl px-4 py-4 text-gray-800 bg-gray-50 ${
-          errors[field] ? "border-red-400" : "border-gray-200"
+        className={`border rounded-xl px-4 py-3 text-gray-800 bg-gray-50 ${
+          errors[field] ? "border-red-300 bg-red-50" : "border-gray-200"
         } ${options?.multiline ? "h-24" : ""}`}
+        textAlignVertical={options?.multiline ? "top" : "center"}
         style={{
           fontFamily: AppFonts.regular,
-          textAlignVertical: options?.multiline ? "top" : "center",
           textAlign: isRTL ? "right" : "left",
         }}
         placeholder={placeholder}
@@ -502,7 +502,7 @@ export default function FamousArtistRequestModal({
         }`}
       >
         <Text
-          className={`text-base ${
+          className={`${
             formData.famous_division ? "text-gray-800" : "text-gray-400"
           }`}
           style={{
@@ -539,7 +539,7 @@ export default function FamousArtistRequestModal({
   ) => (
     <View className="mb-5">
       <Text
-        className="text-gray-800 text-base mb-2"
+        className="text-gray-800 mb-2"
         style={{
           fontFamily: AppFonts.medium,
           textAlign: isRTL ? "right" : "left",
@@ -934,7 +934,7 @@ export default function FamousArtistRequestModal({
                   }`}
                 >
                   <Text
-                    className={`text-base ${
+                    className={`${
                       formData.famous_division === division.key
                         ? "text-red-600 font-semibold"
                         : "text-gray-800"

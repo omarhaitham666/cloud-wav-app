@@ -1,6 +1,7 @@
 import { useAppFonts } from "@/utils/fonts";
+import { Ionicons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import "react-native-reanimated";
 import Toast from "react-native-toast-message";
 import { useAuthInit } from "../hooks/useAuthInit";
@@ -55,22 +56,36 @@ function RootLayout() {
                     borderRadius: 8,
                     marginHorizontal: 16,
                     marginTop: 50,
-                    zIndex: 999999,
-                    elevation: 999999,
+                    zIndex: 9999999,
+                    elevation: 9999999,
                     position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
-                    {props.text1}
-                  </Text>
-                  {props.text2 && (
-                    <Text style={{ color: "white", marginTop: 4 }}>
-                      {props.text2}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      {props.text1}
                     </Text>
-                  )}
+                    {props.text2 && (
+                      <Text style={{ color: "white", marginTop: 4 }}>
+                        {props.text2}
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => Toast.hide()}
+                    style={{
+                      padding: 4,
+                      marginLeft: 8,
+                    }}
+                  >
+                    <Ionicons name="close" size={20} color="white" />
+                  </TouchableOpacity>
                 </View>
               ),
               error: (props) => (
@@ -82,22 +97,36 @@ function RootLayout() {
                     borderRadius: 8,
                     marginHorizontal: 16,
                     marginTop: 50,
-                    zIndex: 999999,
-                    elevation: 999999,
+                    zIndex: 9999999,
+                    elevation: 9999999,
                     position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
-                    {props.text1}
-                  </Text>
-                  {props.text2 && (
-                    <Text style={{ color: "white", marginTop: 4 }}>
-                      {props.text2}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      {props.text1}
                     </Text>
-                  )}
+                    {props.text2 && (
+                      <Text style={{ color: "white", marginTop: 4 }}>
+                        {props.text2}
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => Toast.hide()}
+                    style={{
+                      padding: 4,
+                      marginLeft: 8,
+                    }}
+                  >
+                    <Ionicons name="close" size={20} color="white" />
+                  </TouchableOpacity>
                 </View>
               ),
               info: (props) => (
@@ -109,22 +138,36 @@ function RootLayout() {
                     borderRadius: 8,
                     marginHorizontal: 16,
                     marginTop: 50,
-                    zIndex: 999999,
-                    elevation: 999999,
+                    zIndex: 9999999,
+                    elevation: 9999999,
                     position: "absolute",
                     top: 0,
                     left: 0,
                     right: 0,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
-                    {props.text1}
-                  </Text>
-                  {props.text2 && (
-                    <Text style={{ color: "white", marginTop: 4 }}>
-                      {props.text2}
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: "white", fontWeight: "bold" }}>
+                      {props.text1}
                     </Text>
-                  )}
+                    {props.text2 && (
+                      <Text style={{ color: "white", marginTop: 4 }}>
+                        {props.text2}
+                      </Text>
+                    )}
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => Toast.hide()}
+                    style={{
+                      padding: 4,
+                      marginLeft: 8,
+                    }}
+                  >
+                    <Ionicons name="close" size={20} color="white" />
+                  </TouchableOpacity>
                 </View>
               ),
             }}

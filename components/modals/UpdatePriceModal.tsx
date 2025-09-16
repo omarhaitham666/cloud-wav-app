@@ -5,13 +5,13 @@ import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
@@ -177,8 +177,9 @@ function UpdatePriceModal({
                       value={value}
                       onChangeText={onChange}
                       keyboardType="numeric"
-                      className="border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800"
+                      className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50"
                       placeholderTextColor="#9CA3AF"
+                      textAlignVertical="center"
                       style={{
                         textAlign: isRTL ? "right" : "left",
                         fontFamily: AppFonts.semibold,

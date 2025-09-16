@@ -241,7 +241,7 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComple
               <View className="items-center">
                 <Ionicons name="image-outline" size={48} color="#10B981" />
                 <Text
-                  className="text-green-400 text-base mt-3"
+                  className="text-green-400 mt-3"
                   style={{
                     fontFamily: AppFonts.medium,
                     textAlign: isRTL ? "right" : "left",
@@ -284,8 +284,9 @@ const AlbumUploadForm: React.FC<Props> = ({ isRTL, onUploadStart, onUploadComple
                 }
                 value={value}
                 onChangeText={onChange}
-                className="bg-white/5 text-white rounded-xl px-4 py-4 text-base border border-white/10"
-                placeholderTextColor="#6B7280"
+                className="border border-gray-200 rounded-xl px-4 py-3 text-gray-800 bg-gray-50"
+                placeholderTextColor="#9CA3AF"
+                textAlignVertical="center"
                 style={{
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.medium,

@@ -159,7 +159,7 @@ const FAQPage = () => {
             }}
           >
             <Text
-              className="text-base font-semibold mb-2 text-black"
+              className="font-semibold mb-2 text-black"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
@@ -180,7 +180,7 @@ const FAQPage = () => {
 
           <View className="bg-red-100 p-4 mt-4 rounded-lg">
             <Text
-              className="text-base font-bold mb-1 text-red-700"
+              className="font-bold mb-1 text-red-700"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,

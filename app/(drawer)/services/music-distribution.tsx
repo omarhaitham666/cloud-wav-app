@@ -1,5 +1,6 @@
 import MusicServiceModal from "@/components/modals/MusicServiceModal";
 import { services } from "@/utils/data";
+import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -14,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { AppFonts } from "@/utils/fonts";
 
 const MusicDistribution = () => {
   const [visible, setVisible] = useState(false);
@@ -59,7 +59,7 @@ const MusicDistribution = () => {
             {t("services.musicDistribution.title")}
           </Text>
           <Text
-            className="text-white text-base leading-6 mb-6 mt-4"
+            className="text-white leading-6 mb-6 mt-4"
             style={{
               fontFamily: AppFonts.semibold,
             }}
@@ -160,28 +160,31 @@ const MusicDistribution = () => {
               {t("services.musicDistribution.letsTalkTitle")}
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+              className="border border-gray-200 rounded-xl px-4 py-3 mb-4 bg-gray-50 text-gray-800"
               placeholder={t("services.musicDistribution.form.name")}
-              placeholderTextColor="#888"
+              placeholderTextColor="#9CA3AF"
+              textAlignVertical="center"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             />
             <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+              className="border border-gray-200 rounded-xl px-4 py-3 mb-4 bg-gray-50 text-gray-800"
               placeholder={t("services.musicDistribution.form.email")}
-              placeholderTextColor="#888"
+              placeholderTextColor="#9CA3AF"
+              textAlignVertical="center"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
               }}
             />
             <TextInput
-              className="border border-gray-300 rounded-lg px-4 py-3 mb-4 h-24 text-base"
+              className="border border-gray-200 rounded-xl px-4 py-3 mb-4 bg-gray-50 text-gray-800 h-24"
               placeholder={t("services.musicDistribution.form.projectDetails")}
-              placeholderTextColor="#888"
+              placeholderTextColor="#9CA3AF"
               multiline
+              textAlignVertical="top"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
@@ -189,7 +192,7 @@ const MusicDistribution = () => {
             />
             <TouchableOpacity className="bg-blue-600 py-3 rounded-xl items-center">
               <Text
-                className="text-white text-base font-medium"
+                className="text-white font-medium"
                 style={{
                   fontFamily: AppFonts.semibold,
                 }}

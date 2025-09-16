@@ -187,16 +187,17 @@ const Contact = () => {
     field: string;
   }) => (
     <View
-      className={`mb-4 rounded-xl border px-3 ${
+      className={`mb-4 rounded-xl border px-4 ${
         focusedField === field
-          ? "border-indigo-500 bg-indigo-50"
-          : "border-gray-200 bg-white"
+          ? "border-gray-300 bg-gray-100"
+          : "border-gray-200 bg-gray-50"
       }`}
     >
       <TextInput
-        className={`py-3 text-base text-gray-900 ${multiline ? "h-24" : ""}`}
+        className={`py-3 text-gray-800 ${multiline ? "h-24" : ""}`}
         placeholder={placeholder}
         placeholderTextColor="#9CA3AF"
+        textAlignVertical={multiline ? "top" : "center"}
         value={value}
         onChangeText={onChangeText}
         onFocus={() => setFocusedField(field)}

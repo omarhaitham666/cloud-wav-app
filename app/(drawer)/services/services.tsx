@@ -205,7 +205,7 @@ export default function ServicesScreen() {
               {t("services.main.title")}
             </Text>
             <Text
-              className="text-base text-gray-500 text-center leading-6 px-5"
+              className="text-gray-500 text-center leading-6 px-5"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,

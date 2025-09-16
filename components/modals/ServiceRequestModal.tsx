@@ -209,13 +209,13 @@ export default function ServiceRequestModal({
                       onChangeText={onChange}
                       multiline={field.multiline || false}
                       editable={!isLoading}
-                      className={`border border-indigo-300 rounded-lg px-4 py-3 text-base text-gray-800 ${
-                        isLoading ? "bg-gray-100" : ""
+                      className={`border rounded-xl px-4 py-3 text-gray-800 ${
+                        isLoading ? "bg-gray-100 border-gray-200" : "border-gray-200 bg-gray-50"
                       }`}
                       placeholderTextColor="#9CA3AF"
+                      textAlignVertical={field.multiline ? "top" : "center"}
                       style={{
                         textAlign: isRTL ? "right" : "left",
-                        textAlignVertical: "top",
                         fontFamily: AppFonts.semibold,
                       }}
                     />
@@ -246,7 +246,7 @@ export default function ServiceRequestModal({
                 <View className="flex-row items-center justify-center">
                   <ActivityIndicator color="#fff" size="small" />
                   <Text
-                    className="text-white text-center text-base ml-2"
+                    className="text-white text-center ml-2"
                     style={{
                       fontFamily: AppFonts.semibold,
                     }}

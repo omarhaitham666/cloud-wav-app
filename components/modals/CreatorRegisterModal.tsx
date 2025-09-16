@@ -7,23 +7,23 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Controller,
-  FieldError,
-  FieldErrorsImpl,
-  Merge,
-  useForm,
+    Controller,
+    FieldError,
+    FieldErrorsImpl,
+    Merge,
+    useForm,
 } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Image,
-  Modal,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    Modal,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
@@ -131,8 +131,8 @@ function FormInput({
             {label}
           </Text>
           <TextInput
-            className={`border rounded-lg px-3 py-2 ${
-              error ? "border-red-500" : "border-gray-300"
+            className={`border rounded-xl px-4 py-3 text-gray-800 bg-gray-50 ${
+              error ? "border-red-300 bg-red-50" : "border-gray-200"
             }`}
             placeholder={placeholder}
             value={value}
@@ -141,6 +141,8 @@ function FormInput({
             multiline={multiline}
             numberOfLines={multiline ? 4 : 1}
             textAlign={isRTL ? "right" : "left"}
+            placeholderTextColor="#9CA3AF"
+            textAlignVertical={multiline ? "top" : "center"}
             style={{ textAlign: isRTL ? "right" : "left" }}
           />
           {error && (

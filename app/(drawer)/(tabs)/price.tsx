@@ -76,7 +76,7 @@ export default function PricingScreen() {
               {t("pricing.title")}
             </Text>
             <Text
-              className="text-base text-gray-600 text-center leading-6 px-4"
+              className="text-gray-600 text-center leading-6 px-4"
               style={{
                 fontFamily: AppFonts.medium,
                 writingDirection: isRTL ? "rtl" : "ltr",

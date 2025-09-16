@@ -5,21 +5,21 @@ import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DateTimePicker, {
-  DateTimePickerEvent,
+    DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Image,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Image,
+    Platform,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
@@ -118,7 +118,7 @@ function RegisterScreen() {
       render={({ field: { onChange, value } }) => (
         <View className="mb-4">
           <View
-            className={`flex-row items-center border border-gray-300 rounded-md px-3 ${
+            className={`flex-row items-center border border-gray-200 rounded-xl px-4 bg-gray-50 ${
               isRTL ? "flex-row-reverse" : ""
             }`}
           >
@@ -135,8 +135,9 @@ function RegisterScreen() {
                   : false)
               }
               keyboardType={keyboardType}
-              className="flex-1 py-3 text-base text-black"
-              placeholderTextColor="#888"
+              className="flex-1 py-3 text-gray-800"
+              placeholderTextColor="#9CA3AF"
+              textAlignVertical="center"
               style={{
                 textAlign: isRTL ? "right" : "left",
                 fontFamily: AppFonts.semibold,
@@ -213,11 +214,11 @@ function RegisterScreen() {
               <View className="mb-4">
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
-                  className="border border-gray-300 rounded-md px-4 py-3"
+                  className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50"
                 >
                   <Text
-                    className={`text-base ${
-                      value ? "text-black" : "text-gray-400"
+                    className={`${
+                      value ? "text-gray-800" : "text-gray-400"
                     }`}
                     style={{
                       textAlign: isRTL ? "right" : "left",

@@ -203,7 +203,9 @@
         "name": "اسمك",
         "email": "بريدك الإلكتروني",
         "projectDetails": "تفاصيل المشروع",
-        "sendMessage": "إرسال الرسالة"
+        "sendMessage": "إرسال الرسالة",
+        "submit": "إرسال",
+        "submitting": "جاري الإرسال..."
       },
       "modal": {
         "title": "طلب الخدمة",
@@ -642,7 +644,10 @@
       "loggedOut": "تم تسجيل الخروج",
       "loggedOutMessage": "تم تسجيل خروجك بنجاح",
       "logoutError": "خطأ في تسجيل الخروج",
-      "logoutErrorMessage": "حدث خطأ أثناء تسجيل الخروج"
+      "logoutErrorMessage": "حدث خطأ أثناء تسجيل الخروج",
+      "updateSuccess": "تم التحديث بنجاح",
+      "updateSuccessMessage": "تم تحديث الملف الشخصي بنجاح",
+      "updateFailedMessage": "حدث خطأ ما"
     },
     "famousArtist": {
       "imageSelected": "تم اختيار الصورة",
