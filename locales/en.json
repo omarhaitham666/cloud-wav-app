@@ -563,7 +563,8 @@
       "register": "Register",
       "logout": "Logout",
       "loggingOut": "Logging Out",
-      "creators": "Creators"
+      "creators": "Creators",
+      "language": "Language"
     },
     "footer": {
       "brand": "CloudWav Production",
