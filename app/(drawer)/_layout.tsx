@@ -102,6 +102,18 @@ function DrawerLayout() {
         }}
       />
       <Drawer.Screen
+        name="policy/policy"
+        options={{
+          drawerLabel: "Privacy Policy",
+        }}
+      />
+      <Drawer.Screen
+        name="terms/terms"
+        options={{
+          drawerLabel: "Terms of Use",
+        }}
+      />
+      <Drawer.Screen
         name="(auth)"
         options={{
           drawerLabel: "Auth",

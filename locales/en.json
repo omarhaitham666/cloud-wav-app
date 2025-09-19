@@ -26,6 +26,8 @@
       "errorTitle": "Error",
       "errorFields": "Please fill in all required fields",
       "invalidEmail": "Please enter a valid email address",
+      "messageMinLength": "Message must be at least 10 characters long",
+      "loginRequired": "Please login to send messages",
       "successTitle": "Success!",
       "successMessage": "Your message has been sent successfully.",
       "errorMessage": "Failed to send message. Please try again."
@@ -576,7 +578,9 @@
       "logout": "Logout",
       "loggingOut": "Logging Out",
       "creators": "Creators",
-      "language": "Language"
+      "language": "Language",
+      "policy": "Policy",
+      "terms": "Terms"
     },
     "footer": {
       "brand": "CloudWav Production",
@@ -959,5 +963,131 @@
       "errorTitle": "Video Content Creator Failed",
       "errorMessage": "Something went wrong"
     }
+  },
+  "policy": {
+    "banner": {
+      "title": "Privacy Policy",
+      "subtitle": "How we protect and use your data",
+      "icon": "shield-checkmark"
+    },
+    "lastUpdated": "Last update: 9/19/2025",
+    "owner": "Owner: CloudWav Production",
+    "introduction": "Welcome to CloudWav Production, a company specializing in music, professional services, advertising, brokerage, artificial intelligence, fashion, sales through other platforms, social media services, programming, artistic and visual production, contracting, partnerships, and other diverse services. We provide integrated solutions that support creators, artists, and content makers while ensuring digital rights protection and offering advanced promotional opportunities.",
+    "aboutServices": {
+      "title": "About Our Services",
+      "content": "Producing and distributing music digitally on more than 200 global platforms. A song platform that allows artists to share their work with the public. Artist shout-outs, where customers can request promotional or greeting videos from artists. Booking artists for events and advertising through a dedicated system within the platform. Managing and executing digital advertising campaigns. Mediating between brands and artists to facilitate collaborations. Using AI to analyze data and deliver effective marketing strategies. Producing professional-level music videos and visual ads. Designing and developing websites and custom apps for creatives and businesses. Managing contracts with artists and creatives to protect the rights of all parties. Paid partnerships between individuals and companies to create new digital job opportunities. Platform management service to protect content during the subscription period. Ability to submit a request for full content protection based on agreement with the company."
+    },
+    "artistRegistration": {
+      "title": "Artist Registration",
+      "content": "Registration is open to all artists without classifications (e.g., rising or famous artist). You must provide accurate personal data, including a valid ID for identity verification. The company has the right to reject any registration request that does not meet the required conditions. The artist grants CloudWav Production the digital broadcasting rights only for the songs uploaded to the platform, while retaining full intellectual property rights."
+    },
+    "dataCollection": {
+      "title": "Data We Collect",
+      "content": "Personal information: name, email, phone number, account data. Payment info: when subscribing to paid services (we do not store card data directly). Usage data: such as pages you visit, device type, approximate location. Cookies: We currently do not use them."
+    },
+    "dataUsage": {
+      "title": "How We Use Your Data",
+      "content": "To provide services such as music publishing, content management, and digital promotion. To improve user experience by analyzing behavior and developing the platform and services. Advertising and marketing by showing you content based on your interests. Security and rights protection by detecting suspicious activity and preventing fraud."
+    },
+    "digitalRights": {
+      "title": "Digital Rights & Content Protection",
+      "content": "All artistic and musical works published through our platform are protected by intellectual property rights. We use advanced technologies to prevent piracy and violations, offering solutions for digital content protection. Artists can subscribe to platform management or request the company for full content protection."
+    },
+    "paidAds": {
+      "title": "Paid Ads & Partnerships",
+      "content": "We show targeted ads but do not share your data with third parties without your consent. Paid partnerships are available for companies and individuals interested in collaborating with creators and artists. All financial dealings related to partnerships are conducted through formal contracts to ensure transparency and rights."
+    },
+    "userRights": {
+      "title": "Your Rights as a User",
+      "content": "You can request access to your personal data. Correct any inaccurate information. Request deletion of your data in some cases. Unsubscribe from newsletters and targeted ads. To contact us about your data, email: support@cloudwavproduction.com"
+    },
+    "dataProtection": {
+      "title": "Data Protection & Security",
+      "content": "We use the latest security technologies to protect user data from breaches or violations. All payment transactions are handled by secure providers, and we do not store card data. We do not share your data with any third party without your permission, except in legal cases or to protect our rights."
+    },
+    "policyChanges": {
+      "title": "Changes to the Policy",
+      "content": "This policy may be updated occasionally, and users will be notified of any major changes. Continued use of our services means you accept the new policy after updates."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "CloudWav Production – All rights reserved. Support email: support@cloudwavproduction.com. General contact: contact@cloudwavproduction.com. Official website: cloudwavproduction.com"
+    },
+    "footer": "Thank you for choosing CloudWav Production. We are here to support your creativity, protect your work, and help you succeed through advanced technology."
+  },
+  "terms": {
+    "banner": {
+      "title": "Terms of Use",
+      "subtitle": "Terms and conditions for using our platform",
+      "icon": "document-text"
+    },
+    "lastUpdated": "Last Updated: (Insert Date Here)",
+    "owner": "Owner: CloudWav Production",
+    "introduction": "Welcome to CloudWav Production, a company specializing in professional services including music, artistic and visual production, advertising, mediation, artificial intelligence, clothing, selling on other platforms, social media services, programming, contracts, and partnerships. Our platform is a comprehensive solution for supporting creators, artists, and content makers, ensuring digital rights protection and offering advanced promotional and marketing opportunities. By using the site and its services, you fully agree to these terms and conditions. Please read them carefully before proceeding.",
+    "generalRegistration": {
+      "title": "General Registration (User Registration)",
+      "content": "Registration is available to all users wishing to browse the site and access public content without needing identity verification. The user must provide accurate and complete data to ensure a quality experience on the site. CloudWav Production reserves the right to reject or suspend user accounts if false or non-compliant information is provided."
+    },
+    "artistRegistration": {
+      "title": "Artist Registration on the Platform",
+      "content": "Artist registration is available to all artists through the site, and requires accurate and complete personal information, along with an official identity document. CloudWav Production reserves the right to reject or suspend any registration that does not meet the required conditions. Registering as an artist on the platform grants the right to digitally broadcast uploaded works, while the artist remains the legal owner of all their content. The artist has the right to modify or update their profile and musical content at any time."
+    },
+    "contracting": {
+      "title": "Contracting with Artists within the Company",
+      "content": "The company offers the option to contract with artists as official partners to provide exceptional production and promotion services. Full personal information and an official identity document are required for contracting. Contract requests are reviewed by CloudWav Production's management, and contracts are executed based on separate agreements defining the rights and responsibilities of both parties."
+    },
+    "videoPlatform": {
+      "title": "Artist Registration on the Video Platform",
+      "content": "Registration on the video platform is for artists offering services such as promotional videos and personalized video greetings. The artist must provide accurate personal data and official identity verification. Registering on the video platform grants the artist the right to receive video requests from clients, with pricing set at their discretion. After the client confirms and pays for the request, the artist receives 70% of the amount, while CloudWav Production retains 30%."
+    },
+    "dataCollection": {
+      "title": "Data We Collect",
+      "content": "Personal information (e.g., name, email, phone number, account data). Payment information when subscribing to paid services (without storing card data directly). Usage data such as visited pages, device type, and approximate geographical location. Cookies are not currently used. All data is handled with strict confidentiality according to the company's privacy policy."
+    },
+    "dataUsage": {
+      "title": "How We Use the Data",
+      "content": "Data is used to provide services such as content publishing, management, and user behavior analysis to improve the site experience. Used in advertising and marketing to display personalized content based on user interests. Used to ensure security and detect suspicious activity to prevent fraud."
+    },
+    "digitalRights": {
+      "title": "Digital Rights and Content Protection",
+      "content": "All digital rights of uploaded content remain the property of the artist; artist registration only grants CloudWav Production the right to digitally broadcast the uploaded works. Advanced technologies are used to prevent piracy and violations, and digital content protection services are available. Artists can subscribe to a platform management service or request full protection based on agreements."
+    },
+    "advertising": {
+      "title": "Advertising and Additional Services Policy",
+      "content": "Site services are provided under the full scope of CloudWav Production's services without internal ads for subscribers. Artists can request additional marketing services to promote their content via paid ad campaigns or customized promotional strategies. All advertising and marketing agreements are formalized through official contracts ensuring transparency and rights protection."
+    },
+    "payments": {
+      "title": "Payments and Refund Policy",
+      "content": "All payments made through the site are final and non-refundable after accepting the service's specific terms and conditions. CloudWav Production is not responsible for refunds after order confirmation, except in the following cases: If the requested service is unavailable or not delivered due to a technical or administrative error. In special humanitarian cases evaluated by the company's management. Payments are processed through secure systems without storing card information."
+    },
+    "dataProtection": {
+      "title": "Data Protection and Privacy",
+      "content": "CloudWav Production is committed to protecting all personal data and not sharing it with third parties unless with explicit consent or a legal request. The artist has the right to request full deletion of their data upon account or service cancellation."
+    },
+    "accountCancellation": {
+      "title": "Account or Service Cancellation",
+      "content": "The artist can request to cancel their account or service at any time with prior notice to the company. CloudWav Production is not obligated to restore the account or service after cancellation and may retain some data for legal or administrative purposes."
+    },
+    "modification": {
+      "title": "Modification of Terms and Conditions",
+      "content": "CloudWav Production reserves the right to modify these terms and conditions at any time without prior notice. Continued use of the account or service after any modifications constitutes full acceptance of the new terms."
+    },
+    "support": {
+      "title": "Contact and Technical Support",
+      "content": "Users can contact the support team to resolve any account or service-related issues. Support is available via email or the contact form on the website."
+    },
+    "security": {
+      "title": "Additional Security Notes",
+      "content": "Users must provide accurate data to ensure service quality. CloudWav Production is not responsible for any penalties imposed by streaming platforms due to violations. If a technical issue arises, the user must contact support immediately."
+    },
+    "legalWarning": {
+      "title": "Legal Warning",
+      "content": "Any violation of these terms may result in account or service suspension or cancellation without notice. CloudWav Production reserves the right to take legal action against users involved in fraudulent or illegal activities."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "CloudWav Production – All rights reserved. Support email: support@cloudwavproduction.com. General contact: contact@cloudwavproduction.com. Official website: cloudwavproduction.com"
+    },
+    "footer": "Thank you for choosing CloudWav Production. We are here to support your creativity, protect your work, and help you succeed through advanced technology."
   }
 }

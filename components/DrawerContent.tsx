@@ -221,6 +221,18 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
         iconName: "users",
         displayName: "Creators",
       },
+      {
+        label: t("drawer.items.policy"),
+        route: "policy/policy",
+        iconName: "shield",
+        displayName: "Policy",
+      },
+      {
+        label: t("drawer.items.terms"),
+        route: "terms/terms",
+        iconName: "file-text",
+        displayName: "Terms",
+      },
     ],
     [t]
   );

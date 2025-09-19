@@ -6,7 +6,8 @@ export type ServiceType =
   | "recover social media account"
   | "Sponsored ads"
   | "platform management"
-  | "artist_service";
+  | "artist_service"
+  | "account_creation";
 
 export interface Services {
   id?: number;

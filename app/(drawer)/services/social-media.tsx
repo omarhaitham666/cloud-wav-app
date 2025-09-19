@@ -23,7 +23,7 @@ import Toast from "react-native-toast-message";
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceType>(
-    "verify social media accounts"
+    "account_creation"
   );
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
@@ -59,14 +59,12 @@ const SocialMedia = () => {
   ];
 
   const handleFormSubmit = async (data: FormData): Promise<void> => {
-    if (!selectedService) return;
-
     const cleanPhoneNumber = (phone: string) => {
       return phone.replace(/^\+/, "").replace(/\D/g, "");
     };
 
     const requestData = {
-      type: selectedService,
+      type: (data.serviceType || selectedService) as ServiceType,
       data: {
         name: data.name,
         email: data.email,
@@ -153,7 +151,7 @@ const SocialMedia = () => {
           >
             <TouchableOpacity
               onPress={() => {
-                setSelectedService("verify social media accounts");
+                setSelectedService("account_creation");
                 setVisible(true);
               }}
               className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
@@ -278,6 +276,7 @@ const SocialMedia = () => {
             isLoading={isLoading}
             onClose={() => setVisible(false)}
             onSubmitForm={handleFormSubmit}
+            serviceType={selectedService}
           />
         </ScrollView>
       </SafeAreaView>
