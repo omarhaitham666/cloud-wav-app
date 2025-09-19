@@ -88,7 +88,7 @@ const DrawerItem = React.memo(
 // ✅ fix display name warning
 DrawerItem.displayName = "DrawerItem";
 
-export default function DrawerContent({ state }: DrawerContentComponentProps) {
+export default function DrawerContent({ state, navigation }: DrawerContentComponentProps) {
   const { t, i18n } = useTranslation();
   const currentRoute = state.routes[state.index]?.name;
   const [token, setToken] = useState<string | null>(null);
@@ -316,8 +316,10 @@ export default function DrawerContent({ state }: DrawerContentComponentProps) {
           Alert.alert("Navigation Error", `Could not navigate to ${route}`);
         }
       }
+      // Close the drawer after navigation
+      navigation.closeDrawer();
     },
-    []
+    [navigation]
   );
 
   const renderDrawerItem = useCallback(
