@@ -18,10 +18,19 @@ import {
   useGetTrendSongQuery,
 } from "@/store/api/global/song";
 import { useGetUserQuery } from "@/store/api/user/user";
+import {
+  ANIMATION_DELAY,
+  getResponsiveSpacing,
+  getSafeAreaInsets,
+  useFadeIn,
+  usePageTransition,
+  useSlideIn,
+  useStaggerAnimation,
+} from "@/utils/animations";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -32,6 +41,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, { SlideInLeft, SlideInRight } from "react-native-reanimated";
 
 type FilterType = "home" | "tsongs" | "tAlbums" | "tAdded";
 
@@ -45,7 +55,37 @@ const { width } = Dimensions.get("window");
 const Music = () => {
   const [activeFilter, setActiveFilter] = useState<FilterType>("home");
   const [activeGenre, setActiveGenre] = useState<string>("All Genres");
-  
+
+  const spacing = getResponsiveSpacing();
+  const safeArea = getSafeAreaInsets();
+
+  // Animation hooks
+  const { animatedStyle: pageStyle, enterPage } = usePageTransition();
+  const { animatedStyle: bannerStyle, startAnimation: startBannerAnimation } =
+    useSlideIn("up", 0);
+  const { animatedStyle: browseStyle, startAnimation: startBrowseAnimation } =
+    useFadeIn(ANIMATION_DELAY.SMALL);
+  const { animatedStyle: genresStyle, startAnimation: startGenresAnimation } =
+    useSlideIn("up", ANIMATION_DELAY.MEDIUM);
+  const { animatedStyle: contentStyle, startAnimation: startContentAnimation } =
+    useFadeIn(ANIMATION_DELAY.LARGE);
+
+  // Stagger animations for filter buttons
+  const { animatedStyle: filterStyle, startAnimation: startFilterAnimation } =
+    useStaggerAnimation(
+      4, // number of filter buttons
+      100,
+      ANIMATION_DELAY.SMALL + 200
+    );
+
+  // Stagger animations for genre buttons
+  const { animatedStyle: genreStyle, startAnimation: startGenreAnimation } =
+    useStaggerAnimation(
+      12, // number of genre buttons
+      50,
+      ANIMATION_DELAY.MEDIUM + 200
+    );
+
   const { data: userData } = useGetUserQuery();
 
   const {
@@ -89,47 +129,52 @@ const Music = () => {
   useAuthRefresh(async () => {
     try {
       const refreshPromises = [];
-      
-      // Only refetch queries that are not skipped
+
       if (!isSongLoading) refreshPromises.push(refetchSongs());
       if (!isArtistLoading) refreshPromises.push(refetchArtists());
       if (!isAlbumLoading) refreshPromises.push(refetchAlbums());
       if (!isLoadingTrendSongs) refreshPromises.push(refetchTrendSongs());
       if (!isLoadingTrendAlbums) refreshPromises.push(refetchTrendAlbums());
-      
-      // Only refetch songsByDivision if it's not skipped
+
       if (activeGenre !== "All Genres" && !isLoadingSongsByDivision) {
         refreshPromises.push(refetchSongsByDivision());
       }
-      
+
       await Promise.all(refreshPromises);
     } catch (error) {
-      console.error('Auth refresh error:', error);
-      // Don't throw the error to prevent app crash
+      console.error("Auth refresh error:", error);
     }
   });
+
+  // Start animations on mount
+  useEffect(() => {
+    enterPage();
+    startBannerAnimation();
+    startBrowseAnimation();
+    startGenresAnimation();
+    startContentAnimation();
+    startFilterAnimation();
+    startGenreAnimation();
+  }, []);
 
   const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
     onRefresh: async () => {
       try {
         const refreshPromises = [];
-        
-        // Only refetch queries that are not skipped
+
         if (!isSongLoading) refreshPromises.push(refetchSongs());
         if (!isArtistLoading) refreshPromises.push(refetchArtists());
         if (!isAlbumLoading) refreshPromises.push(refetchAlbums());
         if (!isLoadingTrendSongs) refreshPromises.push(refetchTrendSongs());
         if (!isLoadingTrendAlbums) refreshPromises.push(refetchTrendAlbums());
-        
-        // Only refetch songsByDivision if it's not skipped
+
         if (activeGenre !== "All Genres" && !isLoadingSongsByDivision) {
           refreshPromises.push(refetchSongsByDivision());
         }
-        
+
         await Promise.all(refreshPromises);
       } catch (error) {
-        console.error('Pull to refresh error:', error);
-        // Don't throw the error to prevent app crash
+        console.error("Pull to refresh error:", error);
       }
     },
     scrollToTopOnRefresh: true,
@@ -396,126 +441,190 @@ const Music = () => {
   };
 
   return (
-      <View className="flex-1 bg-white">
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <TopLoader />
-        <ScrollView
-          ref={scrollViewRef}
-          className="flex-1"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 30 }}
-          refreshControl={refreshControl as any}
+    <Animated.View style={[{ flex: 1, backgroundColor: "white" }, pageStyle]}>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <TopLoader />
+      <ScrollView
+        ref={scrollViewRef}
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: safeArea.bottom + 30,
+          paddingTop: safeArea.top,
+        }}
+        refreshControl={refreshControl as any}
+      >
+        <Animated.View
+          style={[bannerStyle, { marginBottom: spacing.margin.small }]}
         >
-        <View className="mb-2">
           <BannerMusic />
-        </View>
+        </Animated.View>
 
-        <View className="px-5 mb-8">
+        <Animated.View
+          style={[
+            browseStyle,
+            {
+              paddingHorizontal: spacing.padding.medium,
+              marginBottom: spacing.margin.large,
+            },
+          ]}
+        >
           <View className="flex-row items-center justify-between mb-6">
-            <Text className="text-2xl font-bold text-gray-900">Browse</Text>
-            {/* Show Artist button if user has artist_id */}
+            <Text
+              className="font-bold text-gray-900"
+              style={{
+                fontSize: spacing.fontSize.xlarge,
+                fontFamily: AppFonts.semibold,
+              }}
+            >
+              Browse
+            </Text>
             {userData?.artist_id && (
-              <TouchableOpacity
-                onPress={handleArtistPress}
-                className="bg-purple-600 px-4 py-2 rounded-full flex-row items-center shadow-sm"
-                style={{
-                  shadowColor: "#7c3aed",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 4,
-                  elevation: 6,
-                }}
-              >
-                <Ionicons name="musical-notes" size={16} color="white" />
-                <Text
-                  className="text-white text-sm font-medium ml-2"
-                  style={{ fontFamily: AppFonts.semibold }}
+              <Animated.View entering={SlideInRight.delay(300).springify()}>
+                <TouchableOpacity
+                  onPress={handleArtistPress}
+                  className="bg-purple-600 px-4 py-2 rounded-full flex-row items-center shadow-sm"
+                  style={{
+                    shadowColor: "#7c3aed",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 4,
+                    elevation: 6,
+                  }}
                 >
-                  Artist
-                </Text>
-              </TouchableOpacity>
+                  <Ionicons
+                    name="musical-notes"
+                    size={spacing.iconSize.small}
+                    color="white"
+                  />
+                  <Text
+                    className="text-white font-medium ml-2"
+                    style={{
+                      fontSize: spacing.fontSize.small,
+                      fontFamily: AppFonts.semibold,
+                    }}
+                  >
+                    Artist
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             )}
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingRight: 20 }}
+            contentContainerStyle={{ paddingRight: spacing.padding.medium }}
           >
             {browseCategories.map((category, idx) => (
-              <TouchableOpacity
+              <Animated.View
                 key={idx}
-                onPress={() => handleFilterPress(category.filter)}
-                className={`${
-                  activeFilter === category.filter
-                    ? "bg-green-500"
-                    : "bg-gray-50 border-gray-200"
-                } border rounded-full px-5 py-2.5 mr-3 shadow-sm`}
-                style={{
-                  shadowColor:
-                    activeFilter === category.filter ? "#22c55e" : "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: activeFilter === category.filter ? 0.3 : 0.1,
-                  shadowRadius: 4,
-                  elevation: activeFilter === category.filter ? 6 : 2,
-                }}
+                style={[filterStyle, { marginRight: spacing.margin.small }]}
+                entering={SlideInLeft.delay(400 + idx * 100).springify()}
               >
-                <Text
-                  className={`text-sm font-medium ${
+                <TouchableOpacity
+                  onPress={() => handleFilterPress(category.filter)}
+                  className={`${
                     activeFilter === category.filter
-                      ? "text-white"
-                      : "text-gray-600"
-                  }`}
+                      ? "bg-green-500"
+                      : "bg-gray-50 border-gray-200"
+                  } border rounded-full px-5 py-2.5 shadow-sm`}
+                  style={{
+                    shadowColor:
+                      activeFilter === category.filter ? "#22c55e" : "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: activeFilter === category.filter ? 0.3 : 0.1,
+                    shadowRadius: 4,
+                    elevation: activeFilter === category.filter ? 6 : 2,
+                  }}
                 >
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    className={`font-medium ${
+                      activeFilter === category.filter
+                        ? "text-white"
+                        : "text-gray-600"
+                    }`}
+                    style={{
+                      fontSize: spacing.fontSize.small,
+                      fontFamily: AppFonts.semibold,
+                    }}
+                  >
+                    {category.name}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
 
-        <View className="mb-8">
-          <View className="px-5 mb-4">
-            <Text className="text-2xl font-bold text-gray-900">Genres</Text>
+        <Animated.View
+          style={[genresStyle, { marginBottom: spacing.margin.large }]}
+        >
+          <View
+            className="mb-4"
+            style={{ paddingHorizontal: spacing.padding.medium }}
+          >
+            <Text
+              className="font-bold text-gray-900"
+              style={{
+                fontSize: spacing.fontSize.xlarge,
+                fontFamily: AppFonts.semibold,
+              }}
+            >
+              Genres
+            </Text>
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
+            contentContainerStyle={{
+              paddingHorizontal: spacing.padding.medium,
+            }}
           >
             {genres.map((genre, idx) => (
-              <TouchableOpacity
+              <Animated.View
                 key={idx}
-                onPress={() => handleGenrePress(genre)}
-                className={`${
-                  activeGenre === genre
-                    ? "bg-green-500"
-                    : "bg-gray-50 border-gray-200"
-                } border rounded-full px-5 py-2.5 mr-3 shadow-sm`}
-                style={{
-                  shadowColor: activeGenre === genre ? "#22c55e" : "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: activeGenre === genre ? 0.3 : 0.1,
-                  shadowRadius: 4,
-                  elevation: activeGenre === genre ? 6 : 2,
-                }}
+                style={[genreStyle, { marginRight: spacing.margin.small }]}
+                entering={SlideInRight.delay(500 + idx * 50).springify()}
               >
-                <Text
-                  className={`text-sm font-medium ${
-                    activeGenre === genre ? "text-white" : "text-gray-600"
-                  }`}
+                <TouchableOpacity
+                  onPress={() => handleGenrePress(genre)}
+                  className={`${
+                    activeGenre === genre
+                      ? "bg-green-500"
+                      : "bg-gray-50 border-gray-200"
+                  } border rounded-full px-5 py-2.5 shadow-sm`}
+                  style={{
+                    shadowColor: activeGenre === genre ? "#22c55e" : "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: activeGenre === genre ? 0.3 : 0.1,
+                    shadowRadius: 4,
+                    elevation: activeGenre === genre ? 6 : 2,
+                  }}
                 >
-                  {genre}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    className={`font-medium ${
+                      activeGenre === genre ? "text-white" : "text-gray-600"
+                    }`}
+                    style={{
+                      fontSize: spacing.fontSize.small,
+                      fontFamily: AppFonts.semibold,
+                    }}
+                  >
+                    {genre}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
 
-        <View className="px-0">{getFilteredContent()}</View>
+        <Animated.View style={[contentStyle, { paddingHorizontal: 0 }]}>
+          {getFilteredContent()}
+        </Animated.View>
 
-        <View className="h-16" />
+        <View style={{ height: safeArea.bottom + 16 }} />
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 };
 

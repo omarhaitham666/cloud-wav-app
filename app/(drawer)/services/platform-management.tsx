@@ -3,6 +3,15 @@ import ServiceRequestModal, {
 } from "@/components/modals/ServiceRequestModal";
 import { ServiceType, useServicesMutation } from "@/store/api/global/services";
 import { AppFonts } from "@/utils/fonts";
+import { 
+  useFadeIn, 
+  useSlideIn, 
+  useScaleIn, 
+  usePageTransition,
+  useCardHover,
+  getResponsiveSpacing,
+  getSafeAreaInsets
+} from "@/utils/animations";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -13,7 +22,7 @@ import {
     TrendingUp,
     User,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
     Image,
@@ -24,12 +33,33 @@ import {
     View,
 } from "react-native";
 import Toast from "react-native-toast-message";
+import Animated from "react-native-reanimated";
 
 const PlatformManagement = () => {
   const [visible, setVisible] = useState(false);
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [Services, { isLoading }] = useServicesMutation();
+
+  const { animatedStyle: pageStyle, enterPage } = usePageTransition();
+  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } = useSlideIn("down", 0);
+  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } = useFadeIn(200);
+  const { animatedStyle: descriptionStyle, startAnimation: startDescriptionAnimation } = useFadeIn(400);
+  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } = useSlideIn("up", 600);
+  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } = useScaleIn(800);
+  const { animatedStyle: featuresStyle, startAnimation: startFeaturesAnimation } = useFadeIn(1000);
+  const spacing = getResponsiveSpacing();
+  const safeArea = getSafeAreaInsets();
+
+  useEffect(() => {
+    enterPage();
+    startHeaderAnimation();
+    startTitleAnimation();
+    startDescriptionAnimation();
+    startButtonsAnimation();
+    startImageAnimation();
+    startFeaturesAnimation();
+  }, []);
 
   const features = [
     {
@@ -114,145 +144,183 @@ const PlatformManagement = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <SafeAreaView className="flex-1 py-3">
-        <View className={`flex-row items-center px-5 pt-10`}>
-          <TouchableOpacity
-            onPress={() => router.push("/(drawer)/services/services")}
-            className="p-2 bg-white/20 rounded-full"
-          >
-            <Ionicons name="arrow-back" size={22} color="#fff" />
-          </TouchableOpacity>
-          <Text
-            className={`text-white text-lg ms-4`}
-            style={{
-              fontFamily: AppFonts.semibold,
-            }}
-          >
-            {t("services.platformManagement.title")}
-          </Text>
-        </View>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          className="flex-1 px-5"
-        >
-          <Text
-            className="text-white text-center my-4 text-lg"
-            style={{
-              textAlign: isRTL ? "right" : "left",
-              fontFamily: AppFonts.semibold,
-            }}
-          >
-            {t("services.platformManagement.title")}
-          </Text>
-          <Text
-            className="text-white leading-6 mb-6 mt-4"
-            style={{
-              textAlign: isRTL ? "right" : "left",
-              fontFamily: AppFonts.semibold,
-            }}
-          >
-            {t("services.platformManagement.description")}
-          </Text>
-
-          <View
-            className={`flex-row justify-between mb-8 ${
-              isRTL ? "flex-row-reverse" : ""
-            }`}
-          >
-            <TouchableOpacity
-              onPress={() => router.push("/(drawer)/(tabs)/price")}
-              className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
-            >
+      <SafeAreaView className="flex-1 py-3" style={{ paddingTop: safeArea.top }}>
+        <Animated.View style={[pageStyle, { flex: 1 }]}>
+          <Animated.View style={[headerStyle]}>
+            <View className={`flex-row items-center px-5 pt-10`}>
+              <TouchableOpacity
+                onPress={() => router.push("/(drawer)/services/services")}
+                className="p-2 bg-white/20 rounded-full"
+              >
+                <Ionicons name="arrow-back" size={22} color="#fff" />
+              </TouchableOpacity>
               <Text
-                className="text-white text-base"
+                className={`text-white text-lg ms-4`}
                 style={{
-                  textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
+                  fontSize: spacing.fontSize.large,
                 }}
               >
-                {t("services.platformManagement.pricing")}
+                {t("services.platformManagement.title")}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setVisible(true)}
-              className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
-            >
-              <Text
-                className="text-white text-base"
-                style={{
+            </View>
+          </Animated.View>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            className="flex-1 px-5"
+            contentContainerStyle={{ paddingBottom: safeArea.bottom + 40 }}
+          >
+            <Animated.Text
+              className="text-white text-center my-4 text-lg"
+              style={[
+                titleStyle,
+                {
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
-                }}
-              >
-                {t("services.platformManagement.getStarted")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View className="mb-4 items-center">
-            <Image
-              source={require("../../../assets/images/platformImg-TiJCBwMF.png")}
-              className="w-full h-72 rounded-2xl"
-              resizeMode="cover"
-            />
-          </View>
-          <View className="mb-8">
-            <Text
-              className="text-2xl font-bold text-gray-900 mt-10 mb-6"
-              style={{
-                textAlign: isRTL ? "right" : "left",
-                fontFamily: AppFonts.semibold,
-              }}
+                  fontSize: spacing.fontSize.large,
+                }
+              ]}
             >
-              {t("services.platformManagement.whyChooseUs")}
-            </Text>
+              {t("services.platformManagement.title")}
+            </Animated.Text>
+            <Animated.Text
+              className="text-white leading-6 mb-6 mt-4"
+              style={[
+                descriptionStyle,
+                {
+                  textAlign: isRTL ? "right" : "left",
+                  fontFamily: AppFonts.semibold,
+                  fontSize: spacing.fontSize.medium,
+                }
+              ]}
+            >
+              {t("services.platformManagement.description")}
+            </Animated.Text>
 
-            <View className="space-y-5">
-              {features.map((item, idx) => (
-                <View
-                  key={idx}
-                  className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${
-                    isRTL ? "flex-row-reverse" : "flex-row"
-                  } items-center space-x-5`}
+            <Animated.View style={[buttonsStyle]}>
+              <View
+                className={`flex-row justify-between mb-8 ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                <TouchableOpacity
+                  onPress={() => router.push("/(drawer)/(tabs)/price")}
+                  className="bg-blue-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
+                >
+                  <Text
+                    className="text-white text-base"
+                    style={{
+                      textAlign: isRTL ? "right" : "left",
+                      fontFamily: AppFonts.semibold,
+                      fontSize: spacing.fontSize.medium,
+                    }}
+                  >
+                    {t("services.platformManagement.pricing")}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setVisible(true)}
+                  className="bg-green-600 px-4 py-3 rounded-xl w-[48%] items-center shadow"
+                >
+                  <Text
+                    className="text-white text-base"
+                    style={{
+                      textAlign: isRTL ? "right" : "left",
+                      fontFamily: AppFonts.semibold,
+                      fontSize: spacing.fontSize.medium,
+                    }}
+                  >
+                    {t("services.platformManagement.getStarted")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+            <Animated.View style={[imageStyle]}>
+              <View className="mb-4 items-center">
+                <Image
+                  source={require("../../../assets/images/platformImg-TiJCBwMF.png")}
+                  className="w-full h-72 rounded-2xl"
+                  resizeMode="cover"
+                />
+              </View>
+            </Animated.View>
+            <Animated.View style={[featuresStyle]}>
+              <View className="mb-8">
+                <Text
+                  className="text-2xl font-bold text-gray-900 mt-10 mb-6"
                   style={{
-                    shadowColor: "#7C3AED",
-                    shadowOpacity: 0.1,
-                    shadowRadius: 8,
-                    elevation: 3,
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                    fontSize: spacing.fontSize.xlarge,
                   }}
                 >
-                  <View
-                    className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${
-                      isRTL ? "ml-2" : "mr-2"
-                    }`}
-                  >
-                    {item.icon}
-                  </View>
-                  <View className="flex-1">
-                    <Text
-                      className="text-lg text-gray-900"
-                      style={{
-                        textAlign: isRTL ? "right" : "left",
-                        fontFamily: AppFonts.semibold,
-                      }}
-                    >
-                      {item.title}
-                    </Text>
-                    <Text
-                      className="text-sm text-gray-600 mt-1 leading-snug"
-                      style={{
-                        textAlign: isRTL ? "right" : "left",
-                        fontFamily: AppFonts.semibold,
-                      }}
-                    >
-                      {item.description}
-                    </Text>
-                  </View>
+                  {t("services.platformManagement.whyChooseUs")}
+                </Text>
+
+                <View className="space-y-5">
+                  {features.map((item, idx) => {
+                    const { animatedStyle: featureStyle, startAnimation: startFeatureAnimation } = useSlideIn("right", 1200 + idx * 100);
+                    const { animatedStyle: cardStyle, onPressIn, onPressOut } = useCardHover();
+                    
+                    useEffect(() => {
+                      startFeatureAnimation();
+                    }, [startFeatureAnimation]);
+
+                    return (
+                      <Animated.View key={idx} style={[featureStyle]}>
+                        <Animated.View
+                          style={[
+                            cardStyle,
+                            {
+                              shadowColor: "#7C3AED",
+                              shadowOpacity: 0.1,
+                              shadowRadius: 8,
+                              elevation: 3,
+                            }
+                          ]}
+                          className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${
+                            isRTL ? "flex-row-reverse" : "flex-row"
+                          } items-center space-x-5`}
+                        >
+                          <View
+                            className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${
+                              isRTL ? "ml-2" : "mr-2"
+                            }`}
+                          >
+                            {item.icon}
+                          </View>
+                          <View className="flex-1">
+                            <Text
+                              className="text-lg text-gray-900"
+                              style={{
+                                textAlign: isRTL ? "right" : "left",
+                                fontFamily: AppFonts.semibold,
+                                fontSize: spacing.fontSize.large,
+                              }}
+                            >
+                              {item.title}
+                            </Text>
+                            <Text
+                              className="text-sm text-gray-600 mt-1 leading-snug"
+                              style={{
+                                textAlign: isRTL ? "right" : "left",
+                                fontFamily: AppFonts.semibold,
+                                fontSize: spacing.fontSize.small,
+                              }}
+                            >
+                              {item.description}
+                            </Text>
+                          </View>
+                        </Animated.View>
+                      </Animated.View>
+                    );
+                  })}
                 </View>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
+              </View>
+            </Animated.View>
+          </ScrollView>
+        </Animated.View>
         <ServiceRequestModal
           visible={visible}
           isLoading={isLoading}

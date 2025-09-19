@@ -2,23 +2,36 @@ import CreatorCard from "@/components/cards/CreatorCard";
 import { useAuthRefresh } from "@/hooks/useAuthRefresh";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useSearchCreatorQuery } from "@/store/api/global/search";
+import {
+  ANIMATION_DELAY,
+  getResponsiveSpacing,
+  getSafeAreaInsets,
+  useFadeIn,
+  usePageTransition,
+  useSlideIn,
+  useStaggerAnimation,
+} from "@/utils/animations";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
-  Animated,
   Dimensions,
   FlatList,
-  Platform,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, {
+  SlideInLeft,
+  SlideInRight,
+  SlideInUp,
+  ZoomIn,
+} from "react-native-reanimated";
 import Icon from "react-native-vector-icons/Feather";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -29,10 +42,34 @@ const Search = () => {
   const { category } = useLocalSearchParams<{ category?: string }>();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  const spacing = getResponsiveSpacing();
+  const safeArea = getSafeAreaInsets();
+
+  const { animatedStyle: pageStyle, enterPage } = usePageTransition();
+  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } =
+    useSlideIn("up", 0);
+  const { animatedStyle: searchStyle, startAnimation: startSearchAnimation } =
+    useFadeIn(ANIMATION_DELAY.SMALL);
+  const {
+    animatedStyle: categoriesStyle,
+    startAnimation: startCategoriesAnimation,
+  } = useSlideIn("up", ANIMATION_DELAY.MEDIUM);
+  const { animatedStyle: resultsStyle, startAnimation: startResultsAnimation } =
+    useFadeIn(ANIMATION_DELAY.LARGE);
+
+  const {
+    animatedStyle: categoryStyle,
+    startAnimation: startCategoryAnimation,
+  } = useStaggerAnimation(8, 80, ANIMATION_DELAY.MEDIUM + 200);
+
+  const { animatedStyle: popularStyle, startAnimation: startPopularAnimation } =
+    useStaggerAnimation(4, 150, ANIMATION_DELAY.LARGE + 400);
 
   const { data, refetch, isLoading } = useSearchCreatorQuery(searchQuery);
+
+  const { animatedStyle: resultStyle, startAnimation: startResultAnimation } =
+    useStaggerAnimation(data?.length || 0, 100, 0);
 
   useAuthRefresh(() => {
     refetch();
@@ -47,19 +84,28 @@ const Search = () => {
   });
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
+    enterPage();
+    startHeaderAnimation();
+    startSearchAnimation();
+    startCategoriesAnimation();
+    startResultsAnimation();
+    startCategoryAnimation();
+    startPopularAnimation();
+  }, [
+    enterPage,
+    startHeaderAnimation,
+    startSearchAnimation,
+    startCategoriesAnimation,
+    startResultsAnimation,
+    startCategoryAnimation,
+    startPopularAnimation,
+  ]);
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      startResultAnimation();
+    }
+  }, [data, startResultAnimation]);
 
   useEffect(() => {
     if (category) {
@@ -103,7 +149,7 @@ const Search = () => {
   };
 
   const renderHeader = () => (
-    <View style={{ minHeight: 'auto' }}>
+    <Animated.View style={[{ minHeight: "auto" }, headerStyle]}>
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -117,25 +163,23 @@ const Search = () => {
 
       <View
         style={{
-          paddingTop:
-            Platform.OS === "android"
-              ? (StatusBar.currentHeight ?? 0) + 20
-              : 60,
-          paddingBottom: 20,
+          paddingTop: safeArea.top + spacing.padding.medium,
+          paddingBottom: spacing.padding.medium,
         }}
       >
         <Animated.View
-          style={{
-            paddingHorizontal: 24,
-            marginBottom: screenWidth < 375 ? 24 : 32,
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          }}
+          style={[
+            searchStyle,
+            {
+              paddingHorizontal: spacing.padding.medium,
+              marginBottom: spacing.margin.large,
+            },
+          ]}
         >
           <Text
             className="text-gray-900 mb-2"
             style={{
-              fontSize: screenWidth < 375 ? 24 : 28,
+              fontSize: spacing.fontSize.xlarge,
               fontFamily: AppFonts.semibold,
               textAlign: isRTL ? "right" : "left",
             }}
@@ -145,7 +189,7 @@ const Search = () => {
           <Text
             className="text-gray-600"
             style={{
-              fontSize: screenWidth < 375 ? 14 : 16,
+              fontSize: spacing.fontSize.medium,
               fontFamily: AppFonts.semibold,
               textAlign: isRTL ? "right" : "left",
             }}
@@ -155,27 +199,30 @@ const Search = () => {
         </Animated.View>
 
         <Animated.View
-          style={{
-            paddingHorizontal: 24,
-            marginBottom: screenWidth < 375 ? 20 : 24,
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          }}
+          style={[
+            searchStyle,
+            {
+              paddingHorizontal: spacing.padding.medium,
+              marginBottom: spacing.margin.medium,
+            },
+          ]}
         >
           <View
             className={`bg-white rounded-2xl flex-row items-center shadow-sm border border-gray-200 ${
               isRTL ? "flex-row-reverse" : ""
             }`}
             style={{
-              paddingHorizontal: 16,
-              paddingVertical: screenWidth < 375 ? 12 : 16,
+              paddingHorizontal: spacing.padding.medium,
+              paddingVertical: spacing.padding.small,
             }}
           >
-            <Icon name="search" size={screenWidth < 375 ? 18 : 20} color="#6B7280" />
+            <Icon
+              name="search"
+              size={spacing.iconSize.medium}
+              color="#6B7280"
+            />
             <TextInput
-              className={`flex-1 text-gray-900 ${
-                isRTL ? "mr-3" : "ml-3"
-              }`}
+              className={`flex-1 text-gray-900 ${isRTL ? "mr-3" : "ml-3"}`}
               placeholder={t("song.searchPlaceholder")}
               placeholderTextColor="#6B7280"
               value={searchQuery}
@@ -183,96 +230,107 @@ const Search = () => {
               returnKeyType="search"
               onSubmitEditing={() => refetch()}
               textAlign={isRTL ? "right" : "left"}
-              style={{ 
+              style={{
                 fontFamily: AppFonts.semibold,
-                fontSize: screenWidth < 375 ? 14 : 16
+                fontSize: spacing.fontSize.medium,
               }}
             />
             {searchQuery.length > 0 && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSearchQuery("");
-                  setActiveCategory("all");
-                }}
-                className="w-6 h-6 bg-gray-300 rounded-full justify-center items-center"
-              >
-                <Icon name="x" size={12} color="#6B7280" />
-              </TouchableOpacity>
+              <Animated.View entering={ZoomIn.delay(200).springify()}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchQuery("");
+                    setActiveCategory("all");
+                  }}
+                  className="w-6 h-6 bg-gray-300 rounded-full justify-center items-center"
+                >
+                  <Icon name="x" size={12} color="#6B7280" />
+                </TouchableOpacity>
+              </Animated.View>
             )}
           </View>
         </Animated.View>
 
         <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-            marginBottom: screenWidth < 375 ? 20 : 32,
-          }}
+          style={[categoriesStyle, { marginBottom: spacing.margin.large }]}
         >
           <FlatList
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ 
-              paddingHorizontal: 24,
-              paddingBottom: 8
+            contentContainerStyle={{
+              paddingHorizontal: spacing.padding.medium,
+              paddingBottom: spacing.padding.small,
             }}
             inverted={isRTL}
             data={categories}
             keyExtractor={(item) => item.id}
-            renderItem={({ item: category }) => (
-              <TouchableOpacity
-                onPress={() => handleCategoryPress(category.id)}
-                className={`flex-row items-center rounded-full ${
-                  isRTL ? "ml-3" : "mr-3"
-                } ${
-                  activeCategory === category.id ? "bg-blue-500" : "bg-white"
-                } shadow-sm ${isRTL ? "flex-row-reverse" : ""}`}
-                style={{
-                  paddingHorizontal: screenWidth < 375 ? 12 : 16,
-                  paddingVertical: screenWidth < 375 ? 8 : 12,
-                }}
-                activeOpacity={0.8}
+            renderItem={({ item: category, index }) => (
+              <Animated.View
+                style={[
+                  categoryStyle,
+                  {
+                    marginRight: isRTL ? 0 : spacing.margin.small,
+                    marginLeft: isRTL ? spacing.margin.small : 0,
+                  },
+                ]}
+                entering={SlideInRight.delay(300 + index * 80).springify()}
               >
-                <Icon
-                  name={category.icon}
-                  size={screenWidth < 375 ? 14 : 16}
-                  color={activeCategory === category.id ? "#ffffff" : "#374151"}
+                <TouchableOpacity
+                  onPress={() => handleCategoryPress(category.id)}
+                  className={`flex-row items-center rounded-full ${
+                    activeCategory === category.id ? "bg-blue-500" : "bg-white"
+                  } shadow-sm ${isRTL ? "flex-row-reverse" : ""}`}
                   style={{
-                    marginRight: isRTL ? 0 : 6,
-                    marginLeft: isRTL ? 6 : 0,
+                    paddingHorizontal: spacing.padding.small,
+                    paddingVertical: spacing.padding.small,
                   }}
-                />
-                <Text
-                  className={`${
-                    activeCategory === category.id
-                      ? "text-white"
-                      : "text-gray-700"
-                  }`}
-                  style={{ 
-                    fontFamily: AppFonts.semibold,
-                    fontSize: screenWidth < 375 ? 12 : 14
-                  }}
+                  activeOpacity={0.8}
                 >
-                  {category.label}
-                </Text>
-              </TouchableOpacity>
+                  <Icon
+                    name={category.icon}
+                    size={spacing.iconSize.small}
+                    color={
+                      activeCategory === category.id ? "#ffffff" : "#374151"
+                    }
+                    style={{
+                      marginRight: isRTL ? 0 : 6,
+                      marginLeft: isRTL ? 6 : 0,
+                    }}
+                  />
+                  <Text
+                    className={`${
+                      activeCategory === category.id
+                        ? "text-white"
+                        : "text-gray-700"
+                    }`}
+                    style={{
+                      fontFamily: AppFonts.semibold,
+                      fontSize: spacing.fontSize.small,
+                    }}
+                  >
+                    {category.label}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             )}
           />
         </Animated.View>
       </View>
-    </View>
+    </Animated.View>
   );
 
   const renderEmptyState = () => {
     if (isLoading) {
       return (
-        <View style={{ 
-          minHeight: screenWidth * 0.6, 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          paddingVertical: 40 
-        }}>
+        <View
+          style={{
+            minHeight: screenWidth * 0.6,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 40,
+          }}
+        >
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text
             className="text-gray-600 mt-4"
@@ -289,12 +347,14 @@ const Search = () => {
 
     if (searchQuery.length > 0) {
       return (
-        <View style={{ 
-          minHeight: screenWidth * 0.6, 
-          justifyContent: 'center', 
-          alignItems: 'center',
-          paddingVertical: 40 
-        }}>
+        <View
+          style={{
+            minHeight: screenWidth * 0.6,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingVertical: 40,
+          }}
+        >
           <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
             <Icon name="search" size={32} color="#9CA3AF" />
           </View>
@@ -321,12 +381,14 @@ const Search = () => {
     }
 
     return (
-      <View style={{ 
-        minHeight: screenWidth * 0.6, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        paddingVertical: 40 
-      }}>
+      <View
+        style={{
+          minHeight: screenWidth * 0.6,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingVertical: 40,
+        }}
+      >
         <View className="w-24 h-24 bg-gray-200 rounded-full justify-center items-center mb-6">
           <Icon name="search" size={32} color="#fff" />
         </View>
@@ -353,15 +415,22 @@ const Search = () => {
   };
 
   const renderFooter = () => (
-    <View style={{ 
-      paddingHorizontal: 24, 
-      paddingTop: 32, 
-      paddingBottom: Platform.OS === 'ios' ? 100 : 80,
-      minHeight: screenWidth * 0.8
-    }}>
+    <Animated.View
+      style={[
+        resultsStyle,
+        {
+          paddingHorizontal: spacing.padding.medium,
+          paddingTop: spacing.padding.large,
+          paddingBottom: safeArea.bottom + spacing.padding.large,
+          minHeight: screenWidth * 0.8,
+        },
+      ]}
+      className={"mb-7"}
+    >
       <Text
-        className="text-gray-900 text-xl mb-6"
+        className="text-gray-900 mb-6"
         style={{
+          fontSize: spacing.fontSize.xlarge,
           fontFamily: AppFonts.semibold,
           textAlign: isRTL ? "right" : "left",
         }}
@@ -370,153 +439,201 @@ const Search = () => {
       </Text>
 
       <View className={`flex-row mb-4 ${isRTL ? "flex-row-reverse" : ""}`}>
-        <TouchableOpacity
-          onPress={() => handlePopularCategoryPress("actor")}
-          className={`flex-1 ${
-            isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl shadow-sm border border-gray-200`}
-          style={{
-            padding: screenWidth < 375 ? 12 : 16,
-            minHeight: screenWidth < 375 ? 100 : 120
-          }}
+        <Animated.View
+          style={[
+            popularStyle,
+            {
+              flex: 1,
+              marginRight: isRTL ? 0 : spacing.margin.small,
+              marginLeft: isRTL ? spacing.margin.small : 0,
+            },
+          ]}
+          entering={SlideInLeft.delay(600).springify()}
         >
-          <Icon
-            name="video"
-            size={screenWidth < 375 ? 20 : 24}
-            color="#3B82F6"
-            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
-          />
-          <Text
-            className="text-gray-900"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 14 : 16
+          <TouchableOpacity
+            onPress={() => handlePopularCategoryPress("actor")}
+            className={`${
+              isRTL ? "items-end" : "items-start"
+            } bg-white rounded-xl shadow-sm border border-gray-200`}
+            style={{
+              padding: spacing.padding.medium,
+              minHeight: 120,
             }}
           >
-            {t("song.categories.actor")}
-          </Text>
-          <Text
-            className="text-gray-600"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 11 : 12
-            }}
-          >
-            {t("song.categoryDescriptions.actor")}
-          </Text>
-        </TouchableOpacity>
+            <Icon
+              name="video"
+              size={spacing.iconSize.medium}
+              color="#3B82F6"
+              style={{ marginBottom: spacing.margin.small }}
+            />
+            <Text
+              className="text-gray-900"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.medium,
+              }}
+            >
+              {t("song.categories.actor")}
+            </Text>
+            <Text
+              className="text-gray-600"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.small,
+              }}
+            >
+              {t("song.categoryDescriptions.actor")}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
 
-        <TouchableOpacity
-          onPress={() => handlePopularCategoryPress("musician")}
-          className={`flex-1 ${
-            isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl shadow-sm border border-gray-200`}
-          style={{
-            padding: screenWidth < 375 ? 12 : 16,
-            minHeight: screenWidth < 375 ? 100 : 120
-          }}
+        <Animated.View
+          style={[
+            popularStyle,
+            {
+              flex: 1,
+              marginRight: isRTL ? 0 : spacing.margin.small,
+              marginLeft: isRTL ? spacing.margin.small : 0,
+            },
+          ]}
+          entering={SlideInRight.delay(700).springify()}
         >
-          <Icon
-            name="music"
-            size={screenWidth < 375 ? 20 : 24}
-            color="#3B82F6"
-            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
-          />
-          <Text
-            className="text-gray-900"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 14 : 16
+          <TouchableOpacity
+            onPress={() => handlePopularCategoryPress("musician")}
+            className={`${
+              isRTL ? "items-end" : "items-start"
+            } bg-white rounded-xl shadow-sm border border-gray-200`}
+            style={{
+              padding: spacing.padding.medium,
+              minHeight: 120,
             }}
           >
-            {t("song.categories.musician")}
-          </Text>
-          <Text
-            className="text-gray-600"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 11 : 12
-            }}
-          >
-            {t("song.categoryDescriptions.musician")}
-          </Text>
-        </TouchableOpacity>
+            <Icon
+              name="music"
+              size={spacing.iconSize.medium}
+              color="#3B82F6"
+              style={{ marginBottom: spacing.margin.small }}
+            />
+            <Text
+              className="text-gray-900"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.medium,
+              }}
+            >
+              {t("song.categories.musician")}
+            </Text>
+            <Text
+              className="text-gray-600"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.small,
+              }}
+            >
+              {t("song.categoryDescriptions.musician")}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       <View className={`flex-row ${isRTL ? "flex-row-reverse" : ""}`}>
-        <TouchableOpacity
-          onPress={() => handlePopularCategoryPress("youtuber")}
-          className={`flex-1 ${
-            isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl shadow-sm border border-gray-200`}
-          style={{
-            padding: screenWidth < 375 ? 12 : 16,
-            minHeight: screenWidth < 375 ? 100 : 120
-          }}
+        <Animated.View
+          style={[
+            popularStyle,
+            {
+              flex: 1,
+              marginRight: isRTL ? 0 : spacing.margin.small,
+              marginLeft: isRTL ? spacing.margin.small : 0,
+            },
+          ]}
+          entering={SlideInLeft.delay(800).springify()}
         >
-          <Icon
-            name="play"
-            size={screenWidth < 375 ? 20 : 24}
-            color="#3B82F6"
-            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
-          />
-          <Text
-            className="text-gray-900"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 14 : 16
+          <TouchableOpacity
+            onPress={() => handlePopularCategoryPress("youtuber")}
+            className={`${
+              isRTL ? "items-end" : "items-start"
+            } bg-white rounded-xl shadow-sm border border-gray-200`}
+            style={{
+              padding: spacing.padding.medium,
+              minHeight: 120,
             }}
           >
-            {t("song.categories.youtuber")}
-          </Text>
-          <Text
-            className="text-gray-600"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 11 : 12
-            }}
-          >
-            {t("song.categoryDescriptions.youtuber")}
-          </Text>
-        </TouchableOpacity>
+            <Icon
+              name="play"
+              size={spacing.iconSize.medium}
+              color="#3B82F6"
+              style={{ marginBottom: spacing.margin.small }}
+            />
+            <Text
+              className="text-gray-900"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.medium,
+              }}
+            >
+              {t("song.categories.youtuber")}
+            </Text>
+            <Text
+              className="text-gray-600"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.small,
+              }}
+            >
+              {t("song.categoryDescriptions.youtuber")}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
 
-        <TouchableOpacity
-          onPress={() => handlePopularCategoryPress("tiktoker")}
-          className={`flex-1 ${
-            isRTL ? "items-end ml-2" : "items-start mr-2"
-          } bg-white rounded-xl shadow-sm border border-gray-200`}
-          style={{
-            padding: screenWidth < 375 ? 12 : 16,
-            minHeight: screenWidth < 375 ? 100 : 120
-          }}
+        <Animated.View
+          style={[
+            popularStyle,
+            {
+              flex: 1,
+              marginRight: isRTL ? 0 : spacing.margin.small,
+              marginLeft: isRTL ? spacing.margin.small : 0,
+            },
+          ]}
+          entering={SlideInRight.delay(900).springify()}
         >
-          <Icon
-            name="zap"
-            size={screenWidth < 375 ? 20 : 24}
-            color="#3B82F6"
-            style={{ marginBottom: screenWidth < 375 ? 6 : 8 }}
-          />
-          <Text
-            className="text-gray-900"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 14 : 16
+          <TouchableOpacity
+            onPress={() => handlePopularCategoryPress("tiktoker")}
+            className={`${
+              isRTL ? "items-end" : "items-start"
+            } bg-white rounded-xl shadow-sm border border-gray-200`}
+            style={{
+              padding: spacing.padding.medium,
+              minHeight: 120,
             }}
           >
-            {t("song.categories.tiktoker")}
-          </Text>
-          <Text
-            className="text-gray-600"
-            style={{ 
-              fontFamily: AppFonts.semibold,
-              fontSize: screenWidth < 375 ? 11 : 12
-            }}
-          >
-            {t("song.categoryDescriptions.tiktoker")}
-          </Text>
-        </TouchableOpacity>
+            <Icon
+              name="zap"
+              size={spacing.iconSize.medium}
+              color="#3B82F6"
+              style={{ marginBottom: spacing.margin.small }}
+            />
+            <Text
+              className="text-gray-900"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.medium,
+              }}
+            >
+              {t("song.categories.tiktoker")}
+            </Text>
+            <Text
+              className="text-gray-600"
+              style={{
+                fontFamily: AppFonts.semibold,
+                fontSize: spacing.fontSize.small,
+              }}
+            >
+              {t("song.categoryDescriptions.tiktoker")}
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
-    </View>
+    </Animated.View>
   );
 
   const flatListData = [
@@ -560,12 +677,20 @@ const Search = () => {
 
       case "creator":
         return (
-          <View style={{ 
-            paddingHorizontal: 24, 
-            marginBottom: 16,
-            minHeight: 120
-          }}>
-            <View style={{ width: screenWidth - 48 }}>
+          <Animated.View
+            style={[
+              resultStyle,
+              {
+                paddingHorizontal: spacing.padding.medium,
+                marginBottom: spacing.margin.medium,
+                minHeight: 120,
+              },
+            ]}
+            entering={SlideInUp.delay(
+              200 + (parseInt(item.id) || 0) * 100
+            ).springify()}
+          >
+            <View style={{ width: screenWidth - spacing.padding.medium * 2 }}>
               <CreatorCard
                 id={item.data.id?.toString() ?? ""}
                 image={`https://api.cloudwavproduction.com/storage/${item.data.profile_image}`}
@@ -574,15 +699,17 @@ const Search = () => {
                 bussiness_price={`$${item.data.bussiness_price || 0}`}
               />
             </View>
-          </View>
+          </Animated.View>
         );
 
       case "empty-state":
         return (
-          <View style={{ 
-            paddingHorizontal: 24,
-            minHeight: screenWidth * 0.7
-          }}>
+          <View
+            style={{
+              paddingHorizontal: 24,
+              minHeight: screenWidth * 0.7,
+            }}
+          >
             {renderEmptyState()}
           </View>
         );
@@ -596,7 +723,7 @@ const Search = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <Animated.View style={[{ flex: 1 }, pageStyle]}>
       <TopLoader />
       <FlatList
         ref={scrollViewRef as any}
@@ -604,9 +731,9 @@ const Search = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ 
+        contentContainerStyle={{
           flexGrow: 1,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 10
+          paddingBottom: safeArea.bottom + spacing.padding.medium,
         }}
         refreshControl={refreshControl as any}
         keyboardShouldPersistTaps="handled"
@@ -615,12 +742,12 @@ const Search = () => {
         windowSize={10}
         initialNumToRender={5}
         getItemLayout={(data, index) => ({
-          length: 120, // Approximate item height
+          length: 120,
           offset: 120 * index,
           index,
         })}
       />
-    </View>
+    </Animated.View>
   );
 };
 

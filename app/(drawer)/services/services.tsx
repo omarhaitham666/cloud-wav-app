@@ -1,5 +1,15 @@
 import SocialServiesModal from "@/components/modals/SocialServiesModal";
 import { AppFonts } from "@/utils/fonts";
+import { 
+  useFadeIn, 
+  useSlideIn, 
+  useScaleIn, 
+  useStaggerAnimation,
+  usePageTransition,
+  useCardHover,
+  getResponsiveSpacing,
+  getSafeAreaInsets
+} from "@/utils/animations";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import {
@@ -11,7 +21,7 @@ import {
   ShoppingBag,
   Video,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ColorValue,
@@ -21,6 +31,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated from "react-native-reanimated";
 
 interface Service {
   id: string;
@@ -37,6 +48,18 @@ export default function ServicesScreen() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [modalVisible, setModalVisible] = useState(false);
+
+  const { animatedStyle: pageStyle, enterPage } = usePageTransition();
+  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } = useSlideIn("up", 0);
+  const { animatedStyle: subtitleStyle, startAnimation: startSubtitleAnimation } = useFadeIn(200);
+  const spacing = getResponsiveSpacing();
+  const safeArea = getSafeAreaInsets();
+
+  useEffect(() => {
+    enterPage();
+    startTitleAnimation();
+    startSubtitleAnimation();
+  }, [enterPage, startTitleAnimation, startSubtitleAnimation]);
 
   const services: Service[] = [
     {
@@ -99,20 +122,32 @@ export default function ServicesScreen() {
     }
   };
 
-  const renderServiceCard = (service: Service) => (
-    <TouchableOpacity
-      key={service.id}
-      onPress={() => handleServicePress(service)}
-      disabled={service.isComingSoon}
-      className={`flex-row items-center rounded-2xl border px-5 py-5 shadow-md mb-4 
-        ${
-          service.isComingSoon
-            ? "opacity-70 bg-gray-50 border-gray-200"
-            : "bg-white border-gray-100"
-        }
-      `}
-      style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
-    >
+  const ServiceCard = ({ service, index }: { service: Service; index: number }) => {
+    const { animatedStyle: cardStyle, onPressIn, onPressOut } = useCardHover();
+    const { animatedStyle: itemStyle, startAnimation: startItemAnimation } = useSlideIn("right", index * 100 + 400);
+
+    useEffect(() => {
+      startItemAnimation();
+    }, [startItemAnimation]);
+
+    return (
+      <Animated.View style={[itemStyle]}>
+        <Animated.View style={[cardStyle]}>
+          <TouchableOpacity
+            key={service.id}
+            onPress={() => handleServicePress(service)}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            disabled={service.isComingSoon}
+            className={`flex-row items-center rounded-2xl border px-5 py-5 shadow-md mb-4 
+              ${
+                service.isComingSoon
+                  ? "opacity-70 bg-gray-50 border-gray-200"
+                  : "bg-white border-gray-100"
+              }
+            `}
+            style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+          >
       <LinearGradient
         colors={service.gradientColors}
         start={{ x: 0, y: 0 }}
@@ -172,51 +207,70 @@ export default function ServicesScreen() {
         </Text>
       </View>
 
-      {!service.isComingSoon && (
-        <View style={{ marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }}>
-          <ChevronRight
-            size={20}
-            color="#9CA3AF"
-            style={{ transform: [{ rotate: isRTL ? "180deg" : "0deg" }] }}
-          />
-        </View>
-      )}
-    </TouchableOpacity>
-  );
+            {!service.isComingSoon && (
+              <View style={{ marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }}>
+                <ChevronRight
+                  size={20}
+                  color="#9CA3AF"
+                  style={{ transform: [{ rotate: isRTL ? "180deg" : "0deg" }] }}
+                />
+              </View>
+            )}
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
+    );
+  };
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1" style={{ paddingTop: safeArea.top }}>
       <LinearGradient
         colors={["#F8FAFC", "#EDE9FE", "#F1F5F9"]}
         className="flex-1"
       >
-        <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="items-center mt-5 mb-8">
-            <Text
-              className="text-2xl font-bold text-gray-900 mb-2"
-              style={{
-                textAlign: isRTL ? "right" : "left",
-                fontFamily: AppFonts.semibold,
-              }}
-            >
-              {t("services.main.title")}
-            </Text>
-            <Text
-              className="text-gray-500 text-center leading-6 px-5"
-              style={{
-                textAlign: isRTL ? "right" : "left",
-                fontFamily: AppFonts.semibold,
-              }}
-            >
-              {t("services.main.subtitle")}
-            </Text>
-          </View>
+        <Animated.View style={[pageStyle, { flex: 1 }]}>
+          <ScrollView
+            contentContainerStyle={{ 
+              paddingHorizontal: spacing.padding.medium, 
+              paddingBottom: safeArea.bottom + 40 
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Animated.View style={[titleStyle]}>
+              <View className="items-center mt-5 mb-8">
+                <Text
+                  className="text-2xl font-bold text-gray-900 mb-2"
+                  style={{
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                    fontSize: spacing.fontSize.xlarge,
+                  }}
+                >
+                  {t("services.main.title")}
+                </Text>
+                <Animated.Text
+                  className="text-gray-500 text-center leading-6 px-5"
+                  style={[
+                    subtitleStyle,
+                    {
+                      textAlign: isRTL ? "right" : "left",
+                      fontFamily: AppFonts.semibold,
+                      fontSize: spacing.fontSize.medium,
+                    }
+                  ]}
+                >
+                  {t("services.main.subtitle")}
+                </Animated.Text>
+              </View>
+            </Animated.View>
 
-          <View className="gap-4">{services.map(renderServiceCard)}</View>
-        </ScrollView>
+            <View style={{ gap: spacing.margin.medium }}>
+              {services.map((service, index) => (
+                <ServiceCard key={service.id} service={service} index={index} />
+              ))}
+            </View>
+          </ScrollView>
+        </Animated.View>
         <SocialServiesModal
           onClose={() => setModalVisible(false)}
           visible={modalVisible}

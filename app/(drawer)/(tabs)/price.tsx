@@ -1,13 +1,26 @@
 import { PricingCard } from "@/components/cards/PricingCard";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import {
+  ANIMATION_DELAY,
+  getResponsiveSpacing,
+  getSafeAreaInsets,
+  useCardHover,
+  useFadeIn,
+  usePageTransition,
+  useScaleIn,
+  useSlideIn,
+  useStaggerAnimation,
+} from "@/utils/animations";
 import { pricingPlans } from "@/utils/data";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
+  BounceIn,
   interpolate,
+  SlideInUp,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -21,16 +34,47 @@ export default function PricingScreen() {
   const [isYearly, setIsYearly] = useState(false);
   const toggleAnimation = useSharedValue(0);
 
-  // Pull to refresh functionality
+  const spacing = getResponsiveSpacing();
+  const safeArea = getSafeAreaInsets();
+
+  const { animatedStyle: pageStyle, enterPage } = usePageTransition();
+  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } =
+    useSlideIn("up", 0);
+  const { animatedStyle: toggleStyle, startAnimation: startToggleAnimation } =
+    useScaleIn(ANIMATION_DELAY.SMALL);
+  const { animatedStyle: cardsStyle, startAnimation: startCardsAnimation } =
+    useFadeIn(ANIMATION_DELAY.MEDIUM);
+
+  const { animatedStyle: cardStyle, startAnimation: startCardAnimation } =
+    useStaggerAnimation(pricingPlans.length, 150, ANIMATION_DELAY.MEDIUM + 200);
+
+  const {
+    animatedStyle: cardHoverStyle,
+    onPressIn: onCardPressIn,
+    onPressOut: onCardPressOut,
+  } = useCardHover();
+
   const { refreshControl, scrollViewRef, TopLoader } = usePullToRefresh({
     onRefresh: async () => {
-      // Refresh pricing data (if needed)
-      // This could trigger a re-fetch of pricing plans from API
       console.log("Refreshing pricing data...");
     },
     scrollToTopOnRefresh: true,
     showTopLoader: true,
   });
+
+  useEffect(() => {
+    enterPage();
+    startHeaderAnimation();
+    startToggleAnimation();
+    startCardsAnimation();
+    startCardAnimation();
+  }, [
+    enterPage,
+    startHeaderAnimation,
+    startToggleAnimation,
+    startCardsAnimation,
+    startCardAnimation,
+  ]);
 
   const setToMonthly = () => {
     setIsYearly(false);
@@ -51,7 +95,7 @@ export default function PricingScreen() {
   });
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1" style={{ paddingTop: safeArea.top }}>
       <LinearGradient
         colors={["#ffffff", "#f8fafc", "#f1f5f9"]}
         className="flex-1"
@@ -59,15 +103,29 @@ export default function PricingScreen() {
         <TopLoader />
         <ScrollView
           ref={scrollViewRef}
-          className="px-6"
-          contentContainerStyle={{ paddingBottom: 100 }}
+          style={[{ flex: 1 }, pageStyle]}
+          contentContainerStyle={{
+            paddingHorizontal: spacing.padding.medium,
+            paddingBottom: safeArea.bottom + 100,
+            paddingTop: spacing.padding.medium,
+          }}
           showsVerticalScrollIndicator={false}
           refreshControl={refreshControl as any}
         >
-          <View className="items-center mt-6 mb-10">
+          <Animated.View
+            style={[
+              headerStyle,
+              {
+                alignItems: "center",
+                marginTop: spacing.margin.medium,
+                marginBottom: spacing.margin.large,
+              },
+            ]}
+          >
             <Text
-              className="text-3xl text-gray-800 mb-4 text-center"
+              className="text-gray-800 mb-4 text-center"
               style={{
+                fontSize: spacing.fontSize.xlarge,
                 fontFamily: AppFonts.bold,
                 textAlign: isRTL ? "right" : "left",
                 writingDirection: isRTL ? "rtl" : "ltr",
@@ -76,20 +134,27 @@ export default function PricingScreen() {
               {t("pricing.title")}
             </Text>
             <Text
-              className="text-gray-600 text-center leading-6 px-4"
+              className="text-gray-600 text-center leading-6"
               style={{
+                fontSize: spacing.fontSize.medium,
                 fontFamily: AppFonts.medium,
                 writingDirection: isRTL ? "rtl" : "ltr",
+                paddingHorizontal: spacing.padding.small,
               }}
             >
               {t("pricing.subtitle")}
             </Text>
-          </View>
+          </Animated.View>
+
           {isYearly && (
-            <View className="self-center mb-4 px-3 py-1 rounded-full bg-green-50 border border-green-200">
+            <Animated.View
+              entering={BounceIn.delay(400).springify()}
+              className="self-center mb-4 px-3 py-1 rounded-full bg-green-50 border border-green-200"
+            >
               <Text
-                className="text-green-700 text-sm font-medium"
+                className="text-green-700 font-medium"
                 style={{
+                  fontSize: spacing.fontSize.small,
                   fontFamily: AppFonts.medium,
                   textAlign: "center",
                   writingDirection: isRTL ? "rtl" : "ltr",
@@ -97,11 +162,24 @@ export default function PricingScreen() {
               >
                 {t("pricing.toggle.savings")}
               </Text>
-            </View>
+            </Animated.View>
           )}
-          <View className="items-center mb-10">
+
+          <Animated.View
+            style={[
+              toggleStyle,
+              {
+                alignItems: "center",
+                marginBottom: spacing.margin.large,
+              },
+            ]}
+          >
             <View
-              className={`flex-row w-44 h-[50px] border border-gray-200 rounded-full relative bg-gray-50 shadow-sm`}
+              className={`flex-row border border-gray-200 rounded-full relative bg-gray-50 shadow-sm`}
+              style={{
+                width: 180,
+                height: 50,
+              }}
             >
               <Animated.View
                 style={[
@@ -112,7 +190,7 @@ export default function PricingScreen() {
                     left: -2,
                   },
                 ]}
-                className="w-[4.8rem] h-12 mt-1 bg-red-500 rounded-full shadow-xl"
+                className="w-[6rem] h-12 mt-1 bg-red-500 rounded-full shadow-xl"
               />
               <TouchableOpacity
                 onPress={setToMonthly}
@@ -123,13 +201,14 @@ export default function PricingScreen() {
                 }}
               >
                 <Text
-                  className={`text-sm font-semibold ${
+                  className={`font-semibold ${
                     !isYearly ? "text-white" : "text-gray-700"
                   }`}
                   style={{
+                    fontSize: spacing.fontSize.small,
                     fontFamily: AppFonts.semibold,
                     textAlign: "center",
-                    writingDirection: isRTL ? "rtl" : "ltr",
+                    writingDirection: "auto",
                   }}
                 >
                   {t("pricing.toggle.monthly")}
@@ -146,10 +225,11 @@ export default function PricingScreen() {
               >
                 <View className="items-center">
                   <Text
-                    className={`text-sm font-semibold ${
+                    className={`font-semibold ${
                       isYearly ? "text-white" : "text-gray-700"
                     }`}
                     style={{
+                      fontSize: spacing.fontSize.small,
                       fontFamily: AppFonts.semibold,
                       textAlign: "center",
                       writingDirection: isRTL ? "rtl" : "ltr",
@@ -160,13 +240,25 @@ export default function PricingScreen() {
                 </View>
               </TouchableOpacity>
             </View>
-          </View>
+          </Animated.View>
 
-          <View className="gap-6">
-            {pricingPlans.map((plan) => (
-              <PricingCard key={plan.id} plan={plan} isYearly={isYearly} />
+          <Animated.View style={[cardsStyle, { gap: spacing.margin.large }]}>
+            {pricingPlans.map((plan, index) => (
+              <Animated.View
+                key={plan.id}
+                style={[cardStyle, cardHoverStyle]}
+                entering={SlideInUp.delay(500 + index * 150).springify()}
+              >
+                <TouchableOpacity
+                  onPressIn={onCardPressIn}
+                  onPressOut={onCardPressOut}
+                  activeOpacity={0.9}
+                >
+                  <PricingCard plan={plan} isYearly={isYearly} />
+                </TouchableOpacity>
+              </Animated.View>
             ))}
-          </View>
+          </Animated.View>
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
