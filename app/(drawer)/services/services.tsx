@@ -1,15 +1,13 @@
 import SocialServiesModal from "@/components/modals/SocialServiesModal";
-import { AppFonts } from "@/utils/fonts";
-import { 
-  useFadeIn, 
-  useSlideIn, 
-  useScaleIn, 
-  useStaggerAnimation,
-  usePageTransition,
-  useCardHover,
+import {
   getResponsiveSpacing,
-  getSafeAreaInsets
+  getSafeAreaInsets,
+  useCardHover,
+  useFadeIn,
+  usePageTransition,
+  useSlideIn,
 } from "@/utils/animations";
+import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import {
@@ -21,7 +19,7 @@ import {
   ShoppingBag,
   Video,
 } from "lucide-react-native";
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ColorValue,
@@ -30,8 +28,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Service {
   id: string;
@@ -50,16 +48,28 @@ export default function ServicesScreen() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const { animatedStyle: pageStyle, enterPage } = usePageTransition();
-  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } = useSlideIn("up", 0);
-  const { animatedStyle: subtitleStyle, startAnimation: startSubtitleAnimation } = useFadeIn(200);
+  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } =
+    useSlideIn("up", 0);
+  const {
+    animatedStyle: subtitleStyle,
+    startAnimation: startSubtitleAnimation,
+  } = useFadeIn(200);
   const spacing = getResponsiveSpacing();
   const safeArea = getSafeAreaInsets();
+  const hasAnimated = useRef(false);
+
+  const startAnimations = useCallback(() => {
+    if (!hasAnimated.current) {
+      enterPage();
+      startTitleAnimation();
+      startSubtitleAnimation();
+      hasAnimated.current = true;
+    }
+  }, [enterPage, startTitleAnimation, startSubtitleAnimation]);
 
   useEffect(() => {
-    enterPage();
-    startTitleAnimation();
-    startSubtitleAnimation();
-  }, [enterPage, startTitleAnimation, startSubtitleAnimation]);
+    startAnimations();
+  }, [startAnimations]);
 
   const services: Service[] = [
     {
@@ -122,9 +132,16 @@ export default function ServicesScreen() {
     }
   };
 
-  const ServiceCard = ({ service, index }: { service: Service; index: number }) => {
+  const ServiceCard = ({
+    service,
+    index,
+  }: {
+    service: Service;
+    index: number;
+  }) => {
     const { animatedStyle: cardStyle, onPressIn, onPressOut } = useCardHover();
-    const { animatedStyle: itemStyle, startAnimation: startItemAnimation } = useSlideIn("right", index * 100 + 400);
+    const { animatedStyle: itemStyle, startAnimation: startItemAnimation } =
+      useSlideIn("right", index * 100 + 400);
 
     useEffect(() => {
       startItemAnimation();
@@ -148,67 +165,72 @@ export default function ServicesScreen() {
             `}
             style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
           >
-      <LinearGradient
-        colors={service.gradientColors}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className={`w-14 h-14 items-center justify-center shadow ${
-          isRTL ? "ml-4" : "mr-4"
-        }`}
-        style={{ borderRadius: 24 }}
-      >
-        {service.icon}
-      </LinearGradient>
+            <LinearGradient
+              colors={service.gradientColors}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              className={`w-14 h-14 items-center justify-center shadow ${
+                isRTL ? "ml-4" : "mr-4"
+              }`}
+              style={{ borderRadius: 24 }}
+            >
+              {service.icon}
+            </LinearGradient>
 
-      <View className="flex-1">
-        <View
-          className={`flex-row items-center mb-1 ${
-            isRTL ? "flex-row-reverse" : ""
-          }`}
-        >
-          <Text
-            className={`flex-1 text-lg font-semibold 
+            <View className="flex-1">
+              <View
+                className={`flex-row items-center mb-1 ${
+                  isRTL ? "flex-row-reverse" : ""
+                }`}
+              >
+                <Text
+                  className={`flex-1 text-lg font-semibold 
               ${service.isComingSoon ? "text-gray-500" : "text-gray-900"}
             `}
-            style={{
-              textAlign: isRTL ? "right" : "left",
-              fontFamily: AppFonts.semibold,
-            }}
-          >
-            {service.title}
-          </Text>
-          {service.isComingSoon && (
-            <View
-              className={`bg-violet-600 px-2 py-1 rounded-md ${
-                isRTL ? "mr-2" : "ml-2"
-              }`}
-            >
+                  style={{
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                  }}
+                >
+                  {service.title}
+                </Text>
+                {service.isComingSoon && (
+                  <View
+                    className={`bg-violet-600 px-2 py-1 rounded-md ${
+                      isRTL ? "mr-2" : "ml-2"
+                    }`}
+                  >
+                    <Text
+                      className="text-white text-[10px] font-semibold"
+                      style={{
+                        fontFamily: AppFonts.semibold,
+                      }}
+                    >
+                      {t("services.main.comingSoon")}
+                    </Text>
+                  </View>
+                )}
+              </View>
               <Text
-                className="text-white text-[10px] font-semibold"
+                className={`text-sm leading-5 
+            ${service.isComingSoon ? "text-gray-400" : "text-gray-500"}
+          `}
                 style={{
+                  textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                 }}
               >
-                {t("services.main.comingSoon")}
+                {service.description}
               </Text>
             </View>
-          )}
-        </View>
-        <Text
-          className={`text-sm leading-5 
-            ${service.isComingSoon ? "text-gray-400" : "text-gray-500"}
-          `}
-          style={{
-            textAlign: isRTL ? "right" : "left",
-            fontFamily: AppFonts.semibold,
-          }}
-        >
-          {service.description}
-        </Text>
-      </View>
 
             {!service.isComingSoon && (
-              <View style={{ marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }}>
+              <View
+                style={{
+                  marginLeft: isRTL ? 0 : 8,
+                  marginRight: isRTL ? 8 : 0,
+                }}
+              >
                 <ChevronRight
                   size={20}
                   color="#9CA3AF"
@@ -230,9 +252,9 @@ export default function ServicesScreen() {
       >
         <Animated.View style={[pageStyle, { flex: 1 }]}>
           <ScrollView
-            contentContainerStyle={{ 
-              paddingHorizontal: spacing.padding.medium, 
-              paddingBottom: safeArea.bottom + 40 
+            contentContainerStyle={{
+              paddingHorizontal: spacing.padding.medium,
+              paddingBottom: safeArea.bottom + 40,
             }}
             showsVerticalScrollIndicator={false}
           >
@@ -256,7 +278,7 @@ export default function ServicesScreen() {
                       textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.semibold,
                       fontSize: spacing.fontSize.medium,
-                    }
+                    },
                   ]}
                 >
                   {t("services.main.subtitle")}

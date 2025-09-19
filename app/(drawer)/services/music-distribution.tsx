@@ -1,18 +1,18 @@
 import MusicServiceModal from "@/components/modals/MusicServiceModal";
+import {
+  getResponsiveSpacing,
+  getSafeAreaInsets,
+  useFadeIn,
+  usePageTransition,
+  useScaleIn,
+  useSlideIn,
+} from "@/utils/animations";
 import { services } from "@/utils/data";
 import { AppFonts } from "@/utils/fonts";
-import { 
-  useFadeIn, 
-  useSlideIn, 
-  useScaleIn, 
-  usePageTransition,
-  getResponsiveSpacing,
-  getSafeAreaInsets
-} from "@/utils/animations";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Image,
@@ -31,26 +31,54 @@ const MusicDistribution = () => {
   const isRTL = i18n.language === "ar";
 
   const { animatedStyle: pageStyle, enterPage } = usePageTransition();
-  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } = useSlideIn("down", 0);
-  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } = useFadeIn(200);
-  const { animatedStyle: descriptionStyle, startAnimation: startDescriptionAnimation } = useFadeIn(400);
-  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } = useSlideIn("up", 600);
-  const { animatedStyle: servicesStyle, startAnimation: startServicesAnimation } = useFadeIn(800);
-  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } = useScaleIn(1000);
-  const { animatedStyle: formStyle, startAnimation: startFormAnimation } = useSlideIn("up", 1200);
+  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } =
+    useSlideIn("down", 0);
+  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } =
+    useFadeIn(200);
+  const {
+    animatedStyle: descriptionStyle,
+    startAnimation: startDescriptionAnimation,
+  } = useFadeIn(400);
+  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } =
+    useSlideIn("up", 600);
+  const {
+    animatedStyle: servicesStyle,
+    startAnimation: startServicesAnimation,
+  } = useFadeIn(800);
+  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } =
+    useScaleIn(1000);
+  const { animatedStyle: formStyle, startAnimation: startFormAnimation } =
+    useSlideIn("up", 1200);
   const spacing = getResponsiveSpacing();
   const safeArea = getSafeAreaInsets();
+  const hasAnimated = useRef(false);
+
+  const startAnimations = useCallback(() => {
+    if (!hasAnimated.current) {
+      enterPage();
+      startHeaderAnimation();
+      startTitleAnimation();
+      startDescriptionAnimation();
+      startButtonsAnimation();
+      startServicesAnimation();
+      startImageAnimation();
+      startFormAnimation();
+      hasAnimated.current = true;
+    }
+  }, [
+    enterPage,
+    startHeaderAnimation,
+    startTitleAnimation,
+    startDescriptionAnimation,
+    startButtonsAnimation,
+    startServicesAnimation,
+    startImageAnimation,
+    startFormAnimation,
+  ]);
 
   useEffect(() => {
-    enterPage();
-    startHeaderAnimation();
-    startTitleAnimation();
-    startDescriptionAnimation();
-    startButtonsAnimation();
-    startServicesAnimation();
-    startImageAnimation();
-    startFormAnimation();
-  }, [enterPage, startHeaderAnimation, startTitleAnimation, startDescriptionAnimation, startButtonsAnimation, startServicesAnimation, startImageAnimation, startFormAnimation]);
+    startAnimations();
+  }, [startAnimations]);
 
   return (
     <LinearGradient
@@ -59,7 +87,10 @@ const MusicDistribution = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <SafeAreaView className="flex-1 py-3" style={{ paddingTop: safeArea.top }}>
+      <SafeAreaView
+        className="flex-1 py-3"
+        style={{ paddingTop: safeArea.top }}
+      >
         <Animated.View style={[pageStyle, { flex: 1 }]}>
           <Animated.View style={[headerStyle]}>
             <View className="flex-row items-center px-5 pt-10">
@@ -93,7 +124,7 @@ const MusicDistribution = () => {
                 {
                   fontFamily: AppFonts.semibold,
                   fontSize: spacing.fontSize.large,
-                }
+                },
               ]}
             >
               {t("services.musicDistribution.title")}
@@ -105,7 +136,7 @@ const MusicDistribution = () => {
                 {
                   fontFamily: AppFonts.semibold,
                   fontSize: spacing.fontSize.medium,
-                }
+                },
               ]}
             >
               {t("services.musicDistribution.description")}
@@ -163,7 +194,11 @@ const MusicDistribution = () => {
                         className="flex-row items-center mb-2"
                         style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
                       >
-                        <Ionicons name={service.icon as any} size={spacing.iconSize.medium} color="#fff" />
+                        <Ionicons
+                          name={service.icon as any}
+                          size={spacing.iconSize.medium}
+                          color="#fff"
+                        />
                         <Text
                           className="text-white text-base"
                           style={{
@@ -239,7 +274,9 @@ const MusicDistribution = () => {
                 />
                 <TextInput
                   className="border border-gray-200 rounded-xl px-4 py-3 mb-4 bg-gray-50 text-gray-800 h-24"
-                  placeholder={t("services.musicDistribution.form.projectDetails")}
+                  placeholder={t(
+                    "services.musicDistribution.form.projectDetails"
+                  )}
                   placeholderTextColor="#9CA3AF"
                   multiline
                   textAlignVertical="top"

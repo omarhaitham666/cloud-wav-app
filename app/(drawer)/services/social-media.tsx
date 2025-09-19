@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -15,50 +15,74 @@ import ServiceRequestModal, {
   FormData,
 } from "@/components/modals/ServiceRequestModal";
 import { ServiceType, useServicesMutation } from "@/store/api/global/services";
-import { AppFonts } from "@/utils/fonts";
-import { 
-  useFadeIn, 
-  useSlideIn, 
-  useScaleIn, 
-  usePageTransition,
-  useCardHover,
+import {
   getResponsiveSpacing,
-  getSafeAreaInsets
+  getSafeAreaInsets,
+  useFadeIn,
+  usePageTransition,
+  useScaleIn,
+  useSlideIn,
 } from "@/utils/animations";
+import { AppFonts } from "@/utils/fonts";
 import { Lightbulb, Megaphone, ShieldCheck } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import Toast from "react-native-toast-message";
 import Animated from "react-native-reanimated";
+import Toast from "react-native-toast-message";
 
 const SocialMedia = () => {
   const [visible, setVisible] = useState(false);
-  const [selectedService, setSelectedService] = useState<ServiceType>(
-    "account_creation"
-  );
+  const [selectedService, setSelectedService] =
+    useState<ServiceType>("account_creation");
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
   const [Services, { isLoading }] = useServicesMutation();
 
   const { animatedStyle: pageStyle, enterPage } = usePageTransition();
-  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } = useSlideIn("down", 0);
-  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } = useFadeIn(200);
-  const { animatedStyle: descriptionStyle, startAnimation: startDescriptionAnimation } = useFadeIn(400);
-  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } = useSlideIn("up", 600);
-  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } = useScaleIn(800);
-  const { animatedStyle: servicesStyle, startAnimation: startServicesAnimation } = useFadeIn(1000);
+  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } =
+    useSlideIn("down", 0);
+  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } =
+    useFadeIn(200);
+  const {
+    animatedStyle: descriptionStyle,
+    startAnimation: startDescriptionAnimation,
+  } = useFadeIn(400);
+  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } =
+    useSlideIn("up", 600);
+  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } =
+    useScaleIn(800);
+  const {
+    animatedStyle: servicesStyle,
+    startAnimation: startServicesAnimation,
+  } = useFadeIn(1000);
   const spacing = getResponsiveSpacing();
   const safeArea = getSafeAreaInsets();
+  const hasAnimated = useRef(false);
+
+  const startAnimations = useCallback(() => {
+    if (!hasAnimated.current) {
+      enterPage();
+      startHeaderAnimation();
+      startTitleAnimation();
+      startDescriptionAnimation();
+      startButtonsAnimation();
+      startImageAnimation();
+      startServicesAnimation();
+      hasAnimated.current = true;
+    }
+  }, [
+    enterPage,
+    startHeaderAnimation,
+    startTitleAnimation,
+    startDescriptionAnimation,
+    startButtonsAnimation,
+    startImageAnimation,
+    startServicesAnimation,
+  ]);
 
   useEffect(() => {
-    enterPage();
-    startHeaderAnimation();
-    startTitleAnimation();
-    startDescriptionAnimation();
-    startButtonsAnimation();
-    startImageAnimation();
-    startServicesAnimation();
-  }, []);
+    startAnimations();
+  }, [startAnimations]);
 
   const services = [
     {
@@ -133,7 +157,10 @@ const SocialMedia = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <SafeAreaView className="flex-1 py-3" style={{ paddingTop: safeArea.top }}>
+      <SafeAreaView
+        className="flex-1 py-3"
+        style={{ paddingTop: safeArea.top }}
+      >
         <Animated.View style={[pageStyle, { flex: 1 }]}>
           <Animated.View style={[headerStyle]}>
             <View className={`flex-row items-center px-5 pt-10`}>
@@ -168,7 +195,7 @@ const SocialMedia = () => {
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                   fontSize: spacing.fontSize.large,
-                }
+                },
               ]}
             >
               {t("services.socialMedia.specialist")}
@@ -181,7 +208,7 @@ const SocialMedia = () => {
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                   fontSize: spacing.fontSize.medium,
-                }
+                },
               ]}
             >
               {t("services.socialMedia.description")}
@@ -253,89 +280,75 @@ const SocialMedia = () => {
                 </Text>
 
                 <View className="space-y-5">
-                  {services.map((service, idx) => {
-                    const { animatedStyle: serviceStyle, startAnimation: startServiceAnimation } = useSlideIn("right", 1200 + idx * 100);
-                    const { animatedStyle: cardStyle, onPressIn, onPressOut } = useCardHover();
-                    
-                    useEffect(() => {
-                      startServiceAnimation();
-                    }, []);
-
-                    return (
-                      <Animated.View key={idx} style={[serviceStyle]}>
-                        <Animated.View
-                          style={[cardStyle]}
-                          className="bg-white rounded-2xl p-5 my-2 shadow-md border border-gray-100"
+                  {services.map((service, idx) => (
+                    <Animated.View key={idx}>
+                      <View className="bg-white rounded-2xl p-5 my-2 shadow-md border border-gray-100">
+                        <View
+                          className={`flex-row items-center space-x-4 mb-3 ${
+                            isRTL ? "flex-row-reverse" : ""
+                          }`}
                         >
                           <View
-                            className={`flex-row items-center space-x-4 mb-3 ${
-                              isRTL ? "flex-row-reverse" : ""
+                            className={`bg-purple-100 p-3 rounded-xl ${
+                              isRTL ? "ml-2" : "mr-2"
                             }`}
                           >
-                            <View
-                              className={`bg-purple-100 p-3 rounded-xl ${
-                                isRTL ? "ml-2" : "mr-2"
-                              }`}
-                            >
-                              {service.icon}
-                            </View>
-                            <Text
-                              className="text-lg text-gray-900 flex-1"
-                              style={{
-                                textAlign: isRTL ? "right" : "left",
-                                fontFamily: AppFonts.semibold,
-                                fontSize: spacing.fontSize.large,
-                              }}
-                            >
-                              {service.title}
-                            </Text>
-                            <Text
-                              className="text-purple-700"
-                              style={{
-                                textAlign: isRTL ? "right" : "left",
-                                fontFamily: AppFonts.semibold,
-                                fontSize: spacing.fontSize.medium,
-                              }}
-                            >
-                              {service.price}
-                            </Text>
+                            {service.icon}
                           </View>
                           <Text
-                            className="text-sm text-gray-600 leading-relaxed mb-4"
+                            className="text-lg text-gray-900 flex-1"
+                            style={{
+                              textAlign: isRTL ? "right" : "left",
+                              fontFamily: AppFonts.semibold,
+                              fontSize: spacing.fontSize.large,
+                            }}
+                          >
+                            {service.title}
+                          </Text>
+                          <Text
+                            className="text-purple-700"
+                            style={{
+                              textAlign: isRTL ? "right" : "left",
+                              fontFamily: AppFonts.semibold,
+                              fontSize: spacing.fontSize.medium,
+                            }}
+                          >
+                            {service.price}
+                          </Text>
+                        </View>
+                        <Text
+                          className="text-sm text-gray-600 leading-relaxed mb-4"
+                          style={{
+                            textAlign: isRTL ? "right" : "left",
+                            fontFamily: AppFonts.semibold,
+                            fontSize: spacing.fontSize.small,
+                          }}
+                        >
+                          {service.description}
+                        </Text>
+                        <TouchableOpacity
+                          className={`bg-purple-600 px-5 py-2 rounded-full ${
+                            isRTL ? "self-end" : "self-start"
+                          }`}
+                          onPress={() => {
+                            setSelectedService(service.type as ServiceType);
+                            setVisible(true);
+                          }}
+                        >
+                          <Text
+                            className="text-white text-sm font-medium"
                             style={{
                               textAlign: isRTL ? "right" : "left",
                               fontFamily: AppFonts.semibold,
                               fontSize: spacing.fontSize.small,
                             }}
                           >
-                            {service.description}
+                            {t("services.socialMedia.getItNow")}
                           </Text>
-                          <TouchableOpacity
-                            className={`bg-purple-600 px-5 py-2 rounded-full ${
-                              isRTL ? "self-end" : "self-start"
-                            }`}
-                            onPress={() => {
-                              setSelectedService(service.type as ServiceType);
-                              setVisible(true);
-                            }}
-                            onPressIn={onPressIn}
-                            onPressOut={onPressOut}
-                          >
-                            <Text
-                              className="text-white text-sm font-medium"
-                              style={{
-                                textAlign: isRTL ? "right" : "left",
-                                fontFamily: AppFonts.semibold,
-                                fontSize: spacing.fontSize.small,
-                              }}
-                            >
-                              {t("services.socialMedia.getItNow")}
-                            </Text>
-                          </TouchableOpacity>
-                        </Animated.View>
-                      </Animated.View>
-                    );
-                  })}
+                        </TouchableOpacity>
+                      </View>
+                    </Animated.View>
+                  ))}
                 </View>
               </View>
             </Animated.View>

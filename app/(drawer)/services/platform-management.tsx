@@ -1,39 +1,38 @@
 import ServiceRequestModal, {
-    FormData,
+  FormData,
 } from "@/components/modals/ServiceRequestModal";
 import { ServiceType, useServicesMutation } from "@/store/api/global/services";
-import { AppFonts } from "@/utils/fonts";
-import { 
-  useFadeIn, 
-  useSlideIn, 
-  useScaleIn, 
-  usePageTransition,
-  useCardHover,
+import {
   getResponsiveSpacing,
-  getSafeAreaInsets
+  getSafeAreaInsets,
+  useFadeIn,
+  usePageTransition,
+  useScaleIn,
+  useSlideIn,
 } from "@/utils/animations";
+import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
-    Briefcase,
-    Download,
-    ShieldCheck,
-    TrendingUp,
-    User,
+  Briefcase,
+  Download,
+  ShieldCheck,
+  TrendingUp,
+  User,
 } from "lucide-react-native";
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import Toast from "react-native-toast-message";
 import Animated from "react-native-reanimated";
+import Toast from "react-native-toast-message";
 
 const PlatformManagement = () => {
   const [visible, setVisible] = useState(false);
@@ -42,24 +41,50 @@ const PlatformManagement = () => {
   const [Services, { isLoading }] = useServicesMutation();
 
   const { animatedStyle: pageStyle, enterPage } = usePageTransition();
-  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } = useSlideIn("down", 0);
-  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } = useFadeIn(200);
-  const { animatedStyle: descriptionStyle, startAnimation: startDescriptionAnimation } = useFadeIn(400);
-  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } = useSlideIn("up", 600);
-  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } = useScaleIn(800);
-  const { animatedStyle: featuresStyle, startAnimation: startFeaturesAnimation } = useFadeIn(1000);
+  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } =
+    useSlideIn("down", 0);
+  const { animatedStyle: titleStyle, startAnimation: startTitleAnimation } =
+    useFadeIn(200);
+  const {
+    animatedStyle: descriptionStyle,
+    startAnimation: startDescriptionAnimation,
+  } = useFadeIn(400);
+  const { animatedStyle: buttonsStyle, startAnimation: startButtonsAnimation } =
+    useSlideIn("up", 600);
+  const { animatedStyle: imageStyle, startAnimation: startImageAnimation } =
+    useScaleIn(800);
+  const {
+    animatedStyle: featuresStyle,
+    startAnimation: startFeaturesAnimation,
+  } = useFadeIn(1000);
   const spacing = getResponsiveSpacing();
   const safeArea = getSafeAreaInsets();
+  const hasAnimated = useRef(false);
+
+  const startAnimations = useCallback(() => {
+    if (!hasAnimated.current) {
+      enterPage();
+      startHeaderAnimation();
+      startTitleAnimation();
+      startDescriptionAnimation();
+      startButtonsAnimation();
+      startImageAnimation();
+      startFeaturesAnimation();
+      hasAnimated.current = true;
+    }
+  }, [
+    enterPage,
+    startHeaderAnimation,
+    startTitleAnimation,
+    startDescriptionAnimation,
+    startButtonsAnimation,
+    startImageAnimation,
+    startFeaturesAnimation,
+  ]);
 
   useEffect(() => {
-    enterPage();
-    startHeaderAnimation();
-    startTitleAnimation();
-    startDescriptionAnimation();
-    startButtonsAnimation();
-    startImageAnimation();
-    startFeaturesAnimation();
-  }, []);
+    startAnimations();
+  }, [startAnimations]);
 
   const features = [
     {
@@ -102,7 +127,7 @@ const PlatformManagement = () => {
   const handleFormSubmit = async (data: FormData) => {
     // Clean phone numbers by removing + prefix and any non-numeric characters except digits
     const cleanPhoneNumber = (phone: string) => {
-      return phone.replace(/^\+/, '').replace(/\D/g, '');
+      return phone.replace(/^\+/, "").replace(/\D/g, "");
     };
 
     const requestData = {
@@ -144,7 +169,10 @@ const PlatformManagement = () => {
       end={{ x: 1, y: 1 }}
       className="flex-1"
     >
-      <SafeAreaView className="flex-1 py-3" style={{ paddingTop: safeArea.top }}>
+      <SafeAreaView
+        className="flex-1 py-3"
+        style={{ paddingTop: safeArea.top }}
+      >
         <Animated.View style={[pageStyle, { flex: 1 }]}>
           <Animated.View style={[headerStyle]}>
             <View className={`flex-row items-center px-5 pt-10`}>
@@ -179,7 +207,7 @@ const PlatformManagement = () => {
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                   fontSize: spacing.fontSize.large,
-                }
+                },
               ]}
             >
               {t("services.platformManagement.title")}
@@ -192,7 +220,7 @@ const PlatformManagement = () => {
                   textAlign: isRTL ? "right" : "left",
                   fontFamily: AppFonts.semibold,
                   fontSize: spacing.fontSize.medium,
-                }
+                },
               ]}
             >
               {t("services.platformManagement.description")}
@@ -259,63 +287,51 @@ const PlatformManagement = () => {
                 </Text>
 
                 <View className="space-y-5">
-                  {features.map((item, idx) => {
-                    const { animatedStyle: featureStyle, startAnimation: startFeatureAnimation } = useSlideIn("right", 1200 + idx * 100);
-                    const { animatedStyle: cardStyle, onPressIn, onPressOut } = useCardHover();
-                    
-                    useEffect(() => {
-                      startFeatureAnimation();
-                    }, [startFeatureAnimation]);
-
-                    return (
-                      <Animated.View key={idx} style={[featureStyle]}>
-                        <Animated.View
-                          style={[
-                            cardStyle,
-                            {
-                              shadowColor: "#7C3AED",
-                              shadowOpacity: 0.1,
-                              shadowRadius: 8,
-                              elevation: 3,
-                            }
-                          ]}
-                          className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${
-                            isRTL ? "flex-row-reverse" : "flex-row"
-                          } items-center space-x-5`}
+                  {features.map((item, idx) => (
+                    <Animated.View key={idx}>
+                      <View
+                        style={{
+                          shadowColor: "#7C3AED",
+                          shadowOpacity: 0.1,
+                          shadowRadius: 8,
+                          elevation: 3,
+                        }}
+                        className={`bg-white/80 rounded-2xl my-1.5 p-5 shadow-md border border-gray-100 ${
+                          isRTL ? "flex-row-reverse" : "flex-row"
+                        } items-center space-x-5`}
+                      >
+                        <View
+                          className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${
+                            isRTL ? "ml-2" : "mr-2"
+                          }`}
                         >
-                          <View
-                            className={`bg-purple-100 p-4 rounded-2xl shadow-sm ${
-                              isRTL ? "ml-2" : "mr-2"
-                            }`}
+                          {item.icon}
+                        </View>
+                        <View className="flex-1">
+                          <Text
+                            className="text-lg text-gray-900"
+                            style={{
+                              textAlign: isRTL ? "right" : "left",
+                              fontFamily: AppFonts.semibold,
+                              fontSize: spacing.fontSize.large,
+                            }}
                           >
-                            {item.icon}
-                          </View>
-                          <View className="flex-1">
-                            <Text
-                              className="text-lg text-gray-900"
-                              style={{
-                                textAlign: isRTL ? "right" : "left",
-                                fontFamily: AppFonts.semibold,
-                                fontSize: spacing.fontSize.large,
-                              }}
-                            >
-                              {item.title}
-                            </Text>
-                            <Text
-                              className="text-sm text-gray-600 mt-1 leading-snug"
-                              style={{
-                                textAlign: isRTL ? "right" : "left",
-                                fontFamily: AppFonts.semibold,
-                                fontSize: spacing.fontSize.small,
-                              }}
-                            >
-                              {item.description}
-                            </Text>
-                          </View>
-                        </Animated.View>
-                      </Animated.View>
-                    );
-                  })}
+                            {item.title}
+                          </Text>
+                          <Text
+                            className="text-sm text-gray-600 mt-1 leading-snug"
+                            style={{
+                              textAlign: isRTL ? "right" : "left",
+                              fontFamily: AppFonts.semibold,
+                              fontSize: spacing.fontSize.small,
+                            }}
+                          >
+                            {item.description}
+                          </Text>
+                        </View>
+                      </View>
+                    </Animated.View>
+                  ))}
                 </View>
               </View>
             </Animated.View>
