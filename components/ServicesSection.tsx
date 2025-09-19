@@ -2,9 +2,10 @@ import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Animated,
   ColorValue,
   Dimensions,
   Image,
@@ -33,6 +34,8 @@ export default function ServicesSection() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [modalVisible, setModalVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
   const services: Service[] = [
     {
       id: "music-distribution",
@@ -90,6 +93,25 @@ export default function ServicesSection() {
     },
   ];
 
+  // Create animated values for each dot using useRef to persist across renders
+  const dotAnimations = useRef(services.map(() => new Animated.Value(0))).current;
+
+  const animateDots = useCallback((newIndex: number) => {
+    // Animate all dots
+    dotAnimations.forEach((anim, index) => {
+      Animated.timing(anim, {
+        toValue: index === newIndex ? 1 : 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    });
+  }, [dotAnimations]);
+
+  // Initialize the first dot as active
+  useEffect(() => {
+    animateDots(0);
+  }, [animateDots]);
+
   const handleServicePress = (service: Service) => {
     if (service.id === "clothes-store") {
       setModalVisible(true);
@@ -137,6 +159,10 @@ export default function ServicesSection() {
           modeConfig={{
             parallaxScrollingScale: 0.9,
             parallaxScrollingOffset: 50,
+          }}
+          onSnapToItem={(index) => {
+            setCurrentIndex(index);
+            animateDots(index);
           }}
           renderItem={({ item, index }) => (
             <View className="flex-1 mx-2">
@@ -296,9 +322,26 @@ export default function ServicesSection() {
       </View>
 
       <View className="flex-row justify-center items-center py-5 gap-2">
-        {services.map((_, index) => (
-          <View key={index} className="w-2 h-2 rounded-full bg-slate-300" />
-        ))}
+        {services.map((service, index) => {
+          const isActive = currentIndex === index;
+           const animatedWidth = dotAnimations[index].interpolate({
+             inputRange: [0, 1],
+             outputRange: [8, 24], // 8px (w-2) to 40px (w-10)
+           });
+          
+          return (
+            <Animated.View
+              key={index}
+              className="h-2 rounded-full"
+              style={{
+                width: animatedWidth,
+                backgroundColor: isActive 
+                  ? service.gradientColors[0] 
+                  : "#CBD5E1", // slate-300 equivalent
+              }}
+            />
+          );
+        })}
       </View>
       <SocialServiesModal
         onClose={() => setModalVisible(false)}

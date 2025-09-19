@@ -202,7 +202,10 @@ export default function AlbumDetails() {
                 : "This album doesn't have any songs yet"}
             </Text>
             {isOwner && (
-              <TouchableOpacity className="mt-6 bg-blue-500 px-6 py-3 rounded-lg">
+              <TouchableOpacity
+                onPress={() => setShowAddSongModal(true)}
+                className="mt-6 bg-blue-500 px-6 py-3 rounded-lg"
+              >
                 <Text className="text-white font-semibold">Add Songs</Text>
               </TouchableOpacity>
             )}
@@ -221,10 +224,10 @@ export default function AlbumDetails() {
         album={
           data?.album
             ? {
-                id: data.album.id.toString(),
-                title: data.album.title,
-                coverImage: data.album.album_cover,
-              }
+              id: data.album.id.toString(),
+              title: data.album.title,
+              coverImage: data.album.album_cover,
+            }
             : { id: "", title: "", coverImage: "" }
         }
       />

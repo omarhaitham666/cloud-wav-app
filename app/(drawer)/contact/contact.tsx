@@ -1,7 +1,9 @@
 import CreativeBanner from "@/components/CreativeBanner";
+import { useSendMessageMutation } from "@/store/api/global/contact";
 import { AppFonts } from "@/utils/fonts";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -17,10 +19,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CountryPicker, {
+  Country,
+  CountryCode,
+} from "react-native-country-picker-modal";
+import Toast from "react-native-toast-message";
 
 const Contact = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
+  const [sendMessage, { isLoading }] = useSendMessageMutation();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -28,8 +36,17 @@ const Contact = () => {
     phone: "",
     message: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [focusedField, setFocusedField] = useState("");
+  const [countryCode, setCountryCode] = useState<CountryCode>("EG");
+  const [country, setCountry] = useState<Country>({
+    callingCode: ["20"],
+    cca2: "EG",
+    currency: ["EGP"],
+    flag: "🇪🇬",
+    name: "Egypt",
+    region: "Africa",
+    subregion: "Northern Africa", // Added missing required property to fix type error
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -58,34 +75,81 @@ const Contact = () => {
       );
     }
 
-    setIsLoading(true);
+    if (formData.message.length < 10) {
+      return Alert.alert(
+        t("contact.alerts.errorTitle"),
+        t("contact.alerts.messageMinLength")
+      );
+    }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      Alert.alert(
-        t("contact.alerts.successTitle"),
-        t("contact.alerts.successMessage"),
-        [
-          {
-            text: "OK",
-            onPress: () =>
-              setFormData({
-                firstName: "",
-                lastName: "",
-                email: "",
-                phone: "",
-                message: "",
-              }),
-          },
-        ]
-      );
-    } catch {
-      Alert.alert(
-        t("contact.alerts.errorTitle"),
-        t("contact.alerts.errorMessage")
-      );
-    } finally {
-      setIsLoading(false);
+      // Print the send data
+       const sendData = {
+         first_name: formData.firstName,
+         last_name: formData.lastName,
+         email: formData.email,
+         phone: `+${country.callingCode[0]}${formData.phone}`,
+         message: formData.message,
+       };
+      console.log("Send data:", sendData);
+
+      await sendMessage(sendData).unwrap();
+
+      // Reset form after successful submission
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+
+      Toast.show({
+        type: "success",
+        text1: t("contact.alerts.successTitle"),
+        text2: t("contact.alerts.successMessage"),
+      });
+    } catch (error: any) {
+      console.error("Contact form submission error:", error);
+      
+      // Check if it's an authentication error
+      if (error?.status === 401 || error?.data?.message === "Unauthenticated.") {
+        Toast.show({
+          type: "error",
+          text1: t("contact.alerts.errorTitle"),
+          text2: t("contact.alerts.loginRequired"),
+        });
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          router.replace("/(drawer)/(auth)/login");
+        }, 1500);
+        return;
+      }
+      
+      let errorMessage = t("contact.alerts.errorMessage");
+      
+      if (error?.data?.errors) {
+        const errors = error.data.errors;
+        const errorMessages = [];
+        
+        if (errors.first_name) errorMessages.push(`First Name: ${errors.first_name[0]}`);
+        if (errors.last_name) errorMessages.push(`Last Name: ${errors.last_name[0]}`);
+        if (errors.email) errorMessages.push(`Email: ${errors.email[0]}`);
+        if (errors.phone) errorMessages.push(`Phone: ${errors.phone[0]}`);
+        if (errors.message) errorMessages.push(`Message: ${errors.message[0]}`);
+        
+        if (errorMessages.length > 0) {
+          errorMessage = errorMessages.join('\n');
+        }
+      } else if (error?.data?.message) {
+        errorMessage = error.data.message;
+      }
+
+      Toast.show({
+        type: "error",
+        text1: t("contact.alerts.errorTitle"),
+        text2: errorMessage,
+      });
     }
   };
 
@@ -286,13 +350,41 @@ const Contact = () => {
               keyboardType="email-address"
               field="email"
             />
-            <InputField
-              placeholder={t("contact.phone")}
-              value={formData.phone}
-              onChangeText={(text) => handleInputChange("phone", text)}
-              keyboardType="phone-pad"
-              field="phone"
-            />
+            {/* Phone Number with Country Picker */}
+            <View className="mb-4">
+              <View className="flex-row items-center border border-gray-300 rounded-lg">
+                <CountryPicker
+                  countryCode={countryCode}
+                  withCallingCode
+                  withFlag
+                  withFilter
+                  withAlphaFilter
+                  onSelect={(selectedCountry) => {
+                    setCountry(selectedCountry);
+                    setCountryCode(selectedCountry.cca2);
+                  }}
+                  containerButtonStyle={{ paddingHorizontal: 10 }}
+                />
+                <Text className="px-2 text-gray-800" style={{ fontFamily: AppFonts.semibold }}>
+                  +{country.callingCode[0]}
+                </Text>
+                <TextInput
+                  className="flex-1 px-4 py-3 text-gray-800"
+                  placeholder={t("contact.phone")}
+                  placeholderTextColor="#9CA3AF"
+                  textAlignVertical="center"
+                  value={formData.phone}
+                  onChangeText={(text) => handleInputChange("phone", text)}
+                  onFocus={() => setFocusedField("phone")}
+                  onBlur={() => setFocusedField("")}
+                  keyboardType="phone-pad"
+                  style={{
+                    textAlign: isRTL ? "right" : "left",
+                    fontFamily: AppFonts.semibold,
+                  }}
+                />
+              </View>
+            </View>
             <InputField
               placeholder={t("contact.message")}
               value={formData.message}

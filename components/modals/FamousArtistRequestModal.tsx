@@ -7,16 +7,17 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Image,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
 import Toast from "react-native-toast-message";
@@ -33,6 +34,7 @@ export default function FamousArtistRequestModal({
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [isLoading, setIsLoading] = useState(false);
+  const screenHeight = Dimensions.get('window').height;
 
   const [formData, setFormData] = useState<FamousArtistRequest>({
     famous_name: "",
@@ -113,24 +115,6 @@ export default function FamousArtistRequestModal({
 
     if (!formData.famous_number.trim()) {
       newErrors.famous_number = t("validation.phoneRequired");
-    } else {
-      // Remove any non-digit characters and check length
-      const cleanNumber = formData.famous_number.replace(/\D/g, "");
-      if (cleanNumber.length !== 11) {
-        newErrors.famous_number =
-          t("famousArtist.validation.phoneMustBe11Digits") ||
-          "Phone number must be exactly 11 digits";
-      }
-    }
-
-    if (formData.famous_whatsapp_number.trim()) {
-      // Remove any non-digit characters and check length
-      const cleanNumber = formData.famous_whatsapp_number.replace(/\D/g, "");
-      if (cleanNumber.length !== 11) {
-        newErrors.famous_whatsapp_number =
-          t("famousArtist.validation.whatsappMustBe11Digits") ||
-          "WhatsApp number must be exactly 11 digits";
-      }
     }
 
     if (formData.famous_social_links.trim()) {
@@ -189,6 +173,9 @@ export default function FamousArtistRequestModal({
                 ? t("famousArtist.fields.idCard")
                 : t("famousArtist.fields.profileImage")
             } ${t("famousArtist.imageSelected")}`,
+          visibilityTime: 3000,
+          topOffset: 100,
+          position: "top",
         });
       }
     } catch (error) {
@@ -209,6 +196,9 @@ export default function FamousArtistRequestModal({
                 ? t("famousArtist.fields.idCard")
                 : t("famousArtist.fields.profileImage"),
           })}. ${t("common.retry")}`,
+        visibilityTime: 3000,
+        topOffset: 100,
+        position: "top",
       });
     }
   };
@@ -304,6 +294,9 @@ export default function FamousArtistRequestModal({
           text2:
             t("famousArtist.alerts.successMessage") ||
             "Your famous artist request has been submitted successfully",
+          visibilityTime: 3000,
+          topOffset: 100,
+          position: "top",
         });
         resetForm();
         onClose();
@@ -380,6 +373,9 @@ export default function FamousArtistRequestModal({
         type: "error",
         text1: t("famousArtist.alerts.errorTitle") || "Request Failed",
         text2: errorMessage,
+        visibilityTime: 3000,
+        topOffset: 100,
+        position: "top",
       });
     } finally {
       setIsLoading(false);
@@ -613,13 +609,21 @@ export default function FamousArtistRequestModal({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      transparent={true}
+      style={{ zIndex: 1000 }}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        <View className="flex-1 bg-white">
+      <View className="flex-1 justify-end">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ 
+            height: screenHeight * 0.8,
+            zIndex: 1000 
+          }}
+        >
+          <View 
+            className="bg-white rounded-t-3xl"
+            style={{ height: screenHeight * 0.8 }}
+          >
           <View
             className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
             style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
@@ -724,7 +728,7 @@ export default function FamousArtistRequestModal({
                     className="flex-1 p-3"
                     placeholder={
                       t("famousArtist.placeholders.phone") ||
-                      "Enter 11-digit phone number"
+                      "Enter phone number"
                     }
                     value={formData.famous_number}
                     onChangeText={(value) =>
@@ -736,7 +740,6 @@ export default function FamousArtistRequestModal({
                       textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.regular,
                     }}
-                    maxLength={11}
                   />
                 </View>
                 {errors.famous_number && (
@@ -794,7 +797,7 @@ export default function FamousArtistRequestModal({
                     className="flex-1 p-3"
                     placeholder={
                       t("famousArtist.placeholders.whatsapp") ||
-                      "Enter 11-digit WhatsApp number"
+                      "Enter WhatsApp number"
                     }
                     value={formData.famous_whatsapp_number}
                     onChangeText={(value) =>
@@ -806,7 +809,6 @@ export default function FamousArtistRequestModal({
                       textAlign: isRTL ? "right" : "left",
                       fontFamily: AppFonts.regular,
                     }}
-                    maxLength={11}
                   />
                 </View>
                 {errors.famous_whatsapp_number && (
@@ -895,8 +897,9 @@ export default function FamousArtistRequestModal({
               )}
             </TouchableOpacity>
           </ScrollView>
-        </View>
-      </KeyboardAvoidingView>
+          </View>
+        </KeyboardAvoidingView>
+      </View>
 
       <Modal
         visible={showDivisionPicker}

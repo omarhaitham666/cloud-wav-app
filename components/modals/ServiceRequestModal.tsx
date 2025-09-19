@@ -32,6 +32,7 @@ const getSchema = (t: any) =>
     platform: z.string().optional(),
     social: z.string().optional(),
     details: z.string().optional(),
+    serviceType: z.string().optional(),
   });
 
 export type FormData = z.infer<ReturnType<typeof getSchema>>;
@@ -41,6 +42,7 @@ type Props = {
   isLoading: boolean;
   onClose: () => void;
   onSubmitForm: (data: FormData) => void;
+  serviceType?: string;
 };
 
 export default function ServiceRequestModal({
@@ -48,6 +50,7 @@ export default function ServiceRequestModal({
   isLoading,
   onClose,
   onSubmitForm,
+  serviceType,
 }: Props) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
@@ -70,7 +73,13 @@ export default function ServiceRequestModal({
     }
 
     try {
-      await onSubmitForm(data);
+      // Include serviceType in the form data
+      const formDataWithServiceType = {
+        ...data,
+        serviceType: serviceType || "",
+      };
+      
+      await onSubmitForm(formDataWithServiceType);
       reset();
       onClose(); // Close the modal after successful submission
       Toast.show({

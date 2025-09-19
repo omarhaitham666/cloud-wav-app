@@ -76,7 +76,7 @@ const PlatformManagement = () => {
     };
 
     const requestData = {
-      type: "platform management" as ServiceType,
+      type: (data.serviceType || "platform management") as ServiceType,
       data: {
         name: data.name,
         email: data.email,
@@ -258,6 +258,7 @@ const PlatformManagement = () => {
           isLoading={isLoading}
           onClose={() => setVisible(false)}
           onSubmitForm={handleFormSubmit}
+          serviceType="platform management"
         />
       </SafeAreaView>
     </LinearGradient>
