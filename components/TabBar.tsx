@@ -1,11 +1,6 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import {
-  BadgeDollarSign,
-  House,
-  Music,
-  Search,
-  User,
-} from "lucide-react-native";
+import { BadgeDollarSign, House, Music, User } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -20,7 +15,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
       case "index":
         return <House color={color} size={size} />;
       case "search":
-        return <Search color={color} size={size} />;
+        return <MaterialIcons name="person-search" color={color} size={size} />;
       case "price":
         return <BadgeDollarSign color={color} size={size} />;
       case "profile":

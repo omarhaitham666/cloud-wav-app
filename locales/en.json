@@ -433,6 +433,10 @@
         "tiktokAgency": {
           "title": "TikTok Agency",
           "description": "We help creators manage their TikTok accounts and reach a wider audience."
+        },
+        "Programming": {
+          "title": "Programming services",
+          "description": "Expert web, app, and software development tailored to your needs."
         }
       },
       "buttons": {

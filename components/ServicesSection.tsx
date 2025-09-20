@@ -35,7 +35,7 @@ export default function ServicesSection() {
   const isRTL = i18n.language === "ar";
   const [modalVisible, setModalVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
+
   const services: Service[] = [
     {
       id: "music-distribution",
@@ -91,21 +91,35 @@ export default function ServicesSection() {
       icon: "",
       route: "",
     },
+    {
+      id: "Programming-services",
+      title: t("services.servicesSection.services.Programming.title"),
+      desc: t("services.servicesSection.services.Programming.description"),
+      image: require("../assets/images/robots-B7io7u5X.png"),
+      comingSoon: true,
+      gradientColors: ["#8B5CF6", "#A855F7", "#C084FC"],
+      icon: "",
+      route: "",
+    },
   ];
 
-  // Create animated values for each dot using useRef to persist across renders
-  const dotAnimations = useRef(services.map(() => new Animated.Value(0))).current;
+  const dotAnimations = useRef(
+    services.map(() => new Animated.Value(0))
+  ).current;
 
-  const animateDots = useCallback((newIndex: number) => {
-    // Animate all dots
-    dotAnimations.forEach((anim, index) => {
-      Animated.timing(anim, {
-        toValue: index === newIndex ? 1 : 0,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    });
-  }, [dotAnimations]);
+  const animateDots = useCallback(
+    (newIndex: number) => {
+      // Animate all dots
+      dotAnimations.forEach((anim, index) => {
+        Animated.timing(anim, {
+          toValue: index === newIndex ? 1 : 0,
+          duration: 300,
+          useNativeDriver: false,
+        }).start();
+      });
+    },
+    [dotAnimations]
+  );
 
   // Initialize the first dot as active
   useEffect(() => {
@@ -324,19 +338,19 @@ export default function ServicesSection() {
       <View className="flex-row justify-center items-center py-5 gap-2">
         {services.map((service, index) => {
           const isActive = currentIndex === index;
-           const animatedWidth = dotAnimations[index].interpolate({
-             inputRange: [0, 1],
-             outputRange: [8, 24], // 8px (w-2) to 40px (w-10)
-           });
-          
+          const animatedWidth = dotAnimations[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [8, 24], // 8px (w-2) to 40px (w-10)
+          });
+
           return (
             <Animated.View
               key={index}
               className="h-2 rounded-full"
               style={{
                 width: animatedWidth,
-                backgroundColor: isActive 
-                  ? service.gradientColors[0] 
+                backgroundColor: isActive
+                  ? service.gradientColors[0]
                   : "#CBD5E1", // slate-300 equivalent
               }}
             />

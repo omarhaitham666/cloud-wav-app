@@ -16,7 +16,7 @@ const AuthProfile = () => {
   const isRTL = i18n.language === "ar";
 
   return (
-    <View className="flex-1 bg-black">
+    <View className="flex-1 w-full bg-black">
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -71,9 +71,9 @@ const AuthProfile = () => {
           >
             <Text
               className="text-white text-lg"
-              style={{ 
+              style={{
                 fontFamily: AppFonts.bold,
-                textAlign: isRTL ? "center" : "center"
+                textAlign: isRTL ? "center" : "center",
               }}
             >
               {t("profile.auth.login")}
@@ -86,9 +86,9 @@ const AuthProfile = () => {
           >
             <Text
               className="text-white text-lg"
-              style={{ 
+              style={{
                 fontFamily: AppFonts.bold,
-                textAlign: isRTL ? "center" : "center"
+                textAlign: isRTL ? "center" : "center",
               }}
             >
               {t("profile.auth.register")}

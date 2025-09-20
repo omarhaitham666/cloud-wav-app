@@ -75,18 +75,16 @@ const Contact = () => {
   } = useSlideIn("up", ANIMATION_DELAY.LARGE);
 
   useEffect(() => {
-    enterPage();
-    startBannerAnimation();
-    startContactCardsAnimation();
-    startFormTitleAnimation();
-    startFormAnimation();
-  }, [
-    enterPage,
-    startBannerAnimation,
-    startContactCardsAnimation,
-    startFormTitleAnimation,
-    startFormAnimation,
-  ]);
+    const timeout = setTimeout(() => {
+      enterPage();
+      startBannerAnimation();
+      startContactCardsAnimation();
+      startFormTitleAnimation();
+      startFormAnimation();
+    }, 100);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

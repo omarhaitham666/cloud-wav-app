@@ -2,15 +2,7 @@ import CreatorCard from "@/components/cards/CreatorCard";
 import { useAuthRefresh } from "@/hooks/useAuthRefresh";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useSearchCreatorQuery } from "@/store/api/global/search";
-import {
-  ANIMATION_DELAY,
-  getResponsiveSpacing,
-  getSafeAreaInsets,
-  useFadeIn,
-  usePageTransition,
-  useSlideIn,
-  useStaggerAnimation,
-} from "@/utils/animations";
+import { getResponsiveSpacing, getSafeAreaInsets } from "@/utils/animations";
 import { AppFonts } from "@/utils/fonts";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams } from "expo-router";
@@ -26,12 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  SlideInLeft,
-  SlideInRight,
-  SlideInUp,
-  ZoomIn,
-} from "react-native-reanimated";
 import Icon from "react-native-vector-icons/Feather";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -46,30 +32,7 @@ const Search = () => {
   const spacing = getResponsiveSpacing();
   const safeArea = getSafeAreaInsets();
 
-  const { animatedStyle: pageStyle, enterPage } = usePageTransition();
-  const { animatedStyle: headerStyle, startAnimation: startHeaderAnimation } =
-    useSlideIn("up", 0);
-  const { animatedStyle: searchStyle, startAnimation: startSearchAnimation } =
-    useFadeIn(ANIMATION_DELAY.SMALL);
-  const {
-    animatedStyle: categoriesStyle,
-    startAnimation: startCategoriesAnimation,
-  } = useSlideIn("up", ANIMATION_DELAY.MEDIUM);
-  const { animatedStyle: resultsStyle, startAnimation: startResultsAnimation } =
-    useFadeIn(ANIMATION_DELAY.LARGE);
-
-  const {
-    animatedStyle: categoryStyle,
-    startAnimation: startCategoryAnimation,
-  } = useStaggerAnimation(8, 80, ANIMATION_DELAY.MEDIUM + 200);
-
-  const { animatedStyle: popularStyle, startAnimation: startPopularAnimation } =
-    useStaggerAnimation(4, 150, ANIMATION_DELAY.LARGE + 400);
-
   const { data, refetch, isLoading } = useSearchCreatorQuery(searchQuery);
-
-  const { animatedStyle: resultStyle, startAnimation: startResultAnimation } =
-    useStaggerAnimation(data?.length || 0, 100, 0);
 
   useAuthRefresh(() => {
     refetch();
@@ -82,30 +45,6 @@ const Search = () => {
     scrollToTopOnRefresh: true,
     showTopLoader: true,
   });
-
-  useEffect(() => {
-    enterPage();
-    startHeaderAnimation();
-    startSearchAnimation();
-    startCategoriesAnimation();
-    startResultsAnimation();
-    startCategoryAnimation();
-    startPopularAnimation();
-  }, [
-    enterPage,
-    startHeaderAnimation,
-    startSearchAnimation,
-    startCategoriesAnimation,
-    startResultsAnimation,
-    startCategoryAnimation,
-    startPopularAnimation,
-  ]);
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      startResultAnimation();
-    }
-  }, [data, startResultAnimation]);
 
   useEffect(() => {
     if (category) {
@@ -149,7 +88,7 @@ const Search = () => {
   };
 
   const renderHeader = () => (
-    <Animated.View style={[{ minHeight: "auto" }, headerStyle]}>
+    <View style={{ minHeight: "auto" }}>
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -167,14 +106,11 @@ const Search = () => {
           paddingBottom: spacing.padding.medium,
         }}
       >
-        <Animated.View
-          style={[
-            searchStyle,
-            {
-              paddingHorizontal: spacing.padding.medium,
-              marginBottom: spacing.margin.large,
-            },
-          ]}
+        <View
+          style={{
+            paddingHorizontal: spacing.padding.medium,
+            marginBottom: spacing.margin.large,
+          }}
         >
           <Text
             className="text-gray-900 mb-2"
@@ -196,16 +132,13 @@ const Search = () => {
           >
             {t("creators.subtitle")}
           </Text>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          style={[
-            searchStyle,
-            {
-              paddingHorizontal: spacing.padding.medium,
-              marginBottom: spacing.margin.medium,
-            },
-          ]}
+        <View
+          style={{
+            paddingHorizontal: spacing.padding.medium,
+            marginBottom: spacing.margin.medium,
+          }}
         >
           <View
             className={`bg-white rounded-2xl flex-row items-center shadow-sm border border-gray-200 ${
@@ -236,24 +169,20 @@ const Search = () => {
               }}
             />
             {searchQuery.length > 0 && (
-              <Animated.View entering={ZoomIn.delay(200).springify()}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setSearchQuery("");
-                    setActiveCategory("all");
-                  }}
-                  className="w-6 h-6 bg-gray-300 rounded-full justify-center items-center"
-                >
-                  <Icon name="x" size={12} color="#6B7280" />
-                </TouchableOpacity>
-              </Animated.View>
+              <TouchableOpacity
+                onPress={() => {
+                  setSearchQuery("");
+                  setActiveCategory("all");
+                }}
+                className="w-6 h-6 bg-gray-300 rounded-full justify-center items-center"
+              >
+                <Icon name="x" size={12} color="#6B7280" />
+              </TouchableOpacity>
             )}
           </View>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          style={[categoriesStyle, { marginBottom: spacing.margin.large }]}
-        >
+        <View style={{ marginBottom: spacing.margin.large }}>
           <FlatList
             horizontal
             pagingEnabled
@@ -265,16 +194,12 @@ const Search = () => {
             inverted={isRTL}
             data={categories}
             keyExtractor={(item) => item.id}
-            renderItem={({ item: category, index }) => (
-              <Animated.View
-                style={[
-                  categoryStyle,
-                  {
-                    marginRight: isRTL ? 0 : spacing.margin.small,
-                    marginLeft: isRTL ? spacing.margin.small : 0,
-                  },
-                ]}
-                entering={SlideInRight.delay(300 + index * 80).springify()}
+            renderItem={({ item: category }) => (
+              <View
+                style={{
+                  marginRight: isRTL ? 0 : spacing.margin.small,
+                  marginLeft: isRTL ? spacing.margin.small : 0,
+                }}
               >
                 <TouchableOpacity
                   onPress={() => handleCategoryPress(category.id)}
@@ -312,12 +237,12 @@ const Search = () => {
                     {category.label}
                   </Text>
                 </TouchableOpacity>
-              </Animated.View>
+              </View>
             )}
           />
-        </Animated.View>
+        </View>
       </View>
-    </Animated.View>
+    </View>
   );
 
   const renderEmptyState = () => {
@@ -415,16 +340,13 @@ const Search = () => {
   };
 
   const renderFooter = () => (
-    <Animated.View
-      style={[
-        resultsStyle,
-        {
-          paddingHorizontal: spacing.padding.medium,
-          paddingTop: spacing.padding.large,
-          paddingBottom: safeArea.bottom + spacing.padding.large,
-          minHeight: screenWidth * 0.8,
-        },
-      ]}
+    <View
+      style={{
+        paddingHorizontal: spacing.padding.medium,
+        paddingTop: spacing.padding.large,
+        paddingBottom: safeArea.bottom + spacing.padding.large,
+        minHeight: screenWidth * 0.8,
+      }}
       className={"mb-7"}
     >
       <Text
@@ -439,16 +361,12 @@ const Search = () => {
       </Text>
 
       <View className={`flex-row mb-4 ${isRTL ? "flex-row-reverse" : ""}`}>
-        <Animated.View
-          style={[
-            popularStyle,
-            {
-              flex: 1,
-              marginRight: isRTL ? 0 : spacing.margin.small,
-              marginLeft: isRTL ? spacing.margin.small : 0,
-            },
-          ]}
-          entering={SlideInLeft.delay(600).springify()}
+        <View
+          style={{
+            flex: 1,
+            marginRight: isRTL ? 0 : spacing.margin.small,
+            marginLeft: isRTL ? spacing.margin.small : 0,
+          }}
         >
           <TouchableOpacity
             onPress={() => handlePopularCategoryPress("actor")}
@@ -485,18 +403,14 @@ const Search = () => {
               {t("song.categoryDescriptions.actor")}
             </Text>
           </TouchableOpacity>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          style={[
-            popularStyle,
-            {
-              flex: 1,
-              marginRight: isRTL ? 0 : spacing.margin.small,
-              marginLeft: isRTL ? spacing.margin.small : 0,
-            },
-          ]}
-          entering={SlideInRight.delay(700).springify()}
+        <View
+          style={{
+            flex: 1,
+            marginRight: isRTL ? 0 : spacing.margin.small,
+            marginLeft: isRTL ? spacing.margin.small : 0,
+          }}
         >
           <TouchableOpacity
             onPress={() => handlePopularCategoryPress("musician")}
@@ -533,20 +447,16 @@ const Search = () => {
               {t("song.categoryDescriptions.musician")}
             </Text>
           </TouchableOpacity>
-        </Animated.View>
+        </View>
       </View>
 
       <View className={`flex-row ${isRTL ? "flex-row-reverse" : ""}`}>
-        <Animated.View
-          style={[
-            popularStyle,
-            {
-              flex: 1,
-              marginRight: isRTL ? 0 : spacing.margin.small,
-              marginLeft: isRTL ? spacing.margin.small : 0,
-            },
-          ]}
-          entering={SlideInLeft.delay(800).springify()}
+        <View
+          style={{
+            flex: 1,
+            marginRight: isRTL ? 0 : spacing.margin.small,
+            marginLeft: isRTL ? spacing.margin.small : 0,
+          }}
         >
           <TouchableOpacity
             onPress={() => handlePopularCategoryPress("youtuber")}
@@ -583,18 +493,14 @@ const Search = () => {
               {t("song.categoryDescriptions.youtuber")}
             </Text>
           </TouchableOpacity>
-        </Animated.View>
+        </View>
 
-        <Animated.View
-          style={[
-            popularStyle,
-            {
-              flex: 1,
-              marginRight: isRTL ? 0 : spacing.margin.small,
-              marginLeft: isRTL ? spacing.margin.small : 0,
-            },
-          ]}
-          entering={SlideInRight.delay(900).springify()}
+        <View
+          style={{
+            flex: 1,
+            marginRight: isRTL ? 0 : spacing.margin.small,
+            marginLeft: isRTL ? spacing.margin.small : 0,
+          }}
         >
           <TouchableOpacity
             onPress={() => handlePopularCategoryPress("tiktoker")}
@@ -631,9 +537,9 @@ const Search = () => {
               {t("song.categoryDescriptions.tiktoker")}
             </Text>
           </TouchableOpacity>
-        </Animated.View>
+        </View>
       </View>
-    </Animated.View>
+    </View>
   );
 
   const flatListData = [
@@ -677,18 +583,12 @@ const Search = () => {
 
       case "creator":
         return (
-          <Animated.View
-            style={[
-              resultStyle,
-              {
-                paddingHorizontal: spacing.padding.medium,
-                marginBottom: spacing.margin.medium,
-                minHeight: 120,
-              },
-            ]}
-            entering={SlideInUp.delay(
-              200 + (parseInt(item.id) || 0) * 100
-            ).springify()}
+          <View
+            style={{
+              paddingHorizontal: spacing.padding.medium,
+              marginBottom: spacing.margin.medium,
+              minHeight: 120,
+            }}
           >
             <View style={{ width: screenWidth - spacing.padding.medium * 2 }}>
               <CreatorCard
@@ -699,7 +599,7 @@ const Search = () => {
                 bussiness_price={`$${item.data.bussiness_price || 0}`}
               />
             </View>
-          </Animated.View>
+          </View>
         );
 
       case "empty-state":
@@ -723,7 +623,7 @@ const Search = () => {
   };
 
   return (
-    <Animated.View style={[{ flex: 1 }, pageStyle]}>
+    <View style={{ flex: 1 }}>
       <TopLoader />
       <FlatList
         ref={scrollViewRef as any}
@@ -747,7 +647,7 @@ const Search = () => {
           index,
         })}
       />
-    </Animated.View>
+    </View>
   );
 };
 

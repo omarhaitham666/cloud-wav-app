@@ -31,6 +31,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import UpdatePriceModal from "../modals/UpdatePriceModal";
+import SplashScreen from "../SplashScreen";
 
 type FormValues = {
   fullName: string;
@@ -483,20 +484,7 @@ const ProfileUser: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-black">
-        <ActivityIndicator size="large" color="#f9a826" />
-        <Text
-          className="text-white mt-2"
-          style={{
-            fontFamily: AppFonts.medium,
-            textAlign: isRTL ? "right" : "left",
-          }}
-        >
-          {t("profile.user.loading") || "Loading..."}
-        </Text>
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   if (error) {
@@ -507,7 +495,7 @@ const ProfileUser: React.FC = () => {
 
     if (isUnauthenticated) {
       return (
-        <View className="flex-1 justify-center items-center bg-black px-6">
+        <View className="flex-1 justify-center w-full items-center bg-black px-6">
           <View className="items-center mb-6">
             <Ionicons name="time-outline" size={64} color="#EF4444" />
             <Text
@@ -578,7 +566,7 @@ const ProfileUser: React.FC = () => {
     }
 
     return (
-      <View className="flex-1 justify-center items-center bg-black px-6">
+      <View className="flex-1 justify-center items-center w-full bg-black px-6">
         <Text
           className="text-red-400 text-center mb-4"
           style={{
@@ -606,8 +594,6 @@ const ProfileUser: React.FC = () => {
     );
   }
 
-  console.log("data", data);
-
   const userData = data as UserData;
   const isArtistOrCreator =
     userData?.role?.includes("artist") ||
@@ -619,7 +605,7 @@ const ProfileUser: React.FC = () => {
   const isUpdating = updateLoading || updateProfileLoading;
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
+    <SafeAreaView className="flex-1 w-full ">
       <StatusBar
         translucent
         backgroundColor="transparent"

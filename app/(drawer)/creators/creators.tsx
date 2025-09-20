@@ -182,7 +182,7 @@ const Creators = () => {
               ))}
             </Animated.ScrollView>
 
-            {!userData?.artist_id && (
+            {!userData?.video_creator_id && (
               <Animated.View
                 style={joinUsAnimatedStyle}
                 className="items-center mt-10"
