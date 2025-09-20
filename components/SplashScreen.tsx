@@ -7,7 +7,7 @@ const SplashScreen = ({ isText }: { isText?: boolean }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   return (
-    <View className="flex-1 justify-center items-center bg-black">
+    <View className="flex-1 justify-center items-center w-full bg-black">
       <ActivityIndicator size="large" color="#f9a826" />
       {isText && (
         <Text

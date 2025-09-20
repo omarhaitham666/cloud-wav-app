@@ -28,7 +28,6 @@ import {
   useStaggerAnimation,
 } from "@/utils/animations";
 import { AppFonts } from "@/utils/fonts";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -70,21 +69,11 @@ const Music = () => {
   const { animatedStyle: contentStyle, startAnimation: startContentAnimation } =
     useFadeIn(ANIMATION_DELAY.LARGE);
 
-  // Stagger animations for filter buttons
   const { animatedStyle: filterStyle, startAnimation: startFilterAnimation } =
-    useStaggerAnimation(
-      4, // number of filter buttons
-      100,
-      ANIMATION_DELAY.SMALL + 200
-    );
+    useStaggerAnimation(4, 100, ANIMATION_DELAY.SMALL + 200);
 
-  // Stagger animations for genre buttons
   const { animatedStyle: genreStyle, startAnimation: startGenreAnimation } =
-    useStaggerAnimation(
-      12, // number of genre buttons
-      50,
-      ANIMATION_DELAY.MEDIUM + 200
-    );
+    useStaggerAnimation(12, 50, ANIMATION_DELAY.MEDIUM + 200);
 
   const { data: userData } = useGetUserQuery();
 
@@ -146,7 +135,6 @@ const Music = () => {
     }
   });
 
-  // Start animations on mount
   useEffect(() => {
     enterPage();
     startBannerAnimation();
@@ -283,6 +271,7 @@ const Music = () => {
               artist={item.artist_name ?? item.artist}
               audio_url={item.song_url ?? item.audio_url}
               cover_url={item.cover_url}
+              isInAlbom={false}
             />
           )}
         />
@@ -479,36 +468,6 @@ const Music = () => {
             >
               Browse
             </Text>
-            {userData?.artist_id && (
-              <Animated.View entering={SlideInRight.delay(300).springify()}>
-                <TouchableOpacity
-                  onPress={handleArtistPress}
-                  className="bg-purple-600 px-4 py-2 rounded-full flex-row items-center shadow-sm"
-                  style={{
-                    shadowColor: "#7c3aed",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 6,
-                  }}
-                >
-                  <Ionicons
-                    name="musical-notes"
-                    size={spacing.iconSize.small}
-                    color="white"
-                  />
-                  <Text
-                    className="text-white font-medium ml-2"
-                    style={{
-                      fontSize: spacing.fontSize.small,
-                      fontFamily: AppFonts.semibold,
-                    }}
-                  >
-                    Artist
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-            )}
           </View>
           <ScrollView
             horizontal

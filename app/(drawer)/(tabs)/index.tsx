@@ -186,6 +186,7 @@ const HomePage = () => {
                       audio_url={item.audio_url}
                       cover_url={item.cover_url}
                       debug_path={item.debug_path}
+                      isInAlbom={false}
                     />
                   </View>
                 )}

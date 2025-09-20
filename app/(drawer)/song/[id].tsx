@@ -1,5 +1,10 @@
 import EnhancedAudioPlayer from "@/components/EnhancedAudioPlayer";
-import { useGetSongQuery, useLikeSongMutation } from "@/store/api/global/song";
+import { useGetalbumsQuery } from "@/store/api/global/albums";
+import {
+  useGetSongQuery,
+  useGetSongsQuery,
+  useLikeSongMutation,
+} from "@/store/api/global/song";
 import { AppFonts } from "@/utils/fonts";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -16,7 +21,7 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -37,7 +42,10 @@ const formatNumber = (num: number) => {
 const SongDetail = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, isInAlbom } = useLocalSearchParams<{
+    id: string;
+    isInAlbom: string;
+  }>();
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [playsCount, setPlaysCount] = useState(0);
@@ -45,6 +53,9 @@ const SongDetail = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [playCountIncremented, setPlayCountIncremented] = useState(false);
   const [likeSong, { isLoading: isLiking }] = useLikeSongMutation();
+  const { data: albums } = useGetalbumsQuery();
+  const { data: songs } = useGetSongsQuery();
+
   const {
     data,
     isLoading: isFetching,
@@ -95,7 +106,8 @@ const SongDetail = () => {
         Toast.show({
           type: "error",
           text1: t("song.playbackError") || "Playback Error",
-          text2: t("common.audioFocusCallMessage") || 
+          text2:
+            t("common.audioFocusCallMessage") ||
             "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.",
           visibilityTime: 6000, // Show for 6 seconds
           autoHide: true,
@@ -136,7 +148,7 @@ const SongDetail = () => {
         });
       }
     }
-  }, [id, isLiked, isLiking, likeSong]);
+  }, [id, isLiked, isLiking, likeSong, t]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -148,11 +160,79 @@ const SongDetail = () => {
     } finally {
       setIsRefreshing(false);
     }
-  }, [refetch, t]);
+  }, [refetch]);
 
   const handleGoBack = useCallback(() => {
     router.back();
   }, []);
+
+  // Navigation functions
+  const getCurrentSongList = useCallback(() => {
+    if (isInAlbom === "true" && albums) {
+      // Find the album that contains the current song
+      for (const album of albums) {
+        if (album.songs && album.songs.length > 0) {
+          const songInAlbum = album.songs.find(
+            (song: any) => song.id === parseInt(id || "0")
+          );
+          if (songInAlbum) {
+            return album.songs;
+          }
+        }
+      }
+      return [];
+    } else if (songs) {
+      return songs;
+    }
+    return [];
+  }, [isInAlbom, albums, songs, id]);
+
+  const handleNextSong = useCallback(() => {
+    const songList = getCurrentSongList();
+    if (songList.length === 0) return;
+
+    const currentIndex = songList.findIndex(
+      (song: any) => song.id === parseInt(id || "0")
+    );
+    if (currentIndex === -1) return;
+
+    const nextIndex = (currentIndex + 1) % songList.length;
+    const nextSong = songList[nextIndex];
+
+    if (nextSong) {
+      router.replace({
+        pathname: "/song/[id]",
+        params: {
+          id: nextSong.id.toString(),
+          isInAlbom: isInAlbom || "false",
+        },
+      });
+    }
+  }, [getCurrentSongList, id, isInAlbom]);
+
+  const handlePreviousSong = useCallback(() => {
+    const songList = getCurrentSongList();
+    if (songList.length === 0) return;
+
+    const currentIndex = songList.findIndex(
+      (song: any) => song.id === parseInt(id || "0")
+    );
+    if (currentIndex === -1) return;
+
+    const prevIndex =
+      currentIndex === 0 ? songList.length - 1 : currentIndex - 1;
+    const prevSong = songList[prevIndex];
+
+    if (prevSong) {
+      router.replace({
+        pathname: "/song/[id]",
+        params: {
+          id: prevSong.id.toString(),
+          isInAlbom: isInAlbom || "false",
+        },
+      });
+    }
+  }, [getCurrentSongList, id, isInAlbom]);
 
   if (isFetching && !data) {
     return (
@@ -251,10 +331,11 @@ const SongDetail = () => {
             className="bg-black/20 rounded-full"
             style={{
               padding: isSmallDevice ? 8 : 10,
+              direction: "ltr",
             }}
           >
             <Ionicons
-              name={isRTL ? "chevron-forward" : "chevron-back"}
+              name={"chevron-back"}
               size={isSmallDevice ? 20 : 24}
               color="white"
             />
@@ -267,32 +348,7 @@ const SongDetail = () => {
             style={{
               gap: 8,
             }}
-          >
-            <TouchableOpacity
-              className="bg-black/20 rounded-full"
-              style={{
-                padding: isSmallDevice ? 8 : 10,
-              }}
-            >
-              <Ionicons
-                name="share-outline"
-                size={isSmallDevice ? 18 : 20}
-                color="white"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="bg-black/20 rounded-full"
-              style={{
-                padding: isSmallDevice ? 8 : 10,
-              }}
-            >
-              <Ionicons
-                name="ellipsis-vertical"
-                size={isSmallDevice ? 18 : 20}
-                color="white"
-              />
-            </TouchableOpacity>
-          </View>
+          ></View>
         </View>
 
         <View
@@ -500,6 +556,8 @@ const SongDetail = () => {
               coverUrl={data.cover_url}
               onPlaybackStateChange={handlePlaybackStateChange}
               onError={handleAudioError}
+              onNext={handleNextSong}
+              onPrevious={handlePreviousSong}
               className="mb-8"
               isRTL={isRTL}
             />

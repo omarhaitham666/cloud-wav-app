@@ -12,7 +12,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.omar666.cloudwav",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["audio"],
+        "NSMicrophoneUsageDescription": "This app needs access to microphone for audio recording features."
       }
     },
     "android": {
@@ -21,7 +23,13 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.omar666.cloudwav"
+      "package": "com.omar666.cloudwav",
+      "permissions": [
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.WAKE_LOCK",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -41,7 +49,15 @@
       ],
       "expo-localization",
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/logo-icon.png",
+          "color": "#f9a826",
+          "defaultChannel": "music-player"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

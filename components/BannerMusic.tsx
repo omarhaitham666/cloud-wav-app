@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import CustomHeader from "./CustomHeader";
 import FamousArtistRequestModal from "./modals/FamousArtistRequestModal";
 
 const BannerMusic = () => {
@@ -38,7 +37,7 @@ const BannerMusic = () => {
     );
     breathe.start();
     return () => breathe.stop();
-  }, []);
+  }, [opacityAnim, scaleAnim]);
 
   const handleFamousArtistPress = () => {
     Animated.sequence([
@@ -66,10 +65,6 @@ const BannerMusic = () => {
         imageStyle={{ borderRadius: 16 }}
       >
         <View className="flex-1 bg-black/40 justify-around px-4 py-3 rounded-2xl">
-          <View>
-            <CustomHeader transparent colorIcon="#fff" />
-          </View>
-
           <View className="flex-row justify-between items-center">
             <View className="flex-1">
               <Text className="text-white text-2xl font-bold mb-1">
@@ -80,7 +75,6 @@ const BannerMusic = () => {
               </Text>
             </View>
 
-            {/* Only show Become A Artist button if user doesn't have artist_id */}
             {!userData?.artist_id && (
               <Animated.View
                 style={{

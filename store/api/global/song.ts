@@ -15,6 +15,7 @@ export interface Songs {
   artist_name?: string;
   song_url?: string;
   isOwner?: boolean;
+  isInAlbom?: boolean;
 }
 
 const songApi = mainApi.injectEndpoints({

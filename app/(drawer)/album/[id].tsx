@@ -187,6 +187,7 @@ export default function AlbumDetails() {
               cover_url={item.cover_image || ""}
               debug_path={item.debug_path}
               isOwner={isOwner || false}
+              isInAlbom={true}
             />
           </View>
         )}
@@ -224,10 +225,10 @@ export default function AlbumDetails() {
         album={
           data?.album
             ? {
-              id: data.album.id.toString(),
-              title: data.album.title,
-              coverImage: data.album.album_cover,
-            }
+                id: data.album.id.toString(),
+                title: data.album.title,
+                coverImage: data.album.album_cover,
+              }
             : { id: "", title: "", coverImage: "" }
         }
       />

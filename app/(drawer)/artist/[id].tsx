@@ -11,20 +11,24 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useGetUserQuery } from "@/store/api/user/user";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    RefreshControl,
-    StatusBar,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  RefreshControl,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const ArtistProfile = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: artistData, isLoading: isFetching, refetch } = useGetArtistQuery(id);
+  const {
+    data: artistData,
+    isLoading: isFetching,
+    refetch,
+  } = useGetArtistQuery(id);
   const { data: user } = useGetUserQuery();
   const [UploadSong, setUploadSong] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -56,6 +60,7 @@ const ArtistProfile = () => {
         artist={(artistData?.name as string) || ""}
         audio_url={item.song_path}
         cover_url={item.cover_path}
+        isInAlbom={false}
         isOwner={isOwner || false}
       />
     </View>

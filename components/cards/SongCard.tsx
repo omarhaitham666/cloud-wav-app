@@ -5,28 +5,31 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
-export const SongCard = ({ id, title, artist, cover_url, isOwner }: Songs) => {
+export const SongCard = ({
+  id,
+  title,
+  artist,
+  cover_url,
+  isOwner,
+  isInAlbom = false,
+}: Songs) => {
   const router = useRouter();
   const [deleteSong, { isLoading: isDeleting }] = useDeleteSongMutation();
 
   const handleDelete = () => {
-    Alert.alert(
-      "Delete Song",
-      "Are you sure you want to delete this song?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
+    Alert.alert("Delete Song", "Are you sure you want to delete this song?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          deleteSong(id.toString());
         },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            deleteSong(id.toString());
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -40,7 +43,10 @@ export const SongCard = ({ id, title, artist, cover_url, isOwner }: Songs) => {
     >
       <TouchableOpacity
         onPress={() =>
-          router.push({ pathname: "/(drawer)/song/[id]", params: { id } })
+          router.push({
+            pathname: "/(drawer)/song/[id]",
+            params: { id, isInAlbom: isInAlbom ? "true" : "false" },
+          })
         }
         style={{
           width: 120,
@@ -76,10 +82,10 @@ export const SongCard = ({ id, title, artist, cover_url, isOwner }: Songs) => {
             alignItems: "center",
           }}
         >
-          <Ionicons 
-            name={isDeleting ? "hourglass" : "trash"} 
-            size={16} 
-            color="white" 
+          <Ionicons
+            name={isDeleting ? "hourglass" : "trash"}
+            size={16}
+            color="white"
           />
         </TouchableOpacity>
       )}

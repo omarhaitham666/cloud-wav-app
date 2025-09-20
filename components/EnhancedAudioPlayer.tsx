@@ -1,15 +1,17 @@
 import { AppFonts } from "@/utils/fonts";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Slider from "@react-native-community/slider";
 import { Audio } from "expo-av";
+import * as Notifications from "expo-notifications";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Dimensions,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -20,6 +22,8 @@ interface EnhancedAudioPlayerProps {
   coverUrl: string;
   onPlaybackStateChange?: (isPlaying: boolean) => void;
   onError?: (error: string) => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
   className?: string;
   isRTL?: boolean;
 }
@@ -41,6 +45,8 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   coverUrl,
   onPlaybackStateChange,
   onError,
+  onNext,
+  onPrevious,
   className = "",
   isRTL = false,
 }) => {
@@ -55,7 +61,6 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [audioFocusAvailable, setAudioFocusAvailable] = useState(true);
 
   const soundRef = useRef<Audio.Sound | null>(null);
   const positionUpdateTimeoutRef = useRef<number | null>(null);
@@ -71,10 +76,10 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       // Request permissions first
       await Audio.requestPermissionsAsync();
 
-      // Set audio mode
+      // Set audio mode for background playback
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
-        staysActiveInBackground: false,
+        staysActiveInBackground: true,
         playsInSilentModeIOS: true,
         shouldDuckAndroid: true,
         playThroughEarpieceAndroid: false,
@@ -92,25 +97,107 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       // Try to set audio mode to test if audio focus is available
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
-        staysActiveInBackground: false,
+        staysActiveInBackground: true,
         playsInSilentModeIOS: true,
         shouldDuckAndroid: true,
         playThroughEarpieceAndroid: false,
       });
-      setAudioFocusAvailable(true);
       return true;
     } catch (err: any) {
       if (
         err.message?.includes("AudioFocusNotAcquiredException") ||
         err.message?.includes("Audio focus could not be acquired")
       ) {
-        setAudioFocusAvailable(false);
         return false;
       }
-      setAudioFocusAvailable(true);
       return true;
     }
   }, []);
+
+  // Notification management functions
+  const showNotification = useCallback(
+    async (isPlaying: boolean) => {
+      try {
+        // Configure notification channel for Android
+        await Notifications.setNotificationChannelAsync("music-player", {
+          name: "Music Player",
+          description: "Music playback controls",
+          importance: Notifications.AndroidImportance.LOW,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#f9a826",
+        });
+
+        if (isPlaying) {
+          await Notifications.scheduleNotificationAsync({
+            identifier: "music-player-notification",
+            content: {
+              title: songTitle,
+              subtitle: artistName,
+              body: isPlaying ? "Now Playing" : "Paused",
+              data: {
+                type: "music-player",
+                songTitle,
+                artistName,
+                isPlaying,
+              },
+              sound: false,
+              categoryIdentifier: "music-player",
+            },
+            trigger: null, // Show immediately
+          });
+        } else {
+          // Cancel the notification when paused
+          await Notifications.cancelScheduledNotificationAsync(
+            "music-player-notification"
+          );
+        }
+      } catch (error) {
+        console.error("Error managing notification:", error);
+      }
+    },
+    [songTitle, artistName]
+  );
+
+  const setupNotificationCategories = useCallback(async () => {
+    try {
+      await Notifications.setNotificationCategoryAsync("music-player", [
+        {
+          identifier: "PLAY_PAUSE",
+          buttonTitle: isPlaying ? "Pause" : "Play",
+          options: {
+            isDestructive: false,
+            isAuthenticationRequired: false,
+          },
+        },
+        {
+          identifier: "NEXT",
+          buttonTitle: "Next",
+          options: {
+            isDestructive: false,
+            isAuthenticationRequired: false,
+          },
+        },
+        {
+          identifier: "PREVIOUS",
+          buttonTitle: "Previous",
+          options: {
+            isDestructive: false,
+            isAuthenticationRequired: false,
+          },
+        },
+        {
+          identifier: "STOP",
+          buttonTitle: "Stop",
+          options: {
+            isDestructive: true,
+            isAuthenticationRequired: false,
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Error setting up notification categories:", error);
+    }
+  }, [isPlaying]);
 
   useEffect(() => {
     const processStatus = () => {
@@ -140,6 +227,8 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           setIsPlaying((prevIsPlaying) => {
             if (prevIsPlaying !== status.isPlaying) {
               onPlaybackStateChange?.(status.isPlaying);
+              // Show/hide notification based on playback state
+              showNotification(status.isPlaying);
               return status.isPlaying;
             }
             return prevIsPlaying;
@@ -160,7 +249,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
 
     const interval = setInterval(processStatus, 50);
     return () => clearInterval(interval);
-  }, [isSliding, onPlaybackStateChange, onError]);
+  }, [isSliding, onPlaybackStateChange, onError, showNotification]);
 
   const unloadAudio = useCallback(async () => {
     try {
@@ -243,9 +332,10 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       ) {
         // Don't retry automatically for audio focus issues
         // Show user-friendly message immediately
-        const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+        const userFriendlyMessage =
+          t("common.audioFocusCallMessage") ||
           "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
-        
+
         // Show toast notification instead of setting error state
         Toast.show({
           type: "error",
@@ -255,7 +345,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           autoHide: true,
           topOffset: 60,
         });
-        
+
         onError?.(userFriendlyMessage);
       } else {
         setError(errorMessage);
@@ -264,15 +354,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [
-    songUrl,
-    playbackSpeed,
-    onError,
-    onPlaybackStatusUpdate,
-    retryCount,
-    t,
-    error,
-  ]);
+  }, [songUrl, playbackSpeed, onError, onPlaybackStatusUpdate, t, error]);
 
   const handleStop = useCallback(async () => {
     if (!sound) return;
@@ -280,22 +362,25 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     try {
       await sound.stopAsync();
       setPosition(0);
+      // Hide notification when stopped
+      await showNotification(false);
     } catch (err) {
       console.error("Stop error:", err);
     }
-  }, [sound]);
+  }, [sound, showNotification]);
 
   useEffect(() => {
     const initAudio = async () => {
       try {
         await resetAudioMode();
+        await setupNotificationCategories();
       } catch (err) {
         console.error("Error setting audio mode:", err);
       }
     };
 
     initAudio();
-  }, [resetAudioMode]);
+  }, [resetAudioMode, setupNotificationCategories]);
 
   useEffect(() => {
     if (songUrl) {
@@ -321,12 +406,13 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         if (focusAvailable && !isPlaying) {
           // Audio focus is available again, clear the error and show success toast
           setError(null);
-          setAudioFocusAvailable(true);
-          
+
           Toast.show({
             type: "success",
             text1: t("song.playbackSuccess") || "Audio Ready",
-            text2: t("common.audioFocusSuccessMessage") || "Audio focus acquired successfully. You can now play music.",
+            text2:
+              t("common.audioFocusSuccessMessage") ||
+              "Audio focus acquired successfully. You can now play music.",
             visibilityTime: 3000,
             autoHide: true,
             topOffset: 60,
@@ -372,7 +458,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     };
   }, [isPlaying, isSliding, sound, handleStop]);
 
-  const handlePlayPause = async () => {
+  const handlePlayPause = useCallback(async () => {
     if (!sound) return;
 
     try {
@@ -383,11 +469,12 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       } else {
         // Check audio focus availability before attempting to play
         const focusAvailable = await checkAudioFocusAvailability();
-        
+
         if (!focusAvailable) {
-          const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+          const userFriendlyMessage =
+            t("common.audioFocusCallMessage") ||
             "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
-          
+
           // Show toast notification instead of setting error state
           Toast.show({
             type: "error",
@@ -397,7 +484,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
             autoHide: true,
             topOffset: 60,
           });
-          
+
           onError?.(userFriendlyMessage);
           return;
         }
@@ -406,7 +493,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           // Set audio mode with better focus handling
           await Audio.setAudioModeAsync({
             allowsRecordingIOS: false,
-            staysActiveInBackground: false,
+            staysActiveInBackground: true,
             playsInSilentModeIOS: true,
             shouldDuckAndroid: true,
             playThroughEarpieceAndroid: false,
@@ -428,9 +515,10 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
             );
 
             // Show user-friendly error message instead of retrying
-            const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+            const userFriendlyMessage =
+              t("common.audioFocusCallMessage") ||
               "Audio is currently being used by another app (like a phone call or video meeting). Please end the call or close other audio apps and try again.";
-            
+
             // Show toast notification instead of setting error state
             Toast.show({
               type: "error",
@@ -440,9 +528,8 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               autoHide: true,
               topOffset: 60,
             });
-            
+
             onError?.(userFriendlyMessage);
-            setAudioFocusAvailable(false);
             return;
           } else {
             throw playError;
@@ -456,7 +543,35 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       setError(errorMessage);
       onError?.(errorMessage);
     }
-  };
+  }, [sound, isPlaying, checkAudioFocusAvailability, t, onError]);
+
+  // Handle notification responses
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const { actionIdentifier } = response;
+
+        switch (actionIdentifier) {
+          case "PLAY_PAUSE":
+            handlePlayPause();
+            break;
+          case "NEXT":
+            onNext?.();
+            break;
+          case "PREVIOUS":
+            onPrevious?.();
+            break;
+          case "STOP":
+            handleStop();
+            break;
+          default:
+            break;
+        }
+      }
+    );
+
+    return () => subscription.remove();
+  }, [onNext, onPrevious, handlePlayPause, handleStop]);
 
   const handleSeek = async (value: number) => {
     if (!sound || !duration) return;
@@ -540,14 +655,13 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               setError(null);
               setIsLoading(true);
               try {
-                // Check if audio focus is available before retrying
                 const focusAvailable = await checkAudioFocusAvailability();
-                
+
                 if (!focusAvailable) {
-                  const userFriendlyMessage = t("common.audioFocusCallMessage") || 
+                  const userFriendlyMessage =
+                    t("common.audioFocusCallMessage") ||
                     "Audio is still being used by another app. Please end the call or close other audio apps and try again.";
-                  
-                  // Show toast notification instead of setting error state
+
                   Toast.show({
                     type: "error",
                     text1: t("song.playbackError") || "Playback Error",
@@ -556,7 +670,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
                     autoHide: true,
                     topOffset: 60,
                   });
-                  
+
                   onError?.(userFriendlyMessage);
                   return;
                 }
@@ -591,7 +705,6 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               setRetryCount(0);
               setError(null);
               setIsRetrying(false);
-              setAudioFocusAvailable(true);
             }}
             className="bg-gray-600 py-2 px-4 rounded-lg"
           >
@@ -658,13 +771,29 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       </View>
 
       <View
-        className={`flex-row items-center justify-center ${
-          isRTL ? "flex-row-reverse" : ""
-        }`}
+        className={`flex-row items-center justify-center  `}
         style={{
-          gap: isSmallDevice ? 20 : 24,
+          gap: isSmallDevice ? 16 : 20,
+          direction: "ltr",
         }}
       >
+        {/* Previous Song Button */}
+        <TouchableOpacity
+          onPress={onPrevious}
+          disabled={!onPrevious}
+          style={{
+            padding: isSmallDevice ? 8 : 10,
+          }}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="play-skip-back"
+            size={isSmallDevice ? 20 : 24}
+            color={!onPrevious ? "#666" : "white"}
+          />
+        </TouchableOpacity>
+
+        {/* Skip Backward Button */}
         <TouchableOpacity
           onPress={skipBackward}
           disabled={!sound || isLoading}
@@ -673,13 +802,14 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           }}
           activeOpacity={0.7}
         >
-          <Ionicons
-            name="play-back-outline"
+          <FontAwesome6
+            name="arrow-rotate-left"
             size={isSmallDevice ? 20 : 24}
             color={!sound || isLoading ? "#666" : "white"}
           />
         </TouchableOpacity>
 
+        {/* Play/Pause Button */}
         <TouchableOpacity
           onPress={handlePlayPause}
           disabled={!sound || isLoading || isRetrying}
@@ -700,6 +830,8 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           )}
         </TouchableOpacity>
 
+        {/* Skip Forward Button */}
+
         <TouchableOpacity
           onPress={skipForward}
           disabled={!sound || isLoading}
@@ -708,10 +840,26 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           }}
           activeOpacity={0.7}
         >
-          <Ionicons
-            name="play-forward-outline"
+          <FontAwesome6
+            name="arrow-rotate-right"
             size={isSmallDevice ? 20 : 24}
             color={!sound || isLoading ? "#666" : "white"}
+          />
+        </TouchableOpacity>
+
+        {/* Next Song Button */}
+        <TouchableOpacity
+          onPress={onNext}
+          disabled={!onNext}
+          style={{
+            padding: isSmallDevice ? 8 : 10,
+          }}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="play-skip-forward"
+            size={isSmallDevice ? 20 : 24}
+            color={!onNext ? "#666" : "white"}
           />
         </TouchableOpacity>
       </View>
