@@ -85,7 +85,7 @@ export default function ServicesSection() {
       id: "tiktok-agency",
       title: t("services.servicesSection.services.tiktokAgency.title"),
       desc: t("services.servicesSection.services.tiktokAgency.description"),
-      image: require("../assets/images/Kit-Ba0DSf7D.png"),
+      image: require("../assets/images/image-4-DZP0YGzU.png"),
       comingSoon: true,
       gradientColors: ["#6366F1", "#4F46E5"],
       icon: "",
