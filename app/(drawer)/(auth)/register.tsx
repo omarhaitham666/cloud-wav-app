@@ -288,7 +288,7 @@ function RegisterScreen() {
                   }}
                 >
                   <Image
-                    source={require("../../../assets/images/register.png")}
+                    source={require("../../../assets/images/register.jpg")}
                     className="w-24 h-24"
                     resizeMode="contain"
                   />

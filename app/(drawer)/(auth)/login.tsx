@@ -263,7 +263,7 @@ function LoginScreen() {
                   }}
                 >
                   <Image
-                    source={require("../../../assets/images/login.png")}
+                    source={require("../../../assets/images/login.jpg")}
                     className="w-24 h-24"
                     resizeMode="contain"
                   />
