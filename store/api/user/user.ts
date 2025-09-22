@@ -151,10 +151,20 @@ const authApi = mainApi.injectEndpoints({
         }
     >({
       query: (body) => {
+        console.log("UpdateProfileARTISTORCREATORUser API call:", {
+          url: "/profile-update-request",
+          method: "POST",
+          isFormData: body instanceof FormData,
+          bodyType: typeof body
+        });
+        
         return {
           url: "/profile-update-request",
           method: "POST",
           data: body,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         };
       },
     }),

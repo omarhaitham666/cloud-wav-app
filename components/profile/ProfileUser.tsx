@@ -7,7 +7,7 @@ import {
 import { useAuth } from "@/store/auth-context";
 import { invalidateAllQueries } from "@/store/utils";
 import { AppFonts } from "@/utils/fonts";
-import { deleteToken } from "@/utils/secureStore";
+import { deleteToken, getToken } from "@/utils/secureStore";
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
@@ -116,11 +116,11 @@ const ProfileUser: React.FC = () => {
   const pickImage = useCallback(async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
-        base64: true,
+        base64: false, // Don't use base64, send as binary
       });
 
       if (!result.canceled && result.assets?.[0]?.uri) {
@@ -128,12 +128,46 @@ const ProfileUser: React.FC = () => {
         const fileName = asset.fileName || `image_${Date.now()}.jpg`;
         const mimeType = asset.mimeType || "image/jpeg";
 
+        // Validate file size (max 5MB)
+        if (asset.fileSize && asset.fileSize > 5 * 1024 * 1024) {
+          Toast.show({
+            type: "error",
+            text1: "File Too Large",
+            text2: "Please select an image smaller than 5MB",
+          });
+          return;
+        }
+
+        // Validate file type
+        if (!mimeType.startsWith('image/')) {
+          Toast.show({
+            type: "error",
+            text1: "Invalid File Type",
+            text2: "Please select a valid image file",
+          });
+          return;
+        }
+
+        console.log("Image selected:", {
+          fileName,
+          mimeType,
+          fileSize: asset.fileSize,
+          uri: asset.uri,
+          hasBase64: !!asset.base64
+        });
+
         setProfileImage(asset.uri);
         setImageFile({
           uri: asset.uri,
           name: fileName,
           type: mimeType,
-          base64: asset.base64,
+          base64: asset.base64, // Keep base64 as fallback
+        });
+
+        Toast.show({
+          type: "success",
+          text1: "Image Selected",
+          text2: "Image ready for upload",
         });
       }
     } catch (error) {
@@ -203,100 +237,174 @@ const ProfileUser: React.FC = () => {
         return;
       } else {
         if (imageFile && !isUserOnlyWithNoIds) {
-          if (imageFile.base64) {
+          try {
+            const binaryFormData = new FormData();
+            binaryFormData.append("name", formData.fullName.trim());
+            binaryFormData.append("type", userData?.type || "artist");
+            
+            // Create binary file object for FormData
+            const binaryFile = {
+              uri: imageFile.uri,
+              type: imageFile.type,
+              name: imageFile.name,
+            };
+            binaryFormData.append("profile_image", binaryFile as any);
+
+            console.log("Uploading image as binary with FormData:", {
+              name: formData.fullName.trim(),
+              type: userData?.type || "artist",
+              imageType: imageFile.type,
+              imageName: imageFile.name,
+              imageUri: imageFile.uri,
+              hasBase64: !!imageFile.base64
+            });
+
+            // Log FormData contents for debugging
+            console.log("FormData contents:");
             try {
-              const base64FormData = new FormData();
-              base64FormData.append("name", formData.fullName.trim());
-              base64FormData.append("type", userData?.type || "artist");
-              const base64File = {
-                uri: `data:${imageFile.type};base64,${imageFile.base64}`,
-                type: imageFile.type,
-                name: imageFile.name,
-              };
-              base64FormData.append("profile_image", base64File as any);
-
-              await updateProfileARTISTORCREATORUser(base64FormData)
-                .unwrap()
-                .then(() => {
-                  Toast.show({
-                    type: "success",
-                    text1:
-                      t("profile.user.updateSuccess") ||
-                      "Profile Updated Successfully",
-                  });
-                })
-                .catch((e) => {
-                  console.log("error", e);
-
-                  Toast.show({
-                    type: "error",
-                    text1: t("profile.user.updateFailed") || "Update Failed",
-                    text2: e.data.message || e.data.error,
-                  });
-                });
-              setValue("password", "");
-              setValue("confirmPassword", "");
-              setImageFile(null);
-              setProfileImage(null);
-              reset({
-                fullName: formData.fullName,
-                email: formData.email,
-                password: "",
-                confirmPassword: "",
-              });
-              refetch();
-              return;
-            } catch (base64Error) {
-              console.error("Base64 upload error:", base64Error);
-              const payload = {
-                email: formData.email.trim(),
-                new_name: formData.fullName.trim(),
-                type: "user",
-                password: formData.password ?? "",
-              };
-
-              await updateUser(payload)
-                .unwrap()
-                .then(() => {
-                  Toast.show({
-                    type: "success",
-                    text1:
-                      t("profile.user.updateSuccess") ||
-                      "Profile Updated Successfully",
-                  });
-                })
-                .catch((e) => {
-                  Toast.show({
-                    type: "error",
-                    text1: t("profile.user.updateFailed") || "Update Failed",
-                    text2: e.data.message,
-                  });
-                });
-
-              setValue("password", "");
-              setValue("confirmPassword", "");
-              setImageFile(null);
-              setProfileImage(null);
-              reset({
-                fullName: formData.fullName,
-                email: formData.email,
-                password: "",
-                confirmPassword: "",
-              });
-              refetch();
-
-              Toast.show({
-                type: "info",
-                text1:
-                  t("profile.user.profileUpdatedTextOnly") ||
-                  "Profile Updated (Text Only)",
-                text2:
-                  t("profile.user.imageUploadFailed") ||
-                  "Image upload failed, but text fields were updated successfully",
-              });
-
-              return;
+              if ('entries' in binaryFormData && typeof binaryFormData.entries === 'function') {
+                for (const [key, value] of (binaryFormData as any).entries()) {
+                  console.log(`${key}:`, typeof value === 'object' ? 'File object' : value);
+                }
+              } else {
+                console.log("FormData.entries() not available in this environment");
+                console.log("FormData object:", binaryFormData);
+              }
+            } catch (e) {
+              console.log("Could not iterate FormData entries:", e);
             }
+
+            // Try using fetch API like SongUploadForm does
+            try {
+              const token = await getToken("access_token");
+              console.log("Using fetch API for profile update");
+              
+              const response = await fetch(
+                "https://api.cloudwavproduction.com/api/profile-update-request",
+                {
+                  method: "POST",
+                  body: binaryFormData,
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+
+              if (!response.ok) {
+                const errorData = await response.text();
+                console.log("Fetch API error:", {
+                  status: response.status,
+                  statusText: response.statusText,
+                  errorData
+                });
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
+
+              const result = await response.json();
+              console.log("Profile update success with fetch:", result);
+              
+              Toast.show({
+                type: "success",
+                text1:
+                  t("profile.user.updateSuccess") ||
+                  "Profile Updated Successfully",
+              });
+            } catch (fetchError) {
+              console.log("Fetch API failed, trying RTK Query:", fetchError);
+              
+              // Fallback to RTK Query
+              await updateProfileARTISTORCREATORUser(binaryFormData)
+                .unwrap()
+                .then((response) => {
+                  console.log("Profile update success with RTK Query:", response);
+                  Toast.show({
+                    type: "success",
+                    text1:
+                      t("profile.user.updateSuccess") ||
+                      "Profile Updated Successfully",
+                  });
+                })
+                .catch((e) => {
+                  console.log("RTK Query also failed:", {
+                    error: e,
+                    status: e.status,
+                    data: e.data,
+                    message: e.message,
+                    stack: e.stack
+                  });
+
+                  Toast.show({
+                    type: "error",
+                    text1: t("profile.user.updateFailed") || "Update Failed",
+                    text2: e.data?.message || e.data?.error || e.message || "Unknown error occurred",
+                  });
+                });
+            }
+            
+            setValue("password", "");
+            setValue("confirmPassword", "");
+            setImageFile(null);
+            setProfileImage(null);
+            reset({
+              fullName: formData.fullName,
+              email: formData.email,
+              password: "",
+              confirmPassword: "",
+            });
+            refetch();
+            return;
+          } catch (uploadError) {
+            console.error("Binary upload error:", uploadError);
+            
+            // Fallback to text-only update
+            const payload = {
+              email: formData.email.trim(),
+              new_name: formData.fullName.trim(),
+              type: "user",
+              password: formData.password ?? "",
+            };
+
+            await updateUser(payload)
+              .unwrap()
+              .then(() => {
+                Toast.show({
+                  type: "success",
+                  text1:
+                    t("profile.user.updateSuccess") ||
+                    "Profile Updated Successfully",
+                });
+              })
+              .catch((e) => {
+                Toast.show({
+                  type: "error",
+                  text1: t("profile.user.updateFailed") || "Update Failed",
+                  text2: e.data?.message || e.message,
+                });
+              });
+
+            setValue("password", "");
+            setValue("confirmPassword", "");
+            setImageFile(null);
+            setProfileImage(null);
+            reset({
+              fullName: formData.fullName,
+              email: formData.email,
+              password: "",
+              confirmPassword: "",
+            });
+            refetch();
+
+            Toast.show({
+              type: "info",
+              text1:
+                t("profile.user.profileUpdatedTextOnly") ||
+                "Profile Updated (Text Only)",
+              text2:
+                t("profile.user.imageUploadFailed") ||
+                "Image upload failed, but text fields were updated successfully",
+            });
+
+            return;
           }
         } else {
           // For artists/creators without image, update text fields only

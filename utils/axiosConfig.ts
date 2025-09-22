@@ -13,8 +13,19 @@ mainApi.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${token}`;
     if (!(config.data instanceof FormData)) {
       config.headers["Content-Type"] = "application/json";
+    } else {
+      // For FormData, ensure Content-Type is set to multipart/form-data
+      if (!config.headers["Content-Type"]) {
+        config.headers["Content-Type"] = "multipart/form-data";
+      }
+      console.log("FormData request detected:", {
+        url: config.url,
+        method: config.method,
+        hasContentType: !!config.headers["Content-Type"],
+        contentType: config.headers["Content-Type"],
+        originalHeaders: config.headers
+      });
     }
-    // For FormData, let axios set the Content-Type with boundary
   }
 
   // Mark logout requests for special handling
@@ -24,6 +35,30 @@ mainApi.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+// Add response interceptor for debugging
+mainApi.interceptors.response.use(
+  (response) => {
+    console.log("API Response:", {
+      url: response.config.url,
+      method: response.config.method,
+      status: response.status,
+      data: response.data
+    });
+    return response;
+  },
+  (error) => {
+    console.log("API Error:", {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+      code: error.code
+    });
+    return Promise.reject(error);
+  }
+);
 
 export const axiosBaseQuery =
   ({ baseUrl }: { baseUrl: string } = { baseUrl: "" }) =>
