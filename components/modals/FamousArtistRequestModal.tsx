@@ -34,7 +34,7 @@ export default function FamousArtistRequestModal({
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
   const [isLoading, setIsLoading] = useState(false);
-  const screenHeight = Dimensions.get('window').height;
+  const screenHeight = Dimensions.get("window").height;
 
   const [formData, setFormData] = useState<FamousArtistRequest>({
     famous_name: "",
@@ -286,7 +286,7 @@ export default function FamousArtistRequestModal({
           },
         }
       );
-
+      console.log("Response:", response);
       if (response.status === 200 || response.status === 201) {
         Toast.show({
           type: "success",
@@ -615,288 +615,288 @@ export default function FamousArtistRequestModal({
       <View className="flex-1 justify-end">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ 
+          style={{
             height: screenHeight * 0.8,
-            zIndex: 1000 
+            zIndex: 1000,
           }}
         >
-          <View 
+          <View
             className="bg-white rounded-t-3xl"
             style={{ height: screenHeight * 0.8 }}
           >
-          <View
-            className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
-            style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
-          >
-            <Text
-              className="text-lg font-bold text-indigo-600"
-              style={{
-                fontFamily: AppFonts.bold,
-                textAlign: isRTL ? "right" : "left",
-              }}
+            <View
+              className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200"
+              style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
             >
-              {t("famousArtist.modal.title")}
-            </Text>
-            <TouchableOpacity onPress={onClose}>
               <Text
-                className="text-xl text-gray-600"
+                className="text-lg font-bold text-indigo-600"
                 style={{
-                  fontFamily: AppFonts.semibold,
+                  fontFamily: AppFonts.bold,
                   textAlign: isRTL ? "right" : "left",
                 }}
               >
-                {t("famousArtist.modal.close")}
+                {t("famousArtist.modal.title")}
               </Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            className="flex-1 px-6 pt-6"
-            showsVerticalScrollIndicator={false}
-          >
-            <View className="mb-6">
-              <Text
-                className="text-lg font-semibold text-gray-800 mb-4"
-                style={{
-                  fontFamily: AppFonts.semibold,
-                  textAlign: isRTL ? "right" : "left",
-                }}
-              >
-                {t("famousArtist.sections.personalInfo")}
-              </Text>
-
-              {renderInput(
-                "famous_name",
-                t("famousArtist.fields.name"),
-                t("famousArtist.placeholders.name"),
-                { required: true }
-              )}
-              {renderInput(
-                "famous_email",
-                t("famousArtist.fields.email"),
-                t("famousArtist.placeholders.email"),
-                {
-                  required: true,
-                  keyboardType: "email-address",
-                  autoCapitalize: "none",
-                }
-              )}
-              <View className="mb-5">
-                <View
-                  className="flex-row items-center mb-2"
-                  style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
-                >
-                  <Text
-                    className="text-gray-800 text-base"
-                    style={{
-                      fontFamily: AppFonts.medium,
-                      textAlign: isRTL ? "right" : "left",
-                    }}
-                  >
-                    {t("famousArtist.fields.phone")}
-                  </Text>
-                  <Text
-                    className={`text-red-500 ${isRTL ? "mr-1" : "ml-1"}`}
-                    style={{ textAlign: isRTL ? "right" : "left" }}
-                  >
-                    *
-                  </Text>
-                </View>
-                <View className="flex-row items-center border border-gray-300 rounded-xl bg-gray-50">
-                  <CountryPicker
-                    countryCode={phoneCountry.cca2 as any}
-                    withCallingCode
-                    withFlag
-                    withFilter
-                    withAlphaFilter
-                    onSelect={(country) => {
-                      setPhoneCountry({
-                        cca2: country.cca2 as string,
-                        callingCode: country.callingCode[0],
-                        name: country.name as string,
-                      });
-                    }}
-                    containerButtonStyle={{ paddingHorizontal: 10 }}
-                  />
-                  <Text
-                    className="px-2"
-                    style={{ textAlign: isRTL ? "right" : "left" }}
-                  >
-                    +{phoneCountry.callingCode}
-                  </Text>
-                  <TextInput
-                    className="flex-1 p-3"
-                    placeholder={
-                      t("famousArtist.placeholders.phone") ||
-                      "Enter phone number"
-                    }
-                    value={formData.famous_number}
-                    onChangeText={(value) =>
-                      handleInputChange("famous_number", value)
-                    }
-                    keyboardType="phone-pad"
-                    textAlign={isRTL ? "right" : "left"}
-                    style={{
-                      textAlign: isRTL ? "right" : "left",
-                      fontFamily: AppFonts.regular,
-                    }}
-                  />
-                </View>
-                {errors.famous_number && (
-                  <Text
-                    className="text-red-500 text-sm mt-1"
-                    style={{
-                      fontFamily: AppFonts.regular,
-                      textAlign: isRTL ? "right" : "left",
-                    }}
-                  >
-                    {errors.famous_number}
-                  </Text>
-                )}
-              </View>
-
-              {/* WhatsApp Number with Country Picker */}
-              <View className="mb-5">
-                <View
-                  className="flex-row items-center mb-2"
-                  style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
-                >
-                  <Text
-                    className="text-gray-800 text-base"
-                    style={{
-                      fontFamily: AppFonts.medium,
-                      textAlign: isRTL ? "right" : "left",
-                    }}
-                  >
-                    {t("famousArtist.fields.whatsapp")}
-                  </Text>
-                </View>
-                <View className="flex-row items-center border border-gray-300 rounded-xl bg-gray-50">
-                  <CountryPicker
-                    countryCode={whatsappCountry.cca2 as any}
-                    withCallingCode
-                    withFlag
-                    withFilter
-                    withAlphaFilter
-                    onSelect={(country) => {
-                      setWhatsappCountry({
-                        cca2: country.cca2 as string,
-                        callingCode: country.callingCode[0],
-                        name: country.name as string,
-                      });
-                    }}
-                    containerButtonStyle={{ paddingHorizontal: 10 }}
-                  />
-                  <Text
-                    className="px-2"
-                    style={{ textAlign: isRTL ? "right" : "left" }}
-                  >
-                    +{whatsappCountry.callingCode}
-                  </Text>
-                  <TextInput
-                    className="flex-1 p-3"
-                    placeholder={
-                      t("famousArtist.placeholders.whatsapp") ||
-                      "Enter WhatsApp number"
-                    }
-                    value={formData.famous_whatsapp_number}
-                    onChangeText={(value) =>
-                      handleInputChange("famous_whatsapp_number", value)
-                    }
-                    keyboardType="phone-pad"
-                    textAlign={isRTL ? "right" : "left"}
-                    style={{
-                      textAlign: isRTL ? "right" : "left",
-                      fontFamily: AppFonts.regular,
-                    }}
-                  />
-                </View>
-                {errors.famous_whatsapp_number && (
-                  <Text
-                    className="text-red-500 text-sm mt-1"
-                    style={{
-                      fontFamily: AppFonts.regular,
-                      textAlign: isRTL ? "right" : "left",
-                    }}
-                  >
-                    {errors.famous_whatsapp_number}
-                  </Text>
-                )}
-              </View>
-            </View>
-            <View className="mb-6">
-              <Text
-                className="text-lg font-semibold text-gray-800 mb-4"
-                style={{
-                  fontFamily: AppFonts.semibold,
-                  textAlign: isRTL ? "right" : "left",
-                }}
-              >
-                {t("famousArtist.sections.professionalInfo")}
-              </Text>
-
-              {renderDivisionPicker()}
-              {renderInput(
-                "famous_social_links",
-                t("famousArtist.fields.socialLinks"),
-                t("famousArtist.placeholders.socialLinks"),
-                { keyboardType: "url", autoCapitalize: "none" }
-              )}
-              {renderInput(
-                "famous_details",
-                t("famousArtist.fields.details"),
-                t("famousArtist.placeholders.details"),
-                { multiline: true }
-              )}
-            </View>
-
-            <View className="mb-8">
-              <Text
-                className="text-lg font-semibold text-gray-800 mb-4"
-                style={{
-                  fontFamily: AppFonts.semibold,
-                  textAlign: isRTL ? "right" : "left",
-                }}
-              >
-                {t("famousArtist.sections.documents")}
-              </Text>
-
-              {renderImagePicker(
-                "profile",
-                t("famousArtist.fields.profileImage"),
-                t("famousArtist.placeholders.selectProfile"),
-                profileImage,
-                "person"
-              )}
-              {renderImagePicker(
-                "id_card",
-                t("famousArtist.fields.idCard"),
-                t("famousArtist.placeholders.selectIdCard"),
-                idCardImage,
-                "card"
-              )}
-            </View>
-
-            <TouchableOpacity
-              className="bg-blue-600 py-3 rounded-full mb-16"
-              onPress={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
+              <TouchableOpacity onPress={onClose}>
                 <Text
-                  className="text-white text-center font-semibold"
+                  className="text-xl text-gray-600"
                   style={{
-                    fontFamily: AppFonts.bold,
-                    textAlign: "center",
+                    fontFamily: AppFonts.semibold,
+                    textAlign: isRTL ? "right" : "left",
                   }}
                 >
-                  {t("famousArtist.submit")}
+                  {t("famousArtist.modal.close")}
                 </Text>
-              )}
-            </TouchableOpacity>
-          </ScrollView>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              className="flex-1 px-6 pt-6"
+              showsVerticalScrollIndicator={false}
+            >
+              <View className="mb-6">
+                <Text
+                  className="text-lg font-semibold text-gray-800 mb-4"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                    textAlign: isRTL ? "right" : "left",
+                  }}
+                >
+                  {t("famousArtist.sections.personalInfo")}
+                </Text>
+
+                {renderInput(
+                  "famous_name",
+                  t("famousArtist.fields.name"),
+                  t("famousArtist.placeholders.name"),
+                  { required: true }
+                )}
+                {renderInput(
+                  "famous_email",
+                  t("famousArtist.fields.email"),
+                  t("famousArtist.placeholders.email"),
+                  {
+                    required: true,
+                    keyboardType: "email-address",
+                    autoCapitalize: "none",
+                  }
+                )}
+                <View className="mb-5">
+                  <View
+                    className="flex-row items-center mb-2"
+                    style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+                  >
+                    <Text
+                      className="text-gray-800 text-base"
+                      style={{
+                        fontFamily: AppFonts.medium,
+                        textAlign: isRTL ? "right" : "left",
+                      }}
+                    >
+                      {t("famousArtist.fields.phone")}
+                    </Text>
+                    <Text
+                      className={`text-red-500 ${isRTL ? "mr-1" : "ml-1"}`}
+                      style={{ textAlign: isRTL ? "right" : "left" }}
+                    >
+                      *
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center border border-gray-300 rounded-xl bg-gray-50">
+                    <CountryPicker
+                      countryCode={phoneCountry.cca2 as any}
+                      withCallingCode
+                      withFlag
+                      withFilter
+                      withAlphaFilter
+                      onSelect={(country) => {
+                        setPhoneCountry({
+                          cca2: country.cca2 as string,
+                          callingCode: country.callingCode[0],
+                          name: country.name as string,
+                        });
+                      }}
+                      containerButtonStyle={{ paddingHorizontal: 10 }}
+                    />
+                    <Text
+                      className="px-2"
+                      style={{ textAlign: isRTL ? "right" : "left" }}
+                    >
+                      +{phoneCountry.callingCode}
+                    </Text>
+                    <TextInput
+                      className="flex-1 p-3"
+                      placeholder={
+                        t("famousArtist.placeholders.phone") ||
+                        "Enter phone number"
+                      }
+                      value={formData.famous_number}
+                      onChangeText={(value) =>
+                        handleInputChange("famous_number", value)
+                      }
+                      keyboardType="phone-pad"
+                      textAlign={isRTL ? "right" : "left"}
+                      style={{
+                        textAlign: isRTL ? "right" : "left",
+                        fontFamily: AppFonts.regular,
+                      }}
+                    />
+                  </View>
+                  {errors.famous_number && (
+                    <Text
+                      className="text-red-500 text-sm mt-1"
+                      style={{
+                        fontFamily: AppFonts.regular,
+                        textAlign: isRTL ? "right" : "left",
+                      }}
+                    >
+                      {errors.famous_number}
+                    </Text>
+                  )}
+                </View>
+
+                {/* WhatsApp Number with Country Picker */}
+                <View className="mb-5">
+                  <View
+                    className="flex-row items-center mb-2"
+                    style={{ flexDirection: isRTL ? "row-reverse" : "row" }}
+                  >
+                    <Text
+                      className="text-gray-800 text-base"
+                      style={{
+                        fontFamily: AppFonts.medium,
+                        textAlign: isRTL ? "right" : "left",
+                      }}
+                    >
+                      {t("famousArtist.fields.whatsapp")}
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center border border-gray-300 rounded-xl bg-gray-50">
+                    <CountryPicker
+                      countryCode={whatsappCountry.cca2 as any}
+                      withCallingCode
+                      withFlag
+                      withFilter
+                      withAlphaFilter
+                      onSelect={(country) => {
+                        setWhatsappCountry({
+                          cca2: country.cca2 as string,
+                          callingCode: country.callingCode[0],
+                          name: country.name as string,
+                        });
+                      }}
+                      containerButtonStyle={{ paddingHorizontal: 10 }}
+                    />
+                    <Text
+                      className="px-2"
+                      style={{ textAlign: isRTL ? "right" : "left" }}
+                    >
+                      +{whatsappCountry.callingCode}
+                    </Text>
+                    <TextInput
+                      className="flex-1 p-3"
+                      placeholder={
+                        t("famousArtist.placeholders.whatsapp") ||
+                        "Enter WhatsApp number"
+                      }
+                      value={formData.famous_whatsapp_number}
+                      onChangeText={(value) =>
+                        handleInputChange("famous_whatsapp_number", value)
+                      }
+                      keyboardType="phone-pad"
+                      textAlign={isRTL ? "right" : "left"}
+                      style={{
+                        textAlign: isRTL ? "right" : "left",
+                        fontFamily: AppFonts.regular,
+                      }}
+                    />
+                  </View>
+                  {errors.famous_whatsapp_number && (
+                    <Text
+                      className="text-red-500 text-sm mt-1"
+                      style={{
+                        fontFamily: AppFonts.regular,
+                        textAlign: isRTL ? "right" : "left",
+                      }}
+                    >
+                      {errors.famous_whatsapp_number}
+                    </Text>
+                  )}
+                </View>
+              </View>
+              <View className="mb-6">
+                <Text
+                  className="text-lg font-semibold text-gray-800 mb-4"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                    textAlign: isRTL ? "right" : "left",
+                  }}
+                >
+                  {t("famousArtist.sections.professionalInfo")}
+                </Text>
+
+                {renderDivisionPicker()}
+                {renderInput(
+                  "famous_social_links",
+                  t("famousArtist.fields.socialLinks"),
+                  t("famousArtist.placeholders.socialLinks"),
+                  { keyboardType: "url", autoCapitalize: "none" }
+                )}
+                {renderInput(
+                  "famous_details",
+                  t("famousArtist.fields.details"),
+                  t("famousArtist.placeholders.details"),
+                  { multiline: true }
+                )}
+              </View>
+
+              <View className="mb-8">
+                <Text
+                  className="text-lg font-semibold text-gray-800 mb-4"
+                  style={{
+                    fontFamily: AppFonts.semibold,
+                    textAlign: isRTL ? "right" : "left",
+                  }}
+                >
+                  {t("famousArtist.sections.documents")}
+                </Text>
+
+                {renderImagePicker(
+                  "profile",
+                  t("famousArtist.fields.profileImage"),
+                  t("famousArtist.placeholders.selectProfile"),
+                  profileImage,
+                  "person"
+                )}
+                {renderImagePicker(
+                  "id_card",
+                  t("famousArtist.fields.idCard"),
+                  t("famousArtist.placeholders.selectIdCard"),
+                  idCardImage,
+                  "card"
+                )}
+              </View>
+
+              <TouchableOpacity
+                className="bg-blue-600 py-3 rounded-full mb-16"
+                onPress={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text
+                    className="text-white text-center font-semibold"
+                    style={{
+                      fontFamily: AppFonts.bold,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("famousArtist.submit")}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </View>
