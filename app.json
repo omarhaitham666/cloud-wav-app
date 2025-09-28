@@ -57,6 +57,12 @@
           "color": "#f9a826",
           "defaultChannel": "music-player"
         }
+      ],
+      [
+        "expo-auth-session",
+        {
+          "redirectUri": "https://auth.expo.io/@omar666/cloud-wav"
+        }
       ]
     ],
     "experiments": {

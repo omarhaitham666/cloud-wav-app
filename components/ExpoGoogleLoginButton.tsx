@@ -1,6 +1,7 @@
 import { GoogleIcon } from "@/assets/icons/GoogleIcon";
 import { makeRedirectUri } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
+import Constants from "expo-constants";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import React, { useEffect, useMemo, useState } from "react";
@@ -16,32 +17,27 @@ export default function ExpoGoogleLoginButton() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Force use Expo proxy to avoid redirect URI issues
+  const isExpoGo = Constants.appOwnership === "expo";
   const redirectUri = useMemo(() => {
-    // Always use Expo proxy for Google Auth
     return makeRedirectUri({
-      scheme: "cloudwav",
-      path: "oauth",
+      useProxy: isExpoGo,
+      native: "com.yourapp.bundleid:/oauthredirect", // For standalone builds
     });
-  }, []);
+  }, [isExpoGo]);
 
   console.log("Using Redirect URI:", redirectUri);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    // Use Web Client ID for all platforms when using Expo proxy
-    clientId:
-      "620097653378-u9do7hco0so0r76191n8bthgvkuhnejt.apps.googleusercontent.com",
-
-    // Don't specify platform-specific client IDs when using proxy
-    // androidClientId: undefined,
-    // webClientId: undefined,
-
+    expoClientId:
+      "620097653378-dnki0i54cepum6oag9slv9htprc9q7ff.apps.googleusercontent.com", // Web Client ID for Expo Go
+    androidClientId:
+      "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com", // For standalone Android
+    webClientId:
+      "620097653378-dnki0i54cepum6oag9slv9htprc9q7ff.apps.googleusercontent.com",
     responseType: "id_token",
     scopes: ["openid", "profile", "email"],
-    extraParams: {
-      prompt: "select_account",
-    },
-    redirectUri,
+    extraParams: { prompt: "select_account" },
+    redirectUri: redirectUri,
   });
 
   useEffect(() => {
@@ -49,32 +45,28 @@ export default function ExpoGoogleLoginButton() {
 
     setIsLoading(false);
 
-    console.log("Auth response type:", response.type);
+    console.log("Full auth response:", JSON.stringify(response, null, 2));
 
     if (response.type === "success") {
       const { id_token } = response.params || {};
-      console.log("Success! ID Token received:", !!id_token);
-
-      setErrorMsg(null);
-
+      console.log("Success! ID Token:", id_token);
       if (id_token) {
         handleAuthResponse(id_token);
       } else {
         console.error("No id_token in success response");
       }
     } else if (response.type === "error") {
-      const err = (response as any)?.error || {};
-      console.error("Google Auth Error Full Details:", {
-        error: err,
+      console.error("Google Auth Error:", {
+        error: response.error,
+        errorDescription: response.error?.description,
         params: response.params,
         redirectUri,
       });
-
-      setErrorMsg(err.error_description || err.error || "Unknown error");
+      setErrorMsg(response.error?.description || "Unknown error");
       Toast.show({
         type: "error",
         text1: t("auth.error"),
-        text2: err.error_description || "Authentication failed",
+        text2: response.error?.description || "Authentication failed",
       });
     } else if (response.type === "cancel") {
       console.log("Auth cancelled by user");
@@ -96,15 +88,14 @@ export default function ExpoGoogleLoginButton() {
     console.log("Request details:", {
       redirectUri,
       clientId:
-        "620097653378-u9do7hco0so0r76191n8bthgvkuhnejt.apps.googleusercontent.com",
+        "620097653378-dnki0i54cepum6oag9slv9htprc9q7ff.apps.googleusercontent.com", // Match Web Client ID
     });
 
     setIsLoading(true);
     setErrorMsg(null);
 
-    // Always use proxy with these settings
     promptAsync({
-      useProxy: true,
+      useProxy: isExpoGo, // Use proxy only in Expo Go
       showInRecents: true,
     });
   };
@@ -112,7 +103,7 @@ export default function ExpoGoogleLoginButton() {
   const handleAuthResponse = async (idToken: string) => {
     try {
       setIsInProgress(true);
-      console.log("Processing auth response...");
+      console.log("Processing auth response with ID Token:", idToken);
 
       const apiResponse = await fetch(
         "https://api.cloudwavproduction.com/api/auth/google/mobile",
@@ -121,14 +112,14 @@ export default function ExpoGoogleLoginButton() {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Authorization: "Bearer " + idToken,
+            Authorization: `Bearer ${idToken}`,
           },
           body: JSON.stringify({ token: idToken }),
         }
       );
 
       const result = await apiResponse.json();
-      console.log("Backend response status:", apiResponse.status);
+      console.log("Backend response:", { status: apiResponse.status, result });
 
       if (apiResponse.ok) {
         console.log("Auth successful, navigating to profile...");
@@ -160,7 +151,6 @@ export default function ExpoGoogleLoginButton() {
     }
   };
 
-  // Show loading while request is being prepared
   if (!request) {
     return (
       <View className="bg-gray-100 border border-gray-300 py-3 px-4 mb-5 rounded-md flex-row items-center justify-center">
