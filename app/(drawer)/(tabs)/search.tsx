@@ -76,7 +76,7 @@ const Search = () => {
   const handleCategoryPress = (categoryId: string) => {
     setActiveCategory(categoryId);
     if (categoryId === "all") {
-      setSearchQuery("");
+      setSearchQuery("all");
     } else {
       setSearchQuery(categoryId);
     }

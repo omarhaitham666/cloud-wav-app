@@ -16,13 +16,12 @@ export function getGoogleAuthConfig(): GoogleAuthConfig {
   return {
     clientId: isExpoGo
       ? process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
-        "620097653378-8t12ljiavs9l5cgd5qvde19ia56a7d84.apps.googleusercontent.com"
+        "620097653378-u9do7hco0so0r76191n8bthgvkuhnejt.apps.googleusercontent.com"
       : Platform.OS === "android"
       ? "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com"
-      : "620097653378-0268ntbcmlqq3j8efk56fgti0fqj5j1s.apps.googleusercontent.com",
+      : "620097653378-u9do7hco0so0r76191n8bthgvkuhnejt.apps.googleusercontent.com",
     redirectUri: isExpoGo
-      ? process.env.EXPO_PUBLIC_GOOGLE_REDIRECT_URI ||
-        "https://auth.expo.io/@omar666/cloud-wav" // ✅ بدون مسافات!
+      ? "https://auth.expo.io/@omar666/cloud-wav"
       : makeRedirectUri({ scheme: "cloudwav", path: "auth" }),
     environment: isExpoGo ? "expo" : "standalone",
   };
